@@ -82,12 +82,20 @@ AI_Resume_Analyzer/
 │   ├── schema.sql            # Tables: Users, Jobs, Resumes, Analysis_History
 │   └── seed.sql              # 8 pre-configured job roles with descriptions & skills
 │
+├── .gitignore                # Git ignore rules for node_modules, .env, and temp files
 └── README.md
 ```
 
 ---
 
 ## 🚀 Quick Start
+
+### 0. Clone the Repository
+
+```bash
+git clone https://github.com/SartazEAlam/AstraAI-AI_Resume_Analyzer.git
+cd AstraAI-AI_Resume_Analyzer
+```
 
 ### Prerequisites
 
@@ -120,7 +128,7 @@ The ML service will be available at `http://localhost:8000`.
 ```bash
 cd backend
 cp .env.example .env
-# Edit .env and set your MySQL password
+# Edit .env and set your MySQL password (DB_PASSWORD)
 npm install
 npm start
 ```
@@ -269,6 +277,14 @@ cd backend && npm run dev
 # ML service (auto-reload)
 cd ml_service && uvicorn main:app --reload --port 8000
 ```
+
+---
+
+## ❓ Troubleshooting & FAQs
+
+- **MySQL `Access Denied` Error**: Ensure your MySQL service is running and the `DB_PASSWORD` in `backend/.env` matches your root MySQL password.
+- **spaCy Model Not Found (`Can't find model 'en_core_web_sm'`)**: Run `python -m spacy download en_core_web_sm` in your terminal.
+- **Frontend Port**: The React app runs by default at `http://localhost:3000` (configured in `vite.config.js`).
 
 ---
 
