@@ -15,7 +15,8 @@ import {
   BrainCircuit,
   ArrowRight,
   Briefcase,
-  Calendar
+  Calendar,
+  Download
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 
@@ -838,6 +839,14 @@ function App() {
                           <h2 className="text-3xl font-black text-slate-900">Analysis Results</h2>
                           <p className="text-slate-400">Comprehensive breakdown of your professional profile</p>
                         </div>
+                        <button
+  onClick={() => window.print()}
+  className="px-4 py-2 bg-slate-800/80 hover:bg-slate-700 text-slate-200 rounded-xl text-sm font-medium border border-slate-700 transition-all flex items-center gap-2 shadow-sm"
+>
+  <Download className="w-4 h-4" />
+  Print / Export PDF
+</button>
+
                         <button 
                           onClick={() => { setResults(null); setFile(null); setFileName(''); }}
                           className="text-xs font-bold uppercase tracking-widest text-indigo-400 hover:text-indigo-300 transition-colors"
@@ -860,14 +869,16 @@ function App() {
                           colorClass="stroke-purple-500"
                         />
                         <ScoreRing
-                          score={Math.round(Math.min(
-                            100,
-                            ((results.extracted_skills?.length || 0) / 15) * 100
-                          ))}
-                          label="Skill Coverage"
-                          icon={CheckCircle2}
-                          colorClass="stroke-cyan-500"
-                        />
+  score={
+    results.required_skill_count > 0
+      ? Math.round((results.matched_skill_count / results.required_skill_count) * 100)
+      : Math.round(Math.min(100, ((results.extracted_skills?.length || 0) / 15) * 100))
+  }
+  label={results.required_skill_count > 0 ? "Target Skill Match" : "Skill Breadth"}
+  icon={CheckCircle2}
+  colorClass="stroke-cyan-500"
+/>
+
                       </div>
                     </div>
 
