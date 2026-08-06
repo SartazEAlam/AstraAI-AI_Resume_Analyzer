@@ -1,0 +1,23 @@
+{
+  "name": "resume-analyzer-backend",
+  "version": "1.0.0",
+  "description": "Node.js backend for AI Resume Analyzer",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.8",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.9.7",
+    "pdf-parse": "^1.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0",
+    "pdf-lib": "^1.17.1"
+  }
+}
