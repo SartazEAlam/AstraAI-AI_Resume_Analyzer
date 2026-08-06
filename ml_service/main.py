@@ -19,17 +19,31 @@ app = FastAPI()
 # ── Master Technical Skills List (Gazetteer) ──
 # In a real production app, this would be a database table or a 10,000+ word library.
 TECHNICAL_SKILLS = {
-    "python", "javascript", "java", "c++", "c#", "php", "ruby", "swift", "go", "rust", "sql", "nosql",
-    "react", "reactjs", "node", "nodejs", "express", "angular", "vue", "nextjs", "django", "flask", "fastapi",
-    "html", "css", "tailwind", "bootstrap", "sass", "typescript", "jquery", "redux", "graphql",
-    "postgresql", "mysql", "mongodb", "redis", "oracle", "sqlite", "firebase", "cassandra",
-    "aws", "azure", "gcp", "docker", "kubernetes", "jenkins", "git", "github", "gitlab", "terraform", "ansible",
-    "machine learning", "deep learning", "nlp", "natural language processing", "cv", "computer vision",
-    "pytorch", "tensorflow", "keras", "scikit-learn", "pandas", "numpy", "matplotlib", "seaborn", "nltk", "spacy",
-    "data science", "data analysis", "tableau", "power bi", "excel", "statistics", "r programming",
-    "rest api", "soap", "microservices", "agile", "scrum", "devops", "ci/cd", "linux", "unix", "bash", "shell",
-    "cybersecurity", "penetration testing", "firewall", "encryption", "blockchain", "solidity"
+    # Programming Languages
+    "python", "javascript", "typescript", "java", "c++", "c", "c#", "php", "ruby", "swift", "go", "rust", "kotlin", "scala", "dart", "r", "r programming", "matlab", "solidity", "perl", "bash", "shell", "powershell",
+    
+    # Frontend Frameworks & Libraries
+    "react", "react.js", "reactjs", "next.js", "nextjs", "vue", "vue.js", "vuejs", "nuxt.js", "angular", "angularjs", "svelte", "sveltekit", "redux", "redux toolkit", "mobx", "zustand", "html", "html5", "css", "css3", "sass", "scss", "tailwind", "tailwind css", "bootstrap", "material ui", "chakra ui", "shadcn", "jquery", "webpack", "vite", "babel", "responsive design",
+    
+    # Backend Frameworks & Runtimes
+    "node", "node.js", "nodejs", "express", "express.js", "nestjs", "fastapi", "django", "flask", "spring", "spring boot", "ruby on rails", "laravel", "asp.net", ".net", "graphql", "rest api", "rest apis", "restful api", "microservices", "grpc", "websockets", "authentication", "jwt", "oauth",
+    
+    # Databases & ORMs
+    "sql", "mysql", "postgresql", "postgres", "mongodb", "sqlite", "redis", "cassandra", "dynamodb", "elasticsearch", "mariadb", "oracle", "firebase", "supabase", "prisma", "sequelize", "typeorm", "mongoose", "nosql",
+    
+    # Cloud & DevOps
+    "aws", "amazon web services", "azure", "gcp", "google cloud", "docker", "kubernetes", "k8s", "terraform", "ansible", "jenkins", "gitlab ci", "github actions", "ci/cd", "linux", "unix", "nginx", "apache", "prometheus", "grafana", "monitoring", "serverless", "lambda",
+    
+    # Data Science, AI & Machine Learning
+    "machine learning", "deep learning", "nlp", "natural language processing", "cv", "computer vision", "artificial intelligence", "generative ai", "llm", "large language models", "langchain", "llama", "openai", "huggingface", "pytorch", "tensorflow", "keras", "scikit-learn", "sklearn", "pandas", "numpy", "matplotlib", "seaborn", "scipy", "spacy", "nltk", "opencv", "data science", "data analysis", "data visualization", "tableau", "power bi", "excel", "statistics", "jupyter", "etl", "spark", "hadoop", "airflow",
+    
+    # Version Control, Tools & Methodologies
+    "git", "github", "gitlab", "bitbucket", "jira", "confluence", "agile", "scrum", "kanban", "postman", "figma", "unit testing", "jest", "pytest", "cypress", "selenium",
+    
+    # Security
+    "cybersecurity", "penetration testing", "network security", "firewall", "encryption", "vulnerability assessment", "siem", "incident response", "owasp", "ethical hacking", "soc"
 }
+
 TECHNICAL_SKILLS.update({
     "webpack",
     "responsive design",
@@ -360,27 +374,33 @@ def extract_experience(text: str) -> dict:
 
         "is_student": is_student
     }
-def normalize_skill(skill):
+def normalize_skill(skill: str) -> str:
     skill = skill.lower().strip()
-
     mappings = {
         "react.js": "react",
         "reactjs": "react",
-
+        "next.js": "nextjs",
+        "vue.js": "vue",
+        "vuejs": "vue",
         "node.js": "nodejs",
+        "node": "nodejs",
         "express.js": "express",
-
         "tailwind css": "tailwind",
-
         "rest apis": "rest api",
         "restful api": "rest api",
-
         "data visualization": "data analysis",
-
-        "network security": "cybersecurity"
+        "network security": "cybersecurity",
+        "k8s": "kubernetes",
+        "postgres": "postgresql",
+        "mongo": "mongodb",
+        "sklearn": "scikit-learn",
+        "scikit learn": "scikit-learn",
+        "amazon web services": "aws",
+        "google cloud": "gcp",
+        "r programming": "r"
     }
-
     return mappings.get(skill, skill)
+
 @app.post("/analyze")
 def analyze_resume(request: AnalysisRequest):
     try:
@@ -631,7 +651,7 @@ def analyze_resume(request: AnalysisRequest):
         
 
         return {
-            "match_percentage": round(final_match_percentage * 100, 2) if final_match_percentage <= 1 else final_match_percentage,
+            "match_percentage": round(final_match_percentage, 2),
             "missing_skills": missing_skills,
             "matched_skills": matched_skills,
             "strength_score": round(strength_score, 2),
