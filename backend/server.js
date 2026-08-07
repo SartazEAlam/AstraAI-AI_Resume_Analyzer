@@ -3,7 +3,9 @@ const multer = require('multer');
 const axios = require('axios');
 const cors = require('cors');
 const fs = require('fs');
+const path = require('path');
 const pdfParse = require('pdf-parse');
+const mammoth = require('mammoth');
 const mysql = require('mysql2/promise');
 require('dotenv').config();
 
@@ -39,6 +41,58 @@ const safeCleanup = (filePath) => {
     }
 };
 
+// ── Multi-Format Text Extraction Helper ──
+const extractTextFromFile = async (filePath, originalName) => {
+    const ext = path.extname(originalName || '').toLowerCase();
+    const dataBuffer = fs.readFileSync(filePath);
+
+    if (ext === '.pdf') {
+        const pdfData = await pdfParse(dataBuffer);
+        return pdfData.text ? pdfData.text.trim() : '';
+    } else if (ext === '.docx') {
+        const result = await mammoth.extractRawText({ buffer: dataBuffer });
+        return result.value ? result.value.trim() : '';
+    } else if (ext === '.doc') {
+        // Try mammoth first (modern Word often saves as .doc while using docx XML)
+        try {
+            const docxResult = await mammoth.extractRawText({ buffer: dataBuffer });
+            if (docxResult.value && docxResult.value.trim().length > 20) {
+                return docxResult.value.trim();
+            }
+        } catch (_) {}
+
+        // Fallback for legacy binary .doc (Word 97-2003): extract readable text runs
+        const rawStr = dataBuffer.toString('latin1');
+        const matches = rawStr.match(/[\x20-\x7E\r\n\t]{4,}/g);
+        if (matches && matches.length > 0) {
+            return matches
+                .filter(chunk => !chunk.startsWith('bjbj') && !chunk.startsWith('WordDocument'))
+                .join(' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+        return '';
+    } else if (ext === '.rtf') {
+        const rtfStr = dataBuffer.toString('utf-8');
+        return rtfStr
+            .replace(/\\par[d]?/gi, '\n')
+            .replace(/\{\\*?\\[^{}]+;?\}|[{}]|\\[a-z0-9]+/gi, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    } else if (['.txt', '.text', '.md', '.csv'].includes(ext)) {
+        return dataBuffer.toString('utf-8').trim();
+    } else {
+        // Unknown extension fallback: try mammoth then plain text
+        try {
+            const fallbackResult = await mammoth.extractRawText({ buffer: dataBuffer });
+            if (fallbackResult.value && fallbackResult.value.trim()) {
+                return fallbackResult.value.trim();
+            }
+        } catch (_) {}
+        return dataBuffer.toString('utf-8').trim();
+    }
+};
+
 // ── Health Check ──
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'Backend is running!' });
@@ -65,28 +119,23 @@ app.post('/api/upload', upload.single('resume'), async (req, res) => {
 
         const jobId = req.body.jobId;
 
-        // 1. Read the uploaded file
-        const dataBuffer = fs.readFileSync(req.file.path);
-
-        // 2. Extract text from the PDF
+        // 1. Extract text from uploaded document (PDF, DOCX, DOC, TXT, RTF, MD)
         let extractedText = '';
-        if (req.file.originalname.toLowerCase().endsWith('.pdf')) {
-            try {
-                const pdfData = await pdfParse(dataBuffer);
-                extractedText = pdfData.text ? pdfData.text.trim() : '';
-            } catch (pdfErr) {
-                console.error('PDF parsing error:', pdfErr.message);
-                safeCleanup(req.file.path);
-                return res.status(400).json({ error: 'Failed to read the PDF. The file might be corrupted, password-protected, or not a valid PDF.' });
-            }
-        } else {
-            // For DOCX or other formats, read as UTF-8 text (basic fallback)
-            extractedText = dataBuffer.toString('utf-8').trim();
+        try {
+            extractedText = await extractTextFromFile(req.file.path, req.file.originalname);
+        } catch (extractErr) {
+            console.error('File parsing error:', extractErr.message);
+            safeCleanup(req.file.path);
+            return res.status(400).json({ 
+                error: `Failed to read ${req.file.originalname}. The file may be corrupted, password-protected, or in an unsupported format.` 
+            });
         }
 
-        if (!extractedText) {
+        if (!extractedText || extractedText.trim().length === 0) {
             safeCleanup(req.file.path);
-            return res.status(400).json({ error: 'No readable text found in the uploaded file. Please ensure the document is not an image-based PDF or an empty file.' });
+            return res.status(400).json({ 
+                error: 'No readable text found in the uploaded file. Please ensure the document contains extractable text and is not an image scan.' 
+            });
         }
 
         // 3. Get the Job Description from MySQL
@@ -137,10 +186,11 @@ app.post('/api/upload', upload.single('resume'), async (req, res) => {
 
         // 5. Save analysis results to MySQL (optional — won't break if DB is down)
         try {
+            const safeJobId = jobId && !isNaN(parseInt(jobId, 10)) ? parseInt(jobId, 10) : null;
             await pool.query(
                 `INSERT INTO Analysis_History (resume_id, job_id, match_percentage, missing_skills, strength_score)
                  VALUES (?, ?, ?, ?, ?)`,
-                [null, jobId, pythonResponse.data.match_percentage, JSON.stringify(pythonResponse.data.missing_skills), pythonResponse.data.strength_score]
+                [null, safeJobId, pythonResponse.data.match_percentage, JSON.stringify(pythonResponse.data.missing_skills || []), pythonResponse.data.strength_score]
             );
         } catch (saveErr) {
             console.warn('Could not save analysis to DB:', saveErr.message);
