@@ -70,7 +70,7 @@ const Navbar = ({ mode, setMode }) => (
   </nav>
 );
 
-const ScoreRing = ({ score, label, icon: Icon, colorClass }) => {
+const ScoreRing = ({ score, label, badge, icon: Icon, colorClass }) => {
   const isNA = score === null || score === undefined;
 
   const displayScore = isNA ? 0 : Math.min(100, Math.max(0, score));
@@ -79,7 +79,12 @@ const ScoreRing = ({ score, label, icon: Icon, colorClass }) => {
   const offset = circumference - (displayScore / 100) * circumference;
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-3 text-center">
+      {badge && (
+        <span className="text-[11px] font-bold px-3 py-1 rounded-full shadow-sm max-w-[220px] truncate bg-indigo-50 text-indigo-700 border border-indigo-200/80">
+          {badge}
+        </span>
+      )}
       <div className="relative w-36 h-36">
         <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
           <circle
@@ -105,16 +110,123 @@ const ScoreRing = ({ score, label, icon: Icon, colorClass }) => {
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-xl font-black text-slate-900">
+          <span className="text-2xl font-black text-slate-900">
             {isNA ? "N/A" : `${Math.round(displayScore)}%`}
           </span>
         </div>
       </div>
       <div className="flex items-center gap-2">
         <Icon className="w-4 h-4 text-slate-400" />
-        <span className="text-xs font-bold uppercase tracking-widest text-slate-400">
+        <span className="text-xs font-bold uppercase tracking-widest text-slate-500">
           {label}
         </span>
+      </div>
+    </div>
+  );
+};
+
+const DualScoreRing = ({ topScore, topRole, globalScore }) => {
+  const isTopNA = topScore === null || topScore === undefined;
+  const isGlobalNA = globalScore === null || globalScore === undefined;
+
+  const displayTop = isTopNA ? 0 : Math.min(100, Math.max(0, topScore));
+  const displayGlobal = isGlobalNA
+    ? 0
+    : Math.min(100, Math.max(0, globalScore));
+
+  const radius = 30;
+  const circumference = 2 * Math.PI * radius;
+  const topOffset = circumference - (displayTop / 100) * circumference;
+  const globalOffset = circumference - (displayGlobal / 100) * circumference;
+
+  return (
+    <div className="flex flex-col items-center gap-2 w-full">
+      <div className="flex items-center justify-center gap-3 w-full">
+        {/* Ring 1: Top Fit Domain */}
+        <div className="flex flex-col items-center gap-1.5 flex-1 min-w-0">
+          <span
+            className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/80 max-w-[120px] truncate"
+            title={`Top Match: ${topRole || "General"}`}
+          >
+            🎯 {topRole || "Top Fit"}
+          </span>
+          <div className="relative w-24 h-24">
+            <svg className="w-full h-full -rotate-90" viewBox="0 0 76 76">
+              <circle
+                cx="38"
+                cy="38"
+                r={radius}
+                className="stroke-slate-200"
+                strokeWidth="6"
+                fill="none"
+              />
+              <motion.circle
+                cx="38"
+                cy="38"
+                r={radius}
+                className="stroke-indigo-500"
+                strokeWidth="6"
+                fill="none"
+                strokeLinecap="round"
+                initial={{ strokeDashoffset: circumference }}
+                animate={{ strokeDashoffset: topOffset }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+                style={{ strokeDasharray: circumference }}
+              />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-lg font-black text-slate-900">
+                {isTopNA ? "N/A" : `${Math.round(displayTop)}%`}
+              </span>
+            </div>
+          </div>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 text-center">
+            Single Best
+          </span>
+        </div>
+
+        {/* Ring 2: Global Market Fit */}
+        <div className="flex flex-col items-center gap-1.5 flex-1 min-w-0">
+          <span
+            className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 max-w-[120px] truncate"
+            title="Evaluated across all 54 jobs in all sectors"
+          >
+            🌐 All 54 Jobs
+          </span>
+          <div className="relative w-24 h-24">
+            <svg className="w-full h-full -rotate-90" viewBox="0 0 76 76">
+              <circle
+                cx="38"
+                cy="38"
+                r={radius}
+                className="stroke-slate-200"
+                strokeWidth="6"
+                fill="none"
+              />
+              <motion.circle
+                cx="38"
+                cy="38"
+                r={radius}
+                className="stroke-emerald-500"
+                strokeWidth="6"
+                fill="none"
+                strokeLinecap="round"
+                initial={{ strokeDashoffset: circumference }}
+                animate={{ strokeDashoffset: globalOffset }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+                style={{ strokeDasharray: circumference }}
+              />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-lg font-black text-slate-900">
+                {isGlobalNA ? "N/A" : `${displayGlobal}%`}
+              </span>
+            </div>
+          </div>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 text-center">
+            Overall Market
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -193,14 +305,372 @@ const LoadingOverlay = () => (
   </div>
 );
 
-const CandidateModal = ({ candidate, onClose }) => {
+/* ── Formal Executive Resume Assessment & ATS Audit Report ── */
+const ExecutiveReport = ({ results, fileName, jobTitle, category }) => {
+  if (!results) return null;
+
+  const isTargetJob = results.required_skill_count > 0;
+  const targetScore = Math.round(results.match_percentage || 0);
+  const topRoleScore = Math.round(results.top_role_match || results.match_percentage || 0);
+  const globalScore = results.global_market_match != null ? results.global_market_match : 0;
+  const strengthScore = Math.round(results.strength_score || 0);
+  const bestRole = results.best_role || "General Professional";
+  const totalSkills = results.extracted_skills?.length || 0;
+  const missingSkillsCount = results.missing_skills?.length || 0;
+
+  const getVerdict = (score) => {
+    if (score >= 80) return { label: "EXCEPTIONAL MATCH", badge: "bg-emerald-600 text-white", grade: "A+" };
+    if (score >= 65) return { label: "STRONG CANDIDATE", badge: "bg-indigo-600 text-white", grade: "A" };
+    if (score >= 50) return { label: "MODERATE FIT", badge: "bg-amber-600 text-white", grade: "B" };
+    return { label: "GROWTH OPPORTUNITY", badge: "bg-rose-600 text-white", grade: "C" };
+  };
+
+  const primaryScore = isTargetJob ? targetScore : topRoleScore;
+  const verdict = getVerdict(primaryScore);
+
+  const reportDate = new Date().toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  const docId = Math.abs(
+    (fileName || "RESUME").split("").reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) | 0, 0)
+  ).toString(16).toUpperCase().padStart(6, "0");
+
+  return (
+    <div className="report-root bg-white text-slate-900 border border-slate-200 rounded-3xl p-8 md:p-12 shadow-xl space-y-8 font-sans">
+      {/* Report Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b-2 border-slate-900 gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-md">
+            <BrainCircuit className="w-7 h-7" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-black tracking-tight text-slate-900 uppercase">
+                Astra Career Intelligence
+              </h1>
+              <span className="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider bg-indigo-100 text-indigo-800 rounded">
+                Official Report
+              </span>
+            </div>
+            <p className="text-xs font-semibold text-slate-500 tracking-wider uppercase">
+              Executive Resume Evaluation & ATS Readiness Audit
+            </p>
+          </div>
+        </div>
+
+        <div className="text-left md:text-right space-y-1">
+          <div className="text-xs text-slate-500 font-bold uppercase tracking-wider">
+            Evaluation Date
+          </div>
+          <div className="text-sm font-black text-slate-800">{reportDate}</div>
+          <div className="text-[11px] font-mono text-slate-400">
+            REF: AST-{docId}
+          </div>
+        </div>
+      </div>
+
+      {/* Candidate Profile Summary Box */}
+      <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div>
+          <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+            Candidate Document
+          </div>
+          <div className="text-base font-black text-slate-900 truncate" title={fileName}>
+            {fileName || "Candidate Resume"}
+          </div>
+          <div className="text-xs text-slate-500 mt-0.5">
+            {results.experience?.seniority_level || "Professional"} Level
+          </div>
+        </div>
+
+        <div>
+          <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+            Evaluation Target
+          </div>
+          <div className="text-base font-black text-indigo-600 truncate">
+            {isTargetJob ? (jobTitle || "Specific Target Role") : "Multi-Sector Screening"}
+          </div>
+          <div className="text-xs text-slate-500 mt-0.5">
+            {category || "Global Industry Benchmark (54 Roles)"}
+          </div>
+        </div>
+
+        <div>
+          <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+            Total Experience
+          </div>
+          <div className="text-base font-black text-slate-900">
+            {results.experience?.total_years != null
+              ? `${results.experience.total_years} Year${results.experience.total_years !== 1 ? "s" : ""}`
+              : "Not Specified"}
+          </div>
+          <div className="text-xs text-slate-500 mt-0.5">Verified Timeline</div>
+        </div>
+
+        <div>
+          <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+            ATS Readiness Grade
+          </div>
+          <div className="flex items-center gap-2">
+            <span className={`px-2.5 py-0.5 rounded-lg text-sm font-black ${verdict.badge}`}>
+              Grade {verdict.grade}
+            </span>
+            <span className="text-xs font-bold text-slate-700">{verdict.label}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 4-Card Executive Scorecard */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Card 1: Primary Fit */}
+        <div className="p-5 rounded-2xl bg-indigo-50/60 border-2 border-indigo-200 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-indigo-700">
+              {isTargetJob ? "Target Match" : "Single Best Fit"}
+            </span>
+            <Target className="w-4 h-4 text-indigo-600" />
+          </div>
+          <div className="text-3xl font-black text-indigo-900 my-1">
+            {primaryScore}%
+          </div>
+          <p className="text-xs text-indigo-700/80 font-medium">
+            {isTargetJob ? `Role alignment for ${jobTitle}` : `Top match for ${bestRole}`}
+          </p>
+        </div>
+
+        {/* Card 2: Market / Skill Breadth */}
+        <div className="p-5 rounded-2xl bg-cyan-50/60 border-2 border-cyan-200 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-cyan-800">
+              {isTargetJob ? "Skill Match Ratio" : "Overall Market Fit"}
+            </span>
+            <TrendingUp className="w-4 h-4 text-cyan-600" />
+          </div>
+          <div className="text-3xl font-black text-cyan-950 my-1">
+            {isTargetJob
+              ? `${Math.round(((results.matched_skill_count || 0) / (results.required_skill_count || 1)) * 100)}%`
+              : `${globalScore}%`}
+          </div>
+          <p className="text-xs text-cyan-800/80 font-medium">
+            {isTargetJob
+              ? `${results.matched_skill_count} of ${results.required_skill_count} skills matched`
+              : "Normalized across all 54 global database roles"}
+          </p>
+        </div>
+
+        {/* Card 3: Resume Strength */}
+        <div className="p-5 rounded-2xl bg-purple-50/60 border-2 border-purple-200 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-purple-700">
+              Resume Strength
+            </span>
+            <Zap className="w-4 h-4 text-purple-600" />
+          </div>
+          <div className="text-3xl font-black text-purple-950 my-1">
+            {strengthScore}/100
+          </div>
+          <p className="text-xs text-purple-700/80 font-medium">
+            Structure, impact phrasing & keyword density
+          </p>
+        </div>
+
+        {/* Card 4: Skills Identified */}
+        <div className="p-5 rounded-2xl bg-emerald-50/60 border-2 border-emerald-200 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
+              Extracted Skills
+            </span>
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+          </div>
+          <div className="text-3xl font-black text-emerald-950 my-1">
+            {totalSkills} Skills
+          </div>
+          <p className="text-xs text-emerald-800/80 font-medium">
+            Recognized industry competencies
+          </p>
+        </div>
+      </div>
+
+      {/* Competency & Skill Gap Analysis Matrix */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Identified Skills */}
+        <div className="p-6 rounded-2xl border border-slate-200 bg-white space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              Verified Core Competencies ({totalSkills})
+            </h3>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {results.extracted_skills?.map((skill, i) => (
+              <span
+                key={i}
+                className="px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-800 border border-slate-200"
+              >
+                ✓ {skill}
+              </span>
+            ))}
+            {(!results.extracted_skills || results.extracted_skills.length === 0) && (
+              <p className="text-xs text-slate-400 italic">No specific skills detected.</p>
+            )}
+          </div>
+        </div>
+
+        {/* Skill Gaps / Missing Competencies */}
+        <div className="p-6 rounded-2xl border border-slate-200 bg-white space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-rose-600" />
+              Critical Skill Gaps & Development ({missingSkillsCount})
+            </h3>
+          </div>
+          {results.missing_skills?.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {results.missing_skills.map((skill, i) => (
+                <span
+                  key={i}
+                  className="px-3 py-1 rounded-lg text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200"
+                >
+                  + {skill}
+                </span>
+              ))}
+            </div>
+          ) : isTargetJob ? (
+            <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold">
+              ✨ 100% Match! All core required competencies for this target position were found in the resume.
+            </div>
+          ) : (
+            <div className="p-4 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-800 text-xs font-medium leading-relaxed">
+              💡 General multi-sector screening completed. Recommended career paths and required next-level skills are listed below.
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Experience & Work History Breakdown */}
+      {results.experience && (
+        <div className="p-6 rounded-2xl border border-slate-200 bg-white space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
+              <Briefcase className="w-4 h-4 text-amber-600" />
+              Experience & Professional Timeline
+            </h3>
+            <span className="text-xs font-bold px-2.5 py-1 bg-amber-50 text-amber-800 rounded-lg border border-amber-200">
+              {results.experience.seniority_level} Level • {results.experience.total_years || 0} Years Experience
+            </span>
+          </div>
+
+          {results.experience.positions?.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {results.experience.positions.map((pos, i) => (
+                <div
+                  key={i}
+                  className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-3"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center flex-shrink-0 mt-0.5 text-indigo-600 font-bold text-xs">
+                    #{i + 1}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold text-slate-900 truncate">{pos.title}</p>
+                    {pos.company && (
+                      <p className="text-xs text-slate-600">{pos.company}</p>
+                    )}
+                    {pos.duration && (
+                      <p className="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
+                        <Calendar className="w-3 h-3" /> {pos.duration}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-slate-400 italic">No structured positions parsed from resume text.</p>
+          )}
+        </div>
+      )}
+
+      {/* Recommended Career Tracks */}
+      {results.recommended_roles?.length > 0 && (
+        <div className="p-6 rounded-2xl border border-slate-200 bg-white space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
+              <LayoutDashboard className="w-4 h-4 text-indigo-600" />
+              Recommended Career Roles & Target Tracks
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {results.recommended_roles.map((role, i) => (
+              <div
+                key={i}
+                className="p-4 rounded-xl bg-indigo-50/40 border border-indigo-100"
+              >
+                <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest block mb-1">
+                  Track #{i + 1}
+                </span>
+                <span className="text-sm font-black text-slate-900">{role}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* AI Strategic Career Recommendations */}
+      <div className="p-6 rounded-2xl border border-slate-200 bg-slate-50/80 space-y-3">
+        <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-indigo-600" />
+          Strategic Optimization Roadmap for High-Impact ATS Placement
+        </h3>
+        <ul className="space-y-2 text-xs text-slate-700 leading-relaxed font-medium">
+          <li className="flex items-start gap-2">
+            <span className="text-indigo-600 font-bold">•</span>
+            <span>
+              <strong>Quantify Key Achievements:</strong> Integrate concrete metric achievements (e.g. <em>"Increased system throughput by 35%"</em> or <em>"Managed $250k portfolio"</em>) under recent experience.
+            </span>
+          </li>
+          {missingSkillsCount > 0 && (
+            <li className="flex items-start gap-2">
+              <span className="text-rose-600 font-bold">•</span>
+              <span>
+                <strong>Bridge Missing Core Keywords:</strong> Add highlighted target skills ({results.missing_skills?.slice(0, 3).join(", ")}) in project descriptions and technical summaries.
+              </span>
+            </li>
+          )}
+          <li className="flex items-start gap-2">
+            <span className="text-indigo-600 font-bold">•</span>
+            <span>
+              <strong>ATS Format Standard:</strong> Maintain clean single-column structure and standard section headings (Experience, Education, Skills) to guarantee 100% ATS parser fidelity.
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      {/* Report Footer & Certification */}
+      <div className="pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-400 gap-2">
+        <div>
+          Generated by <strong>Astra AI Resume Intelligence Engine</strong> • Confidential Assessment
+        </div>
+        <div>
+          Verification ID: AST-VERIFIED-2026 • Page 1 of 1
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const CandidateModal = ({ candidate, onClose, jobTitle, category }) => {
+  const [modalTab, setModalTab] = useState("breakdown"); // "breakdown" or "report"
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+        className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm no-print"
         onClick={onClose}
       />
       <motion.div
@@ -209,31 +679,69 @@ const CandidateModal = ({ candidate, onClose }) => {
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
         className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl p-8"
       >
-        <div className="flex items-center justify-between mb-8 border-b border-slate-100 pb-6">
+        <div className="flex flex-wrap items-center justify-between mb-8 border-b border-slate-100 pb-6 gap-4 no-print">
           <div>
             <h2 className="text-3xl font-black text-slate-900">
               {candidate.fileName}
             </h2>
-            <p className="text-slate-500 mt-1">Detailed Analysis Results</p>
+            <p className="text-slate-500 mt-1">Detailed Candidate Analysis</p>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-slate-100 rounded-full transition-colors"
-          >
-            <svg
-              width="24"
-              height="24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="text-slate-500"
+
+          <div className="flex items-center gap-3">
+            {!candidate.error && (
+              <>
+                <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+                  <button
+                    onClick={() => setModalTab("breakdown")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      modalTab === "breakdown"
+                        ? "bg-white text-indigo-600 shadow-sm"
+                        : "text-slate-500 hover:text-slate-800"
+                    }`}
+                  >
+                    Breakdown
+                  </button>
+                  <button
+                    onClick={() => setModalTab("report")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      modalTab === "report"
+                        ? "bg-white text-indigo-600 shadow-sm"
+                        : "text-slate-500 hover:text-slate-800"
+                    }`}
+                  >
+                    Executive Report
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => window.print()}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-md shadow-indigo-500/20"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  Print / Export PDF
+                </button>
+              </>
+            )}
+
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-slate-100 rounded-full transition-colors"
             >
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
+              <svg
+                width="24"
+                height="24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-slate-500"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
         </div>
 
         {candidate.error ? (
@@ -244,183 +752,227 @@ const CandidateModal = ({ candidate, onClose }) => {
             </h3>
             <p className="text-slate-500 max-w-md">{candidate.error}</p>
           </div>
+        ) : modalTab === "report" ? (
+          <ExecutiveReport
+            results={candidate}
+            fileName={candidate.fileName}
+            jobTitle={jobTitle}
+            category={category}
+          />
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 py-6 bg-slate-50 rounded-2xl border border-slate-100 mb-8">
-              <ScoreRing
-                score={candidate.match_percentage}
-                label="Job Match"
-                icon={Target}
-                colorClass="stroke-indigo-500"
-              />
-              <ScoreRing
-                score={candidate.strength_score}
-                label="Resume Strength"
-                icon={Zap}
-                colorClass="stroke-purple-500"
-              />
-              <ScoreRing
-                score={
-                  candidate.required_skill_count > 0
-                    ? Math.round(
-                        (candidate.matched_skill_count /
-                          candidate.required_skill_count) *
-                          100,
-                      )
-                    : null
-                }
-                label={
-                  candidate.required_skill_count > 0
-                    ? "Skill Coverage"
-                    : "Profile Analysis"
-                }
-                icon={CheckCircle2}
-                colorClass="stroke-cyan-500"
-              />
-            </div>
+            <div className="screen-only">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 py-6 bg-slate-50 rounded-2xl border border-slate-100 mb-8">
+                {candidate.required_skill_count > 0 ? (
+                  <ScoreRing
+                    score={candidate.match_percentage}
+                    label="Target Job Match"
+                    badge="🎯 Target Opening"
+                    icon={Target}
+                    colorClass="stroke-indigo-500"
+                  />
+                ) : (
+                  <DualScoreRing
+                    topScore={
+                      candidate.top_role_match || candidate.match_percentage
+                    }
+                    topRole={candidate.best_role}
+                    globalScore={candidate.global_market_match}
+                  />
+                )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-              <div className="solid-card p-6 shadow-none">
-                <div className="flex items-center gap-3 border-b border-slate-200 pb-4 mb-4">
-                  <Zap className="w-5 h-5 text-indigo-500" />
-                  <h3 className="text-lg font-bold text-slate-900">
-                    Extracted Skills
-                  </h3>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {candidate.extracted_skills?.map((skill, i) => (
-                    <span
-                      key={i}
-                      className="skill-tag px-3 py-1.5 rounded-lg text-sm font-semibold bg-indigo-50 text-indigo-600 border border-indigo-100"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                  {(!candidate.extracted_skills ||
-                    candidate.extracted_skills.length === 0) && (
-                    <p className="text-slate-500 italic text-sm">
-                      No specific skills detected.
-                    </p>
-                  )}
-                </div>
+                <ScoreRing
+                  score={candidate.strength_score}
+                  label="Resume Strength"
+                  icon={Zap}
+                  colorClass="stroke-purple-500"
+                />
+                <ScoreRing
+                  score={
+                    candidate.required_skill_count > 0
+                      ? Math.round(
+                          (candidate.matched_skill_count /
+                            candidate.required_skill_count) *
+                            100,
+                        )
+                      : Math.round(
+                          Math.min(
+                            100,
+                            ((candidate.extracted_skills?.length || 0) / 15) *
+                              100,
+                          ),
+                        )
+                  }
+                  label={
+                    candidate.required_skill_count > 0
+                      ? "Skill Coverage"
+                      : "Skill Breadth"
+                  }
+                  icon={CheckCircle2}
+                  colorClass="stroke-cyan-500"
+                />
               </div>
-              <div className="solid-card p-6 shadow-none">
-                <div className="flex items-center gap-3 border-b border-slate-200 pb-4 mb-4">
-                  <AlertCircle className="w-5 h-5 text-red-500" />
-                  <h3 className="text-lg font-bold text-slate-900">
-                    Skill Gaps
-                  </h3>
-                </div>
-                {candidate.missing_skills?.length > 0 ? (
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div className="solid-card p-6 shadow-none">
+                  <div className="flex items-center gap-3 border-b border-slate-200 pb-4 mb-4">
+                    <Zap className="w-5 h-5 text-indigo-500" />
+                    <h3 className="text-lg font-bold text-slate-900">
+                      Extracted Skills
+                    </h3>
+                  </div>
                   <div className="flex flex-wrap gap-2">
-                    {candidate.missing_skills.map((skill, i) => (
+                    {candidate.extracted_skills?.map((skill, i) => (
                       <span
                         key={i}
-                        className="skill-tag px-3 py-1.5 rounded-lg text-sm font-semibold bg-red-50 text-red-600 border border-red-100"
+                        className="skill-tag px-3 py-1.5 rounded-lg text-sm font-semibold bg-indigo-50 text-indigo-600 border border-indigo-100"
                       >
                         {skill}
                       </span>
                     ))}
+                    {(!candidate.extracted_skills ||
+                      candidate.extracted_skills.length === 0) && (
+                      <p className="text-slate-500 italic text-sm">
+                        No specific skills detected.
+                      </p>
+                    )}
                   </div>
-                ) : (
-                  <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100">
-                    <p className="text-emerald-600 text-sm font-medium">
-                      ✨ Your profile matches all target skills perfectly!
-                    </p>
+                </div>
+                <div className="solid-card p-6 shadow-none">
+                  <div className="flex items-center gap-3 border-b border-slate-200 pb-4 mb-4">
+                    <AlertCircle className="w-5 h-5 text-red-500" />
+                    <h3 className="text-lg font-bold text-slate-900">
+                      Skill Gaps
+                    </h3>
                   </div>
-                )}
+                  {candidate.missing_skills?.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {candidate.missing_skills.map((skill, i) => (
+                        <span
+                          key={i}
+                          className="skill-tag px-3 py-1.5 rounded-lg text-sm font-semibold bg-red-50 text-red-600 border border-red-100"
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  ) : candidate.required_skill_count > 0 ? (
+                    <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100">
+                      <p className="text-emerald-600 text-sm font-medium">
+                        ✨ Candidate profile matches all target job skills!
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+                      <p className="text-slate-600 text-sm font-medium">
+                        💡 General market screening active. Select a specific role
+                        to analyze required skill gaps.
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
 
-            {/* Experience Section */}
-            {candidate.experience && (
-              <div className="solid-card p-6 shadow-none mb-8">
-                <div className="flex items-center gap-3 border-b border-slate-200 pb-4 mb-4">
-                  <Briefcase className="w-5 h-5 text-amber-500" />
-                  <h3 className="text-lg font-bold text-slate-900">
-                    Previous Experience
+              {/* Experience Section */}
+              {candidate.experience && (
+                <div className="solid-card p-6 shadow-none mb-8">
+                  <div className="flex items-center gap-3 border-b border-slate-200 pb-4 mb-4">
+                    <Briefcase className="w-5 h-5 text-amber-500" />
+                    <h3 className="text-lg font-bold text-slate-900">
+                      Previous Experience
+                    </h3>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
+                      <p className="text-xs font-bold uppercase tracking-widest text-amber-600/70 mb-1">
+                        Total Experience
+                      </p>
+                      <p className="text-2xl font-black text-amber-700">
+                        {candidate.experience.total_years != null
+                          ? `${candidate.experience.total_years} year${candidate.experience.total_years !== 1 ? "s" : ""}`
+                          : "Not detected"}
+                      </p>
+                    </div>
+                    <div className="p-4 rounded-xl bg-violet-50 border border-violet-100">
+                      <p className="text-xs font-bold uppercase tracking-widest text-violet-600/70 mb-1">
+                        Seniority Level
+                      </p>
+                      <p className="text-2xl font-black text-violet-700">
+                        {candidate.experience.seniority_level}
+                      </p>
+                    </div>
+                  </div>
+                  {candidate.experience.positions?.length > 0 && (
+                    <div className="space-y-3">
+                      <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">
+                        Positions Found
+                      </p>
+                      {candidate.experience.positions.map((pos, i) => (
+                        <div
+                          key={i}
+                          className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <Briefcase className="w-4 h-4 text-indigo-500" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-slate-900">
+                              {pos.title}
+                            </p>
+                            {pos.company && (
+                              <p className="text-xs text-slate-500">
+                                {pos.company}
+                              </p>
+                            )}
+                            {pos.duration && (
+                              <p className="text-xs text-slate-400 flex items-center gap-1 mt-1">
+                                <Calendar className="w-3 h-3" /> {pos.duration}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {(!candidate.experience.positions ||
+                    candidate.experience.positions.length === 0) &&
+                    candidate.experience.total_years == null && (
+                      <p className="text-slate-400 italic text-sm">
+                        No specific work experience detected in the resume.
+                      </p>
+                    )}
+                </div>
+              )}
+
+              {candidate.recommended_roles?.length > 0 && (
+                <div className="solid-card p-6 shadow-none bg-slate-50 border-slate-200">
+                  <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <LayoutDashboard className="w-5 h-5 text-indigo-500" />{" "}
+                    Recommended Alternative Roles
                   </h3>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                  <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
-                    <p className="text-xs font-bold uppercase tracking-widest text-amber-600/70 mb-1">
-                      Total Experience
-                    </p>
-                    <p className="text-2xl font-black text-amber-700">
-                      {candidate.experience.total_years != null
-                        ? `${candidate.experience.total_years} year${candidate.experience.total_years !== 1 ? "s" : ""}`
-                        : "Not detected"}
-                    </p>
-                  </div>
-                  <div className="p-4 rounded-xl bg-violet-50 border border-violet-100">
-                    <p className="text-xs font-bold uppercase tracking-widest text-violet-600/70 mb-1">
-                      Seniority Level
-                    </p>
-                    <p className="text-2xl font-black text-violet-700">
-                      {candidate.experience.seniority_level}
-                    </p>
-                  </div>
-                </div>
-                {candidate.experience.positions?.length > 0 && (
-                  <div className="space-y-3">
-                    <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">
-                      Positions Found
-                    </p>
-                    {candidate.experience.positions.map((pos, i) => (
-                      <div
+                  <div className="flex gap-4 flex-wrap">
+                    {candidate.recommended_roles.map((role, i) => (
+                      <span
                         key={i}
-                        className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100"
+                        className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-slate-700 font-bold text-sm shadow-sm"
                       >
-                        <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <Briefcase className="w-4 h-4 text-indigo-500" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold text-slate-900">
-                            {pos.title}
-                          </p>
-                          {pos.company && (
-                            <p className="text-xs text-slate-500">
-                              {pos.company}
-                            </p>
-                          )}
-                          {pos.duration && (
-                            <p className="text-xs text-slate-400 flex items-center gap-1 mt-1">
-                              <Calendar className="w-3 h-3" /> {pos.duration}
-                            </p>
-                          )}
-                        </div>
-                      </div>
+                        {role}
+                      </span>
                     ))}
                   </div>
-                )}
-                {(!candidate.experience.positions ||
-                  candidate.experience.positions.length === 0) &&
-                  candidate.experience.total_years == null && (
-                    <p className="text-slate-400 italic text-sm">
-                      No specific work experience detected in the resume.
-                    </p>
-                  )}
-              </div>
-            )}
-
-            {candidate.recommended_roles?.length > 0 && (
-              <div className="solid-card p-6 shadow-none bg-slate-50 border-slate-200">
-                <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                  <LayoutDashboard className="w-5 h-5 text-indigo-500" />{" "}
-                  Recommended Alternative Roles
-                </h3>
-                <div className="flex gap-4 flex-wrap">
-                  {candidate.recommended_roles.map((role, i) => (
-                    <span
-                      key={i}
-                      className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-slate-700 font-bold text-sm shadow-sm"
-                    >
-                      {role}
-                    </span>
-                  ))}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
+
+            {/* Print-only clean Executive Report */}
+            <div className="print-only">
+              <ExecutiveReport
+                results={candidate}
+                fileName={candidate.fileName}
+                jobTitle={jobTitle}
+                category={category}
+              />
+            </div>
           </>
         )}
       </motion.div>
@@ -428,14 +980,20 @@ const CandidateModal = ({ candidate, onClose }) => {
   );
 };
 
+const ALLOWED_EXTENSIONS = [".pdf", ".docx", ".doc", ".txt", ".rtf", ".md"];
+const isAllowedFile = (name) => {
+  const lower = (name || "").toLowerCase();
+  return ALLOWED_EXTENSIONS.some((ext) => lower.endsWith(ext));
+};
+
 const OrganizationDashboard = () => {
   const [files, setFiles] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [selectedJobId, setSelectedJobId] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   const filteredJobs = selectedCategory
-    ? jobs.filter((j) => (j.category || 'Other') === selectedCategory)
+    ? jobs.filter((j) => (j.category || "Other") === selectedCategory)
     : jobs;
 
   const [loading, setLoading] = useState(false);
@@ -468,8 +1026,8 @@ const OrganizationDashboard = () => {
     e.preventDefault();
     setDragOver(false);
     if (e.dataTransfer.files) {
-      const droppedFiles = Array.from(e.dataTransfer.files).filter(
-        (f) => f.name.endsWith(".pdf") || f.name.endsWith(".docx"),
+      const droppedFiles = Array.from(e.dataTransfer.files).filter((f) =>
+        isAllowedFile(f.name),
       );
       setFiles(droppedFiles);
       setResults([]);
@@ -479,13 +1037,6 @@ const OrganizationDashboard = () => {
   const handleUpload = async () => {
     if (files.length === 0) return;
 
-    if (!selectedJobId) {
-      alert("Please select a job role");
-      return;
-    }
-
-    console.log("Selected Job:", selectedJobId);
-
     setLoading(true);
     setResults([]);
 
@@ -494,7 +1045,9 @@ const OrganizationDashboard = () => {
     for (const file of files) {
       const formData = new FormData();
       formData.append("resume", file);
-      formData.append("jobId", selectedJobId);
+      if (selectedJobId) {
+        formData.append("jobId", selectedJobId);
+      }
       try {
         const response = await axios.post(
           "http://localhost:5000/api/upload",
@@ -548,7 +1101,7 @@ const OrganizationDashboard = () => {
             Bulk Resume Analysis
           </h2>
 
-                    {/* 2-Dropdown Cascading Job Selector for Organization */}
+          {/* 2-Dropdown Cascading Job Selector for Organization */}
           <div className="mb-6 p-6 rounded-2xl bg-slate-50/80 border border-slate-200/80 shadow-sm space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {/* Dropdown 1: Industry / Sector */}
@@ -565,15 +1118,13 @@ const OrganizationDashboard = () => {
                   className="w-full p-3.5 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 font-medium transition-all shadow-sm cursor-pointer"
                 >
                   <option value="">🌐 All Sectors</option>
-                  {[
-                    ...new Set(
-                      jobs.map((j) => j.category || "Other")
+                  {[...new Set(jobs.map((j) => j.category || "Other"))].map(
+                    (category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
                     ),
-                  ].map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
+                  )}
                 </select>
               </div>
 
@@ -587,7 +1138,7 @@ const OrganizationDashboard = () => {
                   onChange={(e) => setSelectedJobId(e.target.value)}
                   className="w-full p-3.5 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 font-medium transition-all shadow-sm cursor-pointer"
                 >
-                  <option value="">-- Select Target Job Opening --</option>
+                  <option value="">Select Target Job Opening</option>
                   {filteredJobs.map((job) => (
                     <option key={job.id} value={String(job.id)}>
                       {job.title}
@@ -597,7 +1148,6 @@ const OrganizationDashboard = () => {
               </div>
             </div>
           </div>
-
 
           <div
             className={`upload-zone min-h-[200px] flex flex-col items-center justify-center p-8 cursor-pointer ${dragOver ? "drag-over" : ""}`}
@@ -615,7 +1165,7 @@ const OrganizationDashboard = () => {
               className="hidden"
               multiple
               onChange={handleFileChange}
-              accept=".pdf,.docx"
+              accept=".pdf,.docx,.doc,.txt,.rtf,.md,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,application/rtf"
             />
             <Upload className="w-10 h-10 text-indigo-400 mb-4" />
             <h3 className="text-xl font-bold text-slate-900">
@@ -624,6 +1174,9 @@ const OrganizationDashboard = () => {
                 : "Drop multiple resumes here"}
             </h3>
             <p className="text-slate-400">or click to browse your files</p>
+            <p className="text-xs text-slate-500 pt-2 uppercase tracking-widest">
+              Supported: PDF, Word (DOCX, DOC), TXT, RTF
+            </p>
           </div>
 
           <button
@@ -757,8 +1310,13 @@ const OrganizationDashboard = () => {
                           Candidate File
                         </th>
                         <th className="p-4 text-sm font-bold text-slate-500 uppercase tracking-wider text-center">
-                          Match %
+                          {selectedJobId ? "Match %" : "Single Best"}
                         </th>
+                        {!selectedJobId && (
+                          <th className="p-4 text-sm font-bold text-slate-500 uppercase tracking-wider text-center">
+                            Overall Market
+                          </th>
+                        )}
                         <th className="p-4 text-sm font-bold text-slate-500 uppercase tracking-wider text-center">
                           Strength
                         </th>
@@ -797,12 +1355,23 @@ const OrganizationDashboard = () => {
                                 "-"
                               ) : (
                                 <MiniScoreRing
-                                  score={res.match_percentage}
+                                  score={res.top_role_match || res.match_percentage}
                                   colorClass="stroke-indigo-500"
                                 />
                               )}
                             </div>
                           </td>
+                          {!selectedJobId && (
+                            <td className="p-4 text-center">
+                              {res.error ? (
+                                "-"
+                              ) : (
+                                <span className="inline-block px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-bold text-xs border border-emerald-200/90 shadow-sm">
+                                  {res.global_market_match != null ? `${res.global_market_match}%` : "0%"}
+                                </span>
+                              )}
+                            </td>
+                          )}
                           <td className="p-4">
                             <div className="flex justify-center">
                               {res.error ? (
@@ -875,6 +1444,8 @@ const OrganizationDashboard = () => {
           <CandidateModal
             candidate={selectedCandidate}
             onClose={() => setSelectedCandidate(null)}
+            jobTitle={jobs.find((j) => String(j.id) === String(selectedJobId))?.title}
+            category={selectedCategory || jobs.find((j) => String(j.id) === String(selectedJobId))?.category}
           />
         )}
       </AnimatePresence>
@@ -886,6 +1457,7 @@ const OrganizationDashboard = () => {
 
 function App() {
   const [mode, setMode] = useState("individual");
+  const [viewMode, setViewMode] = useState("dashboard"); // "dashboard" or "report"
   const [jobs, setJobs] = useState([]);
   const [selectedJobId, setSelectedJobId] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -893,6 +1465,10 @@ function App() {
   const filteredJobs = selectedCategory
     ? jobs.filter((j) => (j.category || "Other") === selectedCategory)
     : jobs;
+
+  const currentJobObj = jobs.find((j) => String(j.id) === String(selectedJobId));
+  const currentJobTitle = currentJobObj ? currentJobObj.title : "";
+  const currentCategory = selectedCategory || (currentJobObj ? currentJobObj.category : "");
 
   useEffect(() => {
     axios
@@ -923,15 +1499,12 @@ function App() {
     e.preventDefault();
     setDragOver(false);
     const dropped = e.dataTransfer.files[0];
-    if (
-      dropped &&
-      (dropped.name.endsWith(".pdf") || dropped.name.endsWith(".docx"))
-    ) {
+    if (dropped && isAllowedFile(dropped.name)) {
       setFile(dropped);
       setFileName(dropped.name);
       setError("");
     } else {
-      setError("Please upload a PDF or DOCX file.");
+      setError("Please upload a supported resume format (PDF, Word DOCX/DOC, TXT, RTF).");
     }
   }, []);
 
@@ -1040,7 +1613,7 @@ function App() {
                           type="file"
                           className="hidden"
                           onChange={handleFileChange}
-                          accept=".pdf,.docx"
+                          accept=".pdf,.docx,.doc,.txt,.rtf,.md,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,application/rtf"
                         />
 
                         <div className="w-20 h-20 rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-6 ring-1 ring-indigo-500/20">
@@ -1057,7 +1630,7 @@ function App() {
                               : "or click to browse your files"}
                           </p>
                           <p className="text-xs text-slate-500 pt-4 uppercase tracking-widest">
-                            Supported formats: PDF, DOCX
+                            Supported formats: PDF, Word (DOCX, DOC), TXT, RTF
                           </p>
                         </div>
                       </div>
@@ -1116,7 +1689,7 @@ function App() {
                               className="w-full p-3.5 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 font-medium transition-all shadow-sm cursor-pointer"
                             >
                               <option value="">
-                                -- General Analysis (No Target Job) --
+                                General Analysis (No Target Job)
                               </option>
                               {filteredJobs.map((job) => (
                                 <option key={job.id} value={String(job.id)}>
@@ -1182,242 +1755,316 @@ function App() {
                     animate={{ opacity: 1, y: 0 }}
                     className="space-y-8"
                   >
-                    {/* Score Overview */}
-                    <div className="solid-card p-8 md:p-12 glow-primary">
-                      <div className="flex items-center justify-between mb-10">
-                        <div>
-                          <h2 className="text-3xl font-black text-slate-900">
-                            Analysis Results
-                          </h2>
-                          <p className="text-slate-400">
-                            Comprehensive breakdown of your professional profile
-                          </p>
-                        </div>
+                    {/* View Switcher & Action Bar */}
+                    <div className="flex flex-wrap items-center justify-between gap-4 no-print bg-white/80 backdrop-blur-md p-4 rounded-2xl border border-slate-200 shadow-sm">
+                      <div className="flex items-center bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+                        <button
+                          onClick={() => setViewMode("dashboard")}
+                          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-xs transition-all ${
+                            viewMode === "dashboard"
+                              ? "bg-white text-indigo-600 shadow-sm"
+                              : "text-slate-500 hover:text-slate-800"
+                          }`}
+                        >
+                          <LayoutDashboard className="w-3.5 h-3.5" />
+                          Interactive Dashboard
+                        </button>
+                        <button
+                          onClick={() => setViewMode("report")}
+                          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-xs transition-all ${
+                            viewMode === "report"
+                              ? "bg-white text-indigo-600 shadow-sm"
+                              : "text-slate-500 hover:text-slate-800"
+                          }`}
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          Executive ATS Report
+                        </button>
+                      </div>
+
+                      <div className="flex items-center gap-3">
                         <button
                           onClick={() => window.print()}
-                          className="px-4 py-2 bg-slate-800/80 hover:bg-slate-700 text-slate-200 rounded-xl text-sm font-medium border border-slate-700 transition-all flex items-center gap-2 shadow-sm"
+                          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-md shadow-indigo-500/20"
                         >
-                          <Download className="w-4 h-4" />
+                          <Download className="w-3.5 h-3.5" />
                           Print / Export PDF
                         </button>
-
                         <button
                           onClick={() => {
                             setResults(null);
                             setFile(null);
                             setFileName("");
+                            setViewMode("dashboard");
                           }}
-                          className="text-xs font-bold uppercase tracking-widest text-indigo-400 hover:text-indigo-300 transition-colors"
+                          className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors"
                         >
                           Analyze New →
                         </button>
                       </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-12 py-6">
-                        <ScoreRing
-                          score={results.match_percentage}
-                          label="Job Match"
-                          icon={Target}
-                          colorClass="stroke-indigo-500"
-                        />
-                        <ScoreRing
-                          score={results.strength_score}
-                          label="Resume Strength"
-                          icon={Zap}
-                          colorClass="stroke-purple-500"
-                        />
-                        <ScoreRing
-                          score={
-                            results.required_skill_count > 0
-                              ? Math.round(
-                                  (results.matched_skill_count /
-                                    results.required_skill_count) *
-                                    100,
-                                )
-                              : Math.round(
-                                  Math.min(
-                                    100,
-                                    ((results.extracted_skills?.length || 0) /
-                                      15) *
-                                      100,
-                                  ),
-                                )
-                          }
-                          label={
-                            results.required_skill_count > 0
-                              ? "Target Skill Match"
-                              : "Skill Breadth"
-                          }
-                          icon={CheckCircle2}
-                          colorClass="stroke-cyan-500"
-                        />
-                      </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      {/* Skills Section */}
-                      <div className="solid-card p-8 space-y-6">
-                        <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
-                          <Zap className="w-5 h-5 text-indigo-500" />
-                          <h3 className="text-xl font-bold text-slate-900">
-                            Extracted Skills
-                          </h3>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          {results.extracted_skills?.map((skill, i) => (
-                            <span
-                              key={i}
-                              className="skill-tag px-3 py-1.5 rounded-lg text-sm font-semibold bg-indigo-50 text-indigo-600 border border-indigo-100"
-                            >
-                              {skill}
-                            </span>
-                          ))}
-                          {(!results.extracted_skills ||
-                            results.extracted_skills.length === 0) && (
-                            <p className="text-slate-500 italic text-sm">
-                              No specific skills detected.
-                            </p>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Skill Gaps Section */}
-                      <div className="solid-card p-8 space-y-6">
-                        <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
-                          <AlertCircle className="w-5 h-5 text-red-500" />
-                          <h3 className="text-xl font-bold text-slate-900">
-                            Skill Gaps
-                          </h3>
-                        </div>
-                        {results.missing_skills?.length > 0 ? (
-                          <div className="flex flex-wrap gap-2">
-                            {results.missing_skills.map((skill, i) => (
-                              <span
-                                key={i}
-                                className="skill-tag px-3 py-1.5 rounded-lg text-sm font-semibold bg-red-50 text-red-600 border border-red-100"
-                              >
-                                {skill}
-                              </span>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100">
-                            <p className="text-emerald-600 text-sm font-medium">
-                              ✨ Your profile matches all target skills
-                              perfectly!
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Experience Section */}
-                    {results.experience && (
-                      <div className="solid-card p-8 space-y-6">
-                        <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
-                          <Briefcase className="w-5 h-5 text-amber-500" />
-                          <h3 className="text-xl font-bold text-slate-900">
-                            Previous Experience
-                          </h3>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4 mb-2">
-                          <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
-                            <p className="text-xs font-bold uppercase tracking-widest text-amber-600/70 mb-1">
-                              Total Experience
-                            </p>
-                            <p className="text-2xl font-black text-amber-700">
-                              {results.experience.total_years != null
-                                ? `${results.experience.total_years} year${results.experience.total_years !== 1 ? "s" : ""}`
-                                : "Not detected"}
-                            </p>
-                          </div>
-                          <div className="p-4 rounded-xl bg-violet-50 border border-violet-100">
-                            <p className="text-xs font-bold uppercase tracking-widest text-violet-600/70 mb-1">
-                              Seniority Level
-                            </p>
-                            <p className="text-2xl font-black text-violet-700">
-                              {results.experience.seniority_level}
-                            </p>
-                          </div>
-                        </div>
-                        {results.experience.positions?.length > 0 && (
-                          <div className="space-y-3">
-                            <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">
-                              Positions Found
-                            </p>
-                            {results.experience.positions.map((pos, i) => (
-                              <div
-                                key={i}
-                                className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100"
-                              >
-                                <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                  <Briefcase className="w-4 h-4 text-indigo-500" />
-                                </div>
-                                <div>
-                                  <p className="text-sm font-bold text-slate-900">
-                                    {pos.title}
-                                  </p>
-                                  {pos.company && (
-                                    <p className="text-xs text-slate-500">
-                                      {pos.company}
-                                    </p>
-                                  )}
-                                  {pos.duration && (
-                                    <p className="text-xs text-slate-400 flex items-center gap-1 mt-1">
-                                      <Calendar className="w-3 h-3" />{" "}
-                                      {pos.duration}
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                        {(!results.experience.positions ||
-                          results.experience.positions.length === 0) &&
-                          results.experience.total_years == null && (
-                            <p className="text-slate-400 italic text-sm">
-                              No specific work experience detected in the
-                              resume.
-                            </p>
-                          )}
-                      </div>
-                    )}
-
-                    {/* Role Recommendations */}
-                    {results.recommended_roles?.length > 0 && (
-                      <div className="solid-card p-8 md:p-10">
-                        <div className="flex items-center gap-3 border-b border-slate-200 pb-6 mb-6">
-                          <LayoutDashboard className="w-6 h-6 text-indigo-500" />
-                          <div>
-                            <h3 className="text-2xl font-bold text-slate-900">
-                              Recommended Career Paths
-                            </h3>
-                            <p className="text-sm text-slate-400">
-                              Based on your current skill set and potential
-                            </p>
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                          {results.recommended_roles.map((role, i) => (
-                            <div
-                              key={i}
-                              className="group p-6 rounded-2xl bg-white border border-slate-200 hover:border-indigo-500/50 transition-all hover:translate-y-[-4px]"
-                            >
-                              <div className="text-slate-500 text-xs font-bold uppercase mb-2">
-                                Recommendation {i + 1}
-                              </div>
-                              <div className="text-lg font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
-                                {role}
-                              </div>
-                              <div className="mt-4 flex items-center text-xs text-indigo-400 font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                                View Roadmap{" "}
-                                <ArrowRight className="w-3 h-3 ml-2" />
+                    {viewMode === "report" ? (
+                      <ExecutiveReport
+                        results={results}
+                        fileName={fileName}
+                        jobTitle={currentJobTitle}
+                        category={currentCategory}
+                      />
+                    ) : (
+                      <>
+                        <div className="screen-only space-y-8">
+                          {/* Score Overview */}
+                          <div className="solid-card p-8 md:p-12 glow-primary">
+                            <div className="flex items-center justify-between mb-10">
+                              <div>
+                                <h2 className="text-3xl font-black text-slate-900">
+                                  Analysis Results
+                                </h2>
+                                <p className="text-slate-400">
+                                  Comprehensive breakdown of your professional profile
+                                </p>
                               </div>
                             </div>
-                          ))}
+
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-12 py-6">
+                              {results.required_skill_count > 0 ? (
+                                <ScoreRing
+                                  score={results.match_percentage}
+                                  label="Target Job Match"
+                                  badge="🎯 Specific Target Job"
+                                  icon={Target}
+                                  colorClass="stroke-indigo-500"
+                                />
+                              ) : (
+                                <DualScoreRing
+                                  topScore={
+                                    results.top_role_match || results.match_percentage
+                                  }
+                                  topRole={results.best_role}
+                                  globalScore={results.global_market_match}
+                                />
+                              )}
+
+                              <ScoreRing
+                                score={results.strength_score}
+                                label="Resume Strength"
+                                icon={Zap}
+                                colorClass="stroke-purple-500"
+                              />
+                              <ScoreRing
+                                score={
+                                  results.required_skill_count > 0
+                                    ? Math.round(
+                                        (results.matched_skill_count /
+                                          results.required_skill_count) *
+                                          100,
+                                      )
+                                    : Math.round(
+                                        Math.min(
+                                          100,
+                                          ((results.extracted_skills?.length || 0) /
+                                            15) *
+                                            100,
+                                        ),
+                                      )
+                                }
+                                label={
+                                  results.required_skill_count > 0
+                                    ? "Target Skill Match"
+                                    : "Skill Breadth"
+                                }
+                                icon={CheckCircle2}
+                                colorClass="stroke-cyan-500"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            {/* Skills Section */}
+                            <div className="solid-card p-8 space-y-6">
+                              <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
+                                <Zap className="w-5 h-5 text-indigo-500" />
+                                <h3 className="text-xl font-bold text-slate-900">
+                                  Extracted Skills
+                                </h3>
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                {results.extracted_skills?.map((skill, i) => (
+                                  <span
+                                    key={i}
+                                    className="skill-tag px-3 py-1.5 rounded-lg text-sm font-semibold bg-indigo-50 text-indigo-600 border border-indigo-100"
+                                  >
+                                    {skill}
+                                  </span>
+                                ))}
+                                {(!results.extracted_skills ||
+                                  results.extracted_skills.length === 0) && (
+                                  <p className="text-slate-500 italic text-sm">
+                                    No specific skills detected.
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Skill Gaps Section */}
+                            <div className="solid-card p-8 space-y-6">
+                              <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
+                                <AlertCircle className="w-5 h-5 text-red-500" />
+                                <h3 className="text-xl font-bold text-slate-900">
+                                  Skill Gaps
+                                </h3>
+                              </div>
+                              {results.missing_skills?.length > 0 ? (
+                                <div className="flex flex-wrap gap-2">
+                                  {results.missing_skills.map((skill, i) => (
+                                    <span
+                                      key={i}
+                                      className="skill-tag px-3 py-1.5 rounded-lg text-sm font-semibold bg-red-50 text-red-600 border border-red-100"
+                                    >
+                                      {skill}
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : results.required_skill_count > 0 ? (
+                                <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100">
+                                  <p className="text-emerald-600 text-sm font-medium">
+                                    ✨ Your profile matches all target skills
+                                    perfectly!
+                                  </p>
+                                </div>
+                              ) : (
+                                <div className="p-4 rounded-xl bg-indigo-50/60 border border-indigo-100">
+                                  <p className="text-indigo-700 text-sm font-medium">
+                                    💡 General analysis mode active. Select a specific
+                                    role above to see targeted skill gaps, or explore
+                                    your recommended career roles below!
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Experience Section */}
+                          {results.experience && (
+                            <div className="solid-card p-8 space-y-6">
+                              <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
+                                <Briefcase className="w-5 h-5 text-amber-500" />
+                                <h3 className="text-xl font-bold text-slate-900">
+                                  Previous Experience
+                                </h3>
+                              </div>
+                              <div className="grid grid-cols-2 gap-4 mb-2">
+                                <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
+                                  <p className="text-xs font-bold uppercase tracking-widest text-amber-600/70 mb-1">
+                                    Total Experience
+                                  </p>
+                                  <p className="text-2xl font-black text-amber-700">
+                                    {results.experience.total_years != null
+                                      ? `${results.experience.total_years} year${results.experience.total_years !== 1 ? "s" : ""}`
+                                      : "Not detected"}
+                                  </p>
+                                </div>
+                                <div className="p-4 rounded-xl bg-violet-50 border border-violet-100">
+                                  <p className="text-xs font-bold uppercase tracking-widest text-violet-600/70 mb-1">
+                                    Seniority Level
+                                  </p>
+                                  <p className="text-2xl font-black text-violet-700">
+                                    {results.experience.seniority_level}
+                                  </p>
+                                </div>
+                              </div>
+                              {results.experience.positions?.length > 0 && (
+                                <div className="space-y-3">
+                                  <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">
+                                    Positions Found
+                                  </p>
+                                  {results.experience.positions.map((pos, i) => (
+                                    <div
+                                      key={i}
+                                      className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100"
+                                    >
+                                      <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <Briefcase className="w-4 h-4 text-indigo-500" />
+                                      </div>
+                                      <div>
+                                        <p className="text-sm font-bold text-slate-900">
+                                          {pos.title}
+                                        </p>
+                                        {pos.company && (
+                                          <p className="text-xs text-slate-500">
+                                            {pos.company}
+                                          </p>
+                                        )}
+                                        {pos.duration && (
+                                          <p className="text-xs text-slate-400 flex items-center gap-1 mt-1">
+                                            <Calendar className="w-3 h-3" />{" "}
+                                            {pos.duration}
+                                          </p>
+                                        )}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                              {(!results.experience.positions ||
+                                results.experience.positions.length === 0) &&
+                                results.experience.total_years == null && (
+                                  <p className="text-slate-400 italic text-sm">
+                                    No specific work experience detected in the
+                                    resume.
+                                  </p>
+                                )}
+                            </div>
+                          )}
+
+                          {/* Role Recommendations */}
+                          {results.recommended_roles?.length > 0 && (
+                            <div className="solid-card p-8 md:p-10">
+                              <div className="flex items-center gap-3 border-b border-slate-200 pb-6 mb-6">
+                                <LayoutDashboard className="w-6 h-6 text-indigo-500" />
+                                <div>
+                                  <h3 className="text-2xl font-bold text-slate-900">
+                                    Recommended Career Paths
+                                  </h3>
+                                  <p className="text-sm text-slate-400">
+                                    Based on your current skill set and potential
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                {results.recommended_roles.map((role, i) => (
+                                  <div
+                                    key={i}
+                                    className="group p-6 rounded-2xl bg-white border border-slate-200 hover:border-indigo-500/50 transition-all hover:translate-y-[-4px]"
+                                  >
+                                    <div className="text-slate-500 text-xs font-bold uppercase mb-2">
+                                      Recommendation {i + 1}
+                                    </div>
+                                    <div className="text-lg font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
+                                      {role}
+                                    </div>
+                                    <div className="mt-4 flex items-center text-xs text-indigo-400 font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                                      View Roadmap{" "}
+                                      <ArrowRight className="w-3 h-3 ml-2" />
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      </div>
+
+                        {/* Pristine Executive Report generated for Print / PDF */}
+                        <div className="print-only">
+                          <ExecutiveReport
+                            results={results}
+                            fileName={fileName}
+                            jobTitle={currentJobTitle}
+                            category={currentCategory}
+                          />
+                        </div>
+                      </>
                     )}
                   </motion.div>
                 )}
