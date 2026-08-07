@@ -60,7 +60,15 @@ TECHNICAL_SKILLS = {
     "user testing", "adobe photoshop", "adobe illustrator", "indesign", "after effects", "premiere pro", "typography",
     "brand identity", "graphic design", "visual design", "motion graphics", "video editing",
 
-    # 🤝 8. Universal Professional & Soft Skills
+    # ⚖️ 9. Legal & Compliance
+    "corporate law", "contract drafting", "legal compliance", "risk mitigation", "due diligence", "litigation",
+    "litigation support", "contract management", "legal research", "regulatory compliance", "intellectual property", "patents", "trademarks",
+
+    # 🏗️ 10. Engineering & Construction
+    "autocad", "solidworks", "mechanical engineering", "civil engineering", "structural analysis", "fea", "matlab",
+    "circuit design", "project scheduling", "construction management", "site supervision", "building codes", "revit", "pcb design", "ansys",
+
+    # 🤝 Universal Professional & Soft Skills
     "leadership", "project management", "pmp", "agile", "scrum", "kanban", "strategic planning", "stakeholder management",
     "problem solving", "critical thinking", "collaboration", "communication", "time management", "decision making"
 }
@@ -94,7 +102,14 @@ COMMON_JOB_TITLES = [
     "intern", "software intern", "engineering intern", "junior developer", "senior developer",
     "consultant", "technical consultant", "freelancer", "contractor",
     "cto", "ceo", "vp of engineering", "director of engineering", "head of engineering",
-    "research scientist", "research engineer", "postdoctoral researcher"
+    "research scientist", "research engineer", "postdoctoral researcher",
+    "registered nurse", "nurse", "physician", "clinical research coordinator", "medical assistant",
+    "financial analyst", "investment banker", "accountant", "auditor", "tax consultant",
+    "marketing manager", "digital marketer", "seo specialist", "content strategist", "sales executive",
+    "hr manager", "recruiter", "talent acquisition specialist", "hr generalist",
+    "supply chain manager", "logistics coordinator", "procurement specialist", "operations manager",
+    "civil engineer", "mechanical engineer", "electrical engineer", "structural engineer",
+    "legal counsel", "compliance officer", "attorney", "paralegal"
 ]
 
 class AnalysisRequest(BaseModel):
@@ -454,19 +469,22 @@ def analyze_resume(request: AnalysisRequest):
 
         cosine_sim = 0
 
-        if job_desc.strip():
-            vectorizer = TfidfVectorizer(
-                stop_words='english'
-            )
+        if job_desc.strip() and resume_text.strip():
+            try:
+                vectorizer = TfidfVectorizer(
+                    stop_words='english'
+                )
 
-            tfidf_matrix = vectorizer.fit_transform(
-                [resume_text, job_desc]
-            )
+                tfidf_matrix = vectorizer.fit_transform(
+                    [resume_text, job_desc]
+                )
 
-            cosine_sim = cosine_similarity(
-                tfidf_matrix[0:1],
-                tfidf_matrix[1:2]
-            )[0][0]
+                cosine_sim = float(cosine_similarity(
+                    tfidf_matrix[0:1],
+                    tfidf_matrix[1:2]
+                )[0][0])
+            except Exception:
+                cosine_sim = 0.0
         
         # B: Skill Matching Ratio (Specific requirements)
         skill_match_ratio = 0
@@ -476,17 +494,7 @@ def analyze_resume(request: AnalysisRequest):
         is_general_analysis = (
             len(request.required_skills) == 0
         )
-        if is_general_analysis:
 
-            final_match_percentage = 0
-
-        else:
-
-            final_match_percentage = round(
-                (cosine_sim * 30)
-                + (skill_match_ratio * 70),
-                2
-            )
             
 
         # 4. Strength Score
@@ -546,6 +554,12 @@ def analyze_resume(request: AnalysisRequest):
             ],
             "UI/UX & Product Designer": [
                 "figma", "ui design", "ux design", "ux research", "wireframing", "prototyping", "design systems", "adobe photoshop", "adobe illustrator"
+            ],
+            "Corporate Legal & Compliance Counsel": [
+                "corporate law", "contract drafting", "legal compliance", "risk mitigation", "due diligence", "litigation support", "contract management", "legal research"
+            ],
+            "Civil / Mechanical Engineer": [
+                "autocad", "solidworks", "mechanical engineering", "civil engineering", "structural analysis", "fea", "matlab", "circuit design", "construction management"
             ]
         }
 
@@ -608,6 +622,7 @@ def analyze_resume(request: AnalysisRequest):
                 role_scores,
                 key=role_scores.get
             )
+            
 
         top_roles = sorted(
             role_scores.items(),
@@ -635,10 +650,45 @@ def analyze_resume(request: AnalysisRequest):
         else:
 
             role_confidence = 0
+
+        # 6. Calculate Match Percentage (Top Domain vs Global Market Coverage)
+        top_role_match = 0
+        global_market_match = 0
         
+        if is_general_analysis:
+            best_role_skills = role_skills.get(best_role, [])
+            matched_in_best = [s for s in best_role_skills if s in resume_skills]
+            
+            # A. Option 2: Primary Domain Fit (0 - 100)
+            domain_score = (len(matched_in_best) / max(len(best_role_skills), 8)) * 100 if best_role_skills else 0
+            skill_depth_score = min(1.0, len(resume_skills) / 12.0) * 100
+            has_exp = 100 if len(experience.get("positions", [])) > 0 or project_count > 0 else 30
+            raw_match = (domain_score * 0.60) + (skill_depth_score * 0.25) + (has_exp * 0.15)
+            top_role_match = min(98.0, max(15.0, round(raw_match, 2))) if len(resume_skills) > 0 else 0
+            
+            # B. Option 1: True Global Market Fit Across All Industry Sectors (typically 1.5% - 5%)
+            all_sector_skills = set().union(*role_skills.values())
+            matched_global = resume_skills & all_sector_skills
+            if len(all_sector_skills) > 0:
+                global_ratio = len(matched_global) / len(all_sector_skills)
+                global_market_match = round((global_ratio / len(role_skills)) * 100, 2)
+            if global_market_match == 0 and len(resume_skills) > 0:
+                global_market_match = round(min(4.5, len(resume_skills) * 0.35), 2)
+                
+            final_match_percentage = top_role_match
+        else:
+            final_match_percentage = round(
+                (cosine_sim * 30)
+                + (skill_match_ratio * 70),
+                2
+            )
+            top_role_match = final_match_percentage
+            global_market_match = 0
 
         return {
             "match_percentage": round(final_match_percentage, 2),
+            "top_role_match": round(top_role_match, 2),
+            "global_market_match": round(global_market_match, 2),
             "missing_skills": missing_skills,
             "matched_skills": matched_skills,
             "strength_score": round(strength_score, 2),
@@ -653,6 +703,7 @@ def analyze_resume(request: AnalysisRequest):
             "required_skill_count": len(job_skills),
         }
 
+        
     except Exception as e:
         import traceback
         print(traceback.format_exc())
