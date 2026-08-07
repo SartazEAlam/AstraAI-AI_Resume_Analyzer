@@ -19,29 +19,50 @@ app = FastAPI()
 # ── Master Technical Skills List (Gazetteer) ──
 # In a real production app, this would be a database table or a 10,000+ word library.
 TECHNICAL_SKILLS = {
-    # Programming Languages
-    "python", "javascript", "typescript", "java", "c++", "c", "c#", "php", "ruby", "swift", "go", "rust", "kotlin", "scala", "dart", "r", "r programming", "matlab", "solidity", "perl", "bash", "shell", "powershell",
-    
-    # Frontend Frameworks & Libraries
-    "react", "react.js", "reactjs", "next.js", "nextjs", "vue", "vue.js", "vuejs", "nuxt.js", "angular", "angularjs", "svelte", "sveltekit", "redux", "redux toolkit", "mobx", "zustand", "html", "html5", "css", "css3", "sass", "scss", "tailwind", "tailwind css", "bootstrap", "material ui", "chakra ui", "shadcn", "jquery", "webpack", "vite", "babel", "responsive design",
-    
-    # Backend Frameworks & Runtimes
-    "node", "node.js", "nodejs", "express", "express.js", "nestjs", "fastapi", "django", "flask", "spring", "spring boot", "ruby on rails", "laravel", "asp.net", ".net", "graphql", "rest api", "rest apis", "restful api", "microservices", "grpc", "websockets", "authentication", "jwt", "oauth",
-    
-    # Databases & ORMs
-    "sql", "mysql", "postgresql", "postgres", "mongodb", "sqlite", "redis", "cassandra", "dynamodb", "elasticsearch", "mariadb", "oracle", "firebase", "supabase", "prisma", "sequelize", "typeorm", "mongoose", "nosql",
-    
-    # Cloud & DevOps
-    "aws", "amazon web services", "azure", "gcp", "google cloud", "docker", "kubernetes", "k8s", "terraform", "ansible", "jenkins", "gitlab ci", "github actions", "ci/cd", "linux", "unix", "nginx", "apache", "prometheus", "grafana", "monitoring", "serverless", "lambda",
-    
-    # Data Science, AI & Machine Learning
-    "machine learning", "deep learning", "nlp", "natural language processing", "cv", "computer vision", "artificial intelligence", "generative ai", "llm", "large language models", "langchain", "llama", "openai", "huggingface", "pytorch", "tensorflow", "keras", "scikit-learn", "sklearn", "pandas", "numpy", "matplotlib", "seaborn", "scipy", "spacy", "nltk", "opencv", "data science", "data analysis", "data visualization", "tableau", "power bi", "excel", "statistics", "jupyter", "etl", "spark", "hadoop", "airflow",
-    
-    # Version Control, Tools & Methodologies
-    "git", "github", "gitlab", "bitbucket", "jira", "confluence", "agile", "scrum", "kanban", "postman", "figma", "unit testing", "jest", "pytest", "cypress", "selenium",
-    
-    # Security
-    "cybersecurity", "penetration testing", "network security", "firewall", "encryption", "vulnerability assessment", "siem", "incident response", "owasp", "ethical hacking", "soc"
+    # 💻 1. Technology, Programming & Cloud
+    "python", "javascript", "typescript", "java", "c++", "c", "c#", "php", "ruby", "swift", "go", "rust", "kotlin", "r",
+    "react", "react.js", "reactjs", "next.js", "nextjs", "vue", "vue.js", "angular", "html", "css", "tailwind", "bootstrap",
+    "node", "node.js", "nodejs", "express", "fastapi", "django", "flask", "spring", "spring boot", "rest api", "graphql",
+    "sql", "mysql", "postgresql", "postgres", "mongodb", "redis", "firebase", "supabase", "aws", "azure", "gcp", "docker",
+    "kubernetes", "k8s", "terraform", "jenkins", "ci/cd", "git", "linux", "machine learning", "deep learning", "nlp",
+    "computer vision", "pytorch", "tensorflow", "scikit-learn", "pandas", "numpy", "power bi", "tableau", "cybersecurity",
+
+    # 📈 2. Finance, Accounting & Banking
+    "financial modeling", "financial analysis", "valuation", "forecasting", "budgeting", "accounting", "general ledger",
+    "gaap", "ifrs", "auditing", "tax preparation", "internal audit", "accounts payable", "accounts receivable", "reconciliation",
+    "quickbooks", "sap", "oracle financial", "corporate finance", "m&a", "mergers and acquisitions", "due diligence",
+    "lbo modeling", "private equity", "investment banking", "capital markets", "risk management", "cpa", "cfa", "variance analysis",
+
+    # 🏥 3. Healthcare, Nursing & Clinical
+    "patient care", "nursing", "medication administration", "triage", "vital signs", "bls", "acls", "cpr", "emr", "ehr",
+    "epic systems", "cerner", "clinical assessment", "infection control", "phlebotomy", "patient education", "clinical trials",
+    "gcp", "irb", "protocol compliance", "patient recruitment", "fda regulations", "hipaa", "medical billing", "medical coding",
+    "icd-10", "pharmacology", "quality assurance",
+
+    # 📣 4. Marketing, Sales & Communication
+    "digital marketing", "seo", "sem", "search engine optimization", "google analytics", "google ads", "content marketing",
+    "social media marketing", "email marketing", "ppc", "pay-per-click", "copywriting", "content strategy", "hubspot",
+    "mailchimp", "b2b sales", "b2c sales", "lead generation", "salesforce", "cold calling", "negotiation", "crm",
+    "pipeline management", "brand strategy", "public relations", "market research", "customer acquisition",
+
+    # 👥 5. Human Resources & Recruiting
+    "human resources", "talent management", "talent acquisition", "recruiting", "talent sourcing", "ats", "workday",
+    "greenhouse", "lever", "interviewing", "candidate screening", "linkedin recruiter", "employee relations", "onboarding",
+    "hr compliance", "performance management", "conflict resolution", "payroll", "compensation", "benefits administration",
+
+    # 📦 6. Supply Chain, Operations & Logistics
+    "supply chain management", "inventory management", "inventory control", "demand forecasting", "logistics", "procurement",
+    "vendor management", "supplier management", "warehouse operations", "erp", "lean manufacturing", "six sigma", "kaizen",
+    "process optimization", "quality control", "operations management", "continuous improvement", "root cause analysis",
+
+    # 🎨 7. Design, Creative & Media
+    "ui design", "ux design", "ux research", "figma", "sketch", "adobe xd", "wireframing", "prototyping", "design systems",
+    "user testing", "adobe photoshop", "adobe illustrator", "indesign", "after effects", "premiere pro", "typography",
+    "brand identity", "graphic design", "visual design", "motion graphics", "video editing",
+
+    # 🤝 8. Universal Professional & Soft Skills
+    "leadership", "project management", "pmp", "agile", "scrum", "kanban", "strategic planning", "stakeholder management",
+    "problem solving", "critical thinking", "collaboration", "communication", "time management", "decision making"
 }
 
 TECHNICAL_SKILLS.update({
@@ -500,68 +521,34 @@ def analyze_resume(request: AnalysisRequest):
 
         # 5. Role Recommendations
         # If match is low, suggest roles based on extracted resume skills
+                # 5. Universal Multi-Sector Role Recommendations
         role_skills = {
-
-            "Frontend Developer": [
-                "react",
-                "reactjs",
-                "html",
-                "css",
-                "javascript",
-                "typescript",
-                "redux",
-                "tailwind",
-                "bootstrap",
-                "nextjs"
+            "Software Engineer": [
+                "react", "node", "nodejs", "python", "javascript", "typescript", "html", "css", "sql", "git", "docker", "aws"
             ],
-
-            "Backend Developer": [
-                "node",
-                "nodejs",
-                "express",
-                "mysql",
-                "postgresql",
-                "mongodb",
-                "redis",
-                "fastapi",
-                "django",
-                "flask",
-                "java",
-                "spring"
+            "Data & AI Specialist": [
+                "python", "machine learning", "deep learning", "tensorflow", "pytorch", "nlp", "scikit-learn", "pandas", "numpy", "sql"
             ],
-
-            "ML Engineer": [
-                "python",
-                "machine learning",
-                "deep learning",
-                "tensorflow",
-                "pytorch",
-                "nlp",
-                "computer vision",
-                "scikit-learn"
+            "Financial & Investment Analyst": [
+                "financial modeling", "valuation", "excel", "financial analysis", "forecasting", "accounting", "corporate finance", "m&a", "gaap"
             ],
-
-            "Data Analyst": [
-                "sql",
-                "excel",
-                "power bi",
-                "tableau",
-                "pandas",
-                "numpy",
-                "statistics",
-                "data analysis"
+            "Healthcare / Nursing Practitioner": [
+                "patient care", "nursing", "medication administration", "triage", "bls", "acls", "emr", "ehr", "hipaa", "clinical assessment"
             ],
-
-            "DevOps Engineer": [
-                "docker",
-                "kubernetes",
-                "aws",
-                "azure",
-                "terraform",
-                "jenkins",
-                "linux"
+            "Digital Marketer & Strategist": [
+                "digital marketing", "seo", "google analytics", "content marketing", "social media marketing", "copywriting", "hubspot", "b2b sales"
+            ],
+            "HR & Talent Acquisition Specialist": [
+                "human resources", "talent management", "talent acquisition", "recruiting", "ats", "employee relations", "onboarding", "workday"
+            ],
+            "Operations & Supply Chain Lead": [
+                "supply chain management", "inventory management", "logistics", "procurement", "lean manufacturing", "six sigma", "erp", "sap"
+            ],
+            "UI/UX & Product Designer": [
+                "figma", "ui design", "ux design", "ux research", "wireframing", "prototyping", "design systems", "adobe photoshop", "adobe illustrator"
             ]
         }
+
 
         role_scores = {}
 
