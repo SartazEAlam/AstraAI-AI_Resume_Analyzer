@@ -198,3 +198,73 @@ h1, h2, h3, h4, h5, h6 {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
+
+/* ── Screen vs Print Helper Classes ── */
+.print-only {
+  display: none !important;
+}
+
+/* ── High Quality Executive Print / PDF Export Styles ── */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm 12mm;
+  }
+
+  .screen-only {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 11pt;
+  }
+
+  /* Hide UI chrome, navbar, footers, background ambient blurs */
+  nav,
+  footer,
+  .no-print,
+  button,
+  .upload-zone,
+  .fixed.inset-0 {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* Ensure the Executive Report expands to full A4 page width with perfect pagination */
+  .report-root {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+
+  .report-root > div,
+  .report-root .grid > div,
+  .solid-card {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+}
+
