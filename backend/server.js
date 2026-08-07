@@ -44,16 +44,17 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'Backend is running!' });
 });
 
-// ── Get All Jobs (for the frontend dropdown) ──
+// ── Get All Jobs with Category ──
 app.get('/api/jobs', async (req, res) => {
     try {
-        const [rows] = await pool.query('SELECT id, title FROM Jobs');
+        const [rows] = await pool.query('SELECT id, title, category, description, required_skills FROM Jobs ORDER BY category ASC, title ASC');
         res.json(rows);
     } catch (error) {
         console.error('Error fetching jobs:', error);
         res.status(500).json({ error: 'Failed to fetch jobs' });
     }
 });
+
 
 // ── Main Upload & Analyze Endpoint ──
 app.post('/api/upload', upload.single('resume'), async (req, res) => {
