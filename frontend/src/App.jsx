@@ -21,6 +21,8 @@ import {
   ShieldCheck,
   Compass,
   FileCheck2,
+  Sun,
+  Moon,
 } from "lucide-react";
 import {
   BarChart,
@@ -45,42 +47,65 @@ const COLORS = [
 
 /* ── Components ── */
 
-const Navbar = ({ mode, setMode }) => (
-  <nav className="fixed top-0 left-0 right-0 z-50 solid-panel px-6 py-3.5">
-    <div className="max-w-7xl mx-auto flex items-center justify-between">
+const Navbar = ({ mode, setMode, theme, toggleTheme }) => (
+  <nav className="fixed top-0 left-0 right-0 z-50 solid-panel px-6 py-3.5 border-b border-slate-200/80 dark:border-slate-800/80 transition-colors">
+    <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
       <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center shadow-sm">
+        <div className="w-9 h-9 rounded-xl bg-slate-900 dark:bg-indigo-600 flex items-center justify-center shadow-sm transition-colors">
           <Layers className="text-white w-5 h-5" />
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-lg font-bold tracking-tight text-slate-900">
-            Astra<span className="text-indigo-600 font-semibold ml-0.5">ATS</span>
+          <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+            Astra<span className="text-indigo-600 dark:text-indigo-400 font-semibold ml-0.5">ATS</span>
           </span>
-          <span className="hidden sm:inline-flex text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200 uppercase tracking-wider">
+          <span className="hidden sm:inline-flex text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 uppercase tracking-wider">
             Enterprise
           </span>
         </div>
       </div>
-      <div className="flex items-center gap-1 bg-slate-100/90 p-1 rounded-xl border border-slate-200/80">
+
+      <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/90 p-1 rounded-xl border border-slate-200/80 dark:border-slate-700/80">
+          <button
+            onClick={() => setMode("individual")}
+            className={`px-3 sm:px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              mode === "individual"
+                ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+            }`}
+          >
+            Candidate Audit
+          </button>
+          <button
+            onClick={() => setMode("organization")}
+            className={`px-3 sm:px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              mode === "organization"
+                ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+            }`}
+          >
+            Recruiter Pool
+          </button>
+        </div>
+
+        {/* Theme Toggle Button */}
         <button
-          onClick={() => setMode("individual")}
-          className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
-            mode === "individual"
-              ? "bg-white text-slate-900 shadow-sm"
-              : "text-slate-500 hover:text-slate-800"
-          }`}
+          onClick={toggleTheme}
+          aria-label="Toggle theme"
+          title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          className="px-2.5 sm:px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-amber-300 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm transition-all flex items-center gap-1.5 text-xs font-bold"
         >
-          Candidate Audit
-        </button>
-        <button
-          onClick={() => setMode("organization")}
-          className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
-            mode === "organization"
-              ? "bg-white text-slate-900 shadow-sm"
-              : "text-slate-500 hover:text-slate-800"
-          }`}
-        >
-          Recruiter Pool
+          {theme === "dark" ? (
+            <>
+              <Sun className="w-4 h-4 text-amber-400" />
+              <span className="hidden sm:inline">Light</span>
+            </>
+          ) : (
+            <>
+              <Moon className="w-4 h-4 text-slate-700" />
+              <span className="hidden sm:inline">Dark</span>
+            </>
+          )}
         </button>
       </div>
     </div>
@@ -103,7 +128,7 @@ const ScoreRing = ({ score, label, badge, icon: Icon, colorClass }) => {
             cx="50"
             cy="50"
             r={radius}
-            className="stroke-slate-200"
+            className="stroke-slate-200 dark:stroke-slate-800"
             strokeWidth="8"
             fill="none"
           />
@@ -122,20 +147,20 @@ const ScoreRing = ({ score, label, badge, icon: Icon, colorClass }) => {
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-2xl font-black text-slate-900">
+          <span className="text-2xl font-black text-slate-900 dark:text-white">
             {isNA ? "N/A" : `${Math.round(displayScore)}%`}
           </span>
         </div>
       </div>
       <div className="flex flex-col items-center gap-1.5 mt-3">
         <div className="flex items-center gap-2">
-          {Icon && <Icon className="w-4 h-4 text-slate-400" />}
-          <span className="text-xs font-bold uppercase tracking-widest text-slate-500">
+          {Icon && <Icon className="w-4 h-4 text-slate-400 dark:text-slate-500" />}
+          <span className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
             {label}
           </span>
         </div>
         {badge && (
-          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm max-w-[200px] truncate bg-indigo-50 text-indigo-700 border border-indigo-200/80">
+          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm max-w-[200px] truncate bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/80">
             {badge}
           </span>
         )}
@@ -169,7 +194,7 @@ const DualScoreRing = ({ topScore, topRole, globalScore }) => {
                 cx="38"
                 cy="38"
                 r={radius}
-                className="stroke-slate-200"
+                className="stroke-slate-200 dark:stroke-slate-800"
                 strokeWidth="6"
                 fill="none"
               />
@@ -177,7 +202,7 @@ const DualScoreRing = ({ topScore, topRole, globalScore }) => {
                 cx="38"
                 cy="38"
                 r={radius}
-                className="stroke-indigo-500"
+                className="stroke-indigo-500 dark:stroke-indigo-400"
                 strokeWidth="6"
                 fill="none"
                 strokeLinecap="round"
@@ -188,17 +213,17 @@ const DualScoreRing = ({ topScore, topRole, globalScore }) => {
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-lg font-black text-slate-900">
+              <span className="text-lg font-black text-slate-900 dark:text-white">
                 {isTopNA ? "N/A" : `${Math.round(displayTop)}%`}
               </span>
             </div>
           </div>
           <div className="flex flex-col items-center gap-1 mt-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 text-center">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-center">
               Single Best
             </span>
             <span
-              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/80 max-w-[120px] truncate"
+              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/80 max-w-[120px] truncate"
               title={`Top Match: ${topRole || "General"}`}
             >
               🎯 {topRole || "Top Fit"}
@@ -214,7 +239,7 @@ const DualScoreRing = ({ topScore, topRole, globalScore }) => {
                 cx="38"
                 cy="38"
                 r={radius}
-                className="stroke-slate-200"
+                className="stroke-slate-200 dark:stroke-slate-800"
                 strokeWidth="6"
                 fill="none"
               />
@@ -222,7 +247,7 @@ const DualScoreRing = ({ topScore, topRole, globalScore }) => {
                 cx="38"
                 cy="38"
                 r={radius}
-                className="stroke-emerald-500"
+                className="stroke-emerald-500 dark:stroke-emerald-400"
                 strokeWidth="6"
                 fill="none"
                 strokeLinecap="round"
@@ -233,17 +258,17 @@ const DualScoreRing = ({ topScore, topRole, globalScore }) => {
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-lg font-black text-slate-900">
+              <span className="text-lg font-black text-slate-900 dark:text-white">
                 {isGlobalNA ? "N/A" : `${displayGlobal}%`}
               </span>
             </div>
           </div>
           <div className="flex flex-col items-center gap-1 mt-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 text-center">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-center">
               Overall Market
             </span>
             <span
-              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 max-w-[120px] truncate"
+              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/80 max-w-[120px] truncate"
               title="Evaluated across all 54 jobs in all sectors"
             >
               🌐 All 54 Jobs
@@ -268,7 +293,7 @@ const MiniScoreRing = ({ score, colorClass }) => {
           cx="24"
           cy="24"
           r={radius}
-          className="stroke-slate-200"
+          className="stroke-slate-200 dark:stroke-slate-800"
           strokeWidth="4"
           fill="none"
         />
@@ -286,7 +311,7 @@ const MiniScoreRing = ({ score, colorClass }) => {
           style={{ strokeDasharray: circumference }}
         />
       </svg>
-      <span className="text-[11px] font-bold text-slate-700 relative z-10">
+      <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200 relative z-10">
         {displayScore}
       </span>
     </div>
@@ -294,13 +319,13 @@ const MiniScoreRing = ({ score, colorClass }) => {
 };
 
 const FeatureCard = ({ icon: Icon, title, desc }) => (
-  <div className="solid-card p-6 flex flex-col gap-3.5 bg-white border border-slate-200">
-    <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700">
-      <Icon className="w-5 h-5 text-indigo-600" />
+  <div className="solid-card p-6 flex flex-col gap-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+    <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-300">
+      <Icon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
     </div>
     <div>
-      <h3 className="text-base font-bold text-slate-900 tracking-tight">{title}</h3>
-      <p className="text-xs text-slate-500 leading-relaxed mt-1">{desc}</p>
+      <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">{title}</h3>
+      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-1">{desc}</p>
     </div>
   </div>
 );
@@ -309,22 +334,22 @@ const LoadingOverlay = () => (
   <div className="space-y-8 py-12">
     <div className="flex flex-col items-center justify-center gap-4">
       <div className="relative w-16 h-16">
-        <div className="absolute inset-0 rounded-full border-2 border-slate-200" />
-        <div className="absolute inset-0 rounded-full border-2 border-indigo-600 border-t-transparent animate-spin" />
-        <Layers className="absolute inset-0 m-auto w-6 h-6 text-indigo-600" />
+        <div className="absolute inset-0 rounded-full border-2 border-slate-200 dark:border-slate-800" />
+        <div className="absolute inset-0 rounded-full border-2 border-indigo-600 dark:border-indigo-400 border-t-transparent animate-spin" />
+        <Layers className="absolute inset-0 m-auto w-6 h-6 text-indigo-600 dark:text-indigo-400" />
       </div>
       <div className="text-center">
-        <h3 className="text-lg font-bold text-slate-900 tracking-tight">
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
           Executing Resume & ATS Audit
         </h3>
-        <p className="text-slate-500 text-xs mt-0.5">
+        <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">
           Extracting competencies, calculating TF-IDF vectors, and verifying timeline records...
         </p>
       </div>
     </div>
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="solid-card p-6 h-40 shimmer border border-slate-200 rounded-2xl" />
+        <div key={i} className="solid-card p-6 h-40 shimmer border border-slate-200 dark:border-slate-800 rounded-2xl" />
       ))}
     </div>
   </div>
@@ -643,35 +668,37 @@ const ExecutiveReport = ({ results, fileName, jobTitle, category }) => {
         </div>
       )}
 
-      {/* AI Strategic Career Recommendations */}
-      <div className="p-6 rounded-2xl border border-slate-200 bg-slate-50/80 space-y-3">
-        <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-indigo-600" />
-          Strategic Optimization Roadmap for High-Impact ATS Placement
-        </h3>
-        <ul className="space-y-2 text-xs text-slate-700 leading-relaxed font-medium">
-          <li className="flex items-start gap-2">
-            <span className="text-indigo-600 font-bold">•</span>
-            <span>
-              <strong>Quantify Key Achievements:</strong> Integrate concrete metric achievements (e.g. <em>"Increased system throughput by 35%"</em> or <em>"Managed $250k portfolio"</em>) under recent experience.
-            </span>
-          </li>
-          {missingSkillsCount > 0 && (
+      {/* AI Strategic Career Recommendations (Dynamic: only shown when gaps/missing skills are detected) */}
+      {(missingSkillsCount > 0 || (results.score && results.score < 80)) && (
+        <div className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/60 space-y-3">
+          <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            Strategic Optimization Roadmap ({missingSkillsCount} Actionable Gaps Identified)
+          </h3>
+          <ul className="space-y-2 text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
+            {missingSkillsCount > 0 && (
+              <li className="flex items-start gap-2">
+                <span className="text-rose-600 dark:text-rose-400 font-bold">•</span>
+                <span>
+                  <strong>Bridge Missing Core Keywords:</strong> Add highlighted target skills ({results.missing_skills?.slice(0, 4).join(", ")}) in project descriptions and technical summaries.
+                </span>
+              </li>
+            )}
             <li className="flex items-start gap-2">
-              <span className="text-rose-600 font-bold">•</span>
+              <span className="text-indigo-600 dark:text-indigo-400 font-bold">•</span>
               <span>
-                <strong>Bridge Missing Core Keywords:</strong> Add highlighted target skills ({results.missing_skills?.slice(0, 3).join(", ")}) in project descriptions and technical summaries.
+                <strong>Quantify Key Achievements:</strong> Integrate concrete metric achievements (e.g. <em>"Increased system throughput by 35%"</em> or <em>"Managed $250k portfolio"</em>) under recent experience.
               </span>
             </li>
-          )}
-          <li className="flex items-start gap-2">
-            <span className="text-indigo-600 font-bold">•</span>
-            <span>
-              <strong>ATS Format Standard:</strong> Maintain clean single-column structure and standard section headings (Experience, Education, Skills) to guarantee 100% ATS parser fidelity.
-            </span>
-          </li>
-        </ul>
-      </div>
+            <li className="flex items-start gap-2">
+              <span className="text-indigo-600 dark:text-indigo-400 font-bold">•</span>
+              <span>
+                <strong>ATS Format Standard:</strong> Maintain clean single-column structure and standard section headings (Experience, Education, Skills) to guarantee 100% ATS parser fidelity.
+              </span>
+            </li>
+          </ul>
+        </div>
+      )}
 
       {/* Report Footer & Certification */}
       <div className="pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-400 gap-2">
@@ -695,33 +722,33 @@ const CandidateModal = ({ candidate, onClose, jobTitle, category }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm no-print"
+        className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm no-print"
         onClick={onClose}
       />
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl p-8"
+        className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white"
       >
-        <div className="flex flex-wrap items-center justify-between mb-8 border-b border-slate-100 pb-6 gap-4 no-print">
+        <div className="flex flex-wrap items-center justify-between mb-8 border-b border-slate-100 dark:border-slate-800 pb-6 gap-4 no-print">
           <div>
-            <h2 className="text-3xl font-black text-slate-900">
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
               {candidate.fileName}
             </h2>
-            <p className="text-slate-500 mt-1">Detailed Candidate Analysis</p>
+            <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm">Detailed Candidate Analysis</p>
           </div>
 
           <div className="flex items-center gap-3">
             {!candidate.error && (
               <>
-                <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+                <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
                   <button
                     onClick={() => setModalTab("breakdown")}
                     className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                       modalTab === "breakdown"
-                        ? "bg-white text-indigo-600 shadow-sm"
-                        : "text-slate-500 hover:text-slate-800"
+                        ? "bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm"
+                        : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                     }`}
                   >
                     Breakdown
@@ -730,8 +757,8 @@ const CandidateModal = ({ candidate, onClose, jobTitle, category }) => {
                     onClick={() => setModalTab("report")}
                     className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                       modalTab === "report"
-                        ? "bg-white text-indigo-600 shadow-sm"
-                        : "text-slate-500 hover:text-slate-800"
+                        ? "bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm"
+                        : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                     }`}
                   >
                     Executive Report
@@ -750,7 +777,7 @@ const CandidateModal = ({ candidate, onClose, jobTitle, category }) => {
 
             <button
               onClick={onClose}
-              className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-500 dark:text-slate-400"
             >
               <svg
                 width="24"
@@ -760,7 +787,6 @@ const CandidateModal = ({ candidate, onClose, jobTitle, category }) => {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-slate-500"
               >
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -772,10 +798,10 @@ const CandidateModal = ({ candidate, onClose, jobTitle, category }) => {
         {candidate.error ? (
           <div className="py-12 flex flex-col items-center text-center">
             <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
-            <h3 className="text-2xl font-bold text-slate-900 mb-2">
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
               Analysis Failed
             </h3>
-            <p className="text-slate-500 max-w-md">{candidate.error}</p>
+            <p className="text-slate-500 dark:text-slate-400 max-w-md">{candidate.error}</p>
           </div>
         ) : modalTab === "report" ? (
           <ExecutiveReport
@@ -787,14 +813,14 @@ const CandidateModal = ({ candidate, onClose, jobTitle, category }) => {
         ) : (
           <>
             <div className="screen-only">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 py-6 bg-slate-50 rounded-2xl border border-slate-100 mb-8">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 py-6 bg-slate-50 dark:bg-slate-950/60 rounded-2xl border border-slate-100 dark:border-slate-800 mb-8">
                 {candidate.required_skill_count > 0 ? (
                   <ScoreRing
                     score={candidate.match_percentage}
                     label="Target Job Match"
                     badge="🎯 Target Opening"
                     icon={Target}
-                    colorClass="stroke-indigo-500"
+                    colorClass="stroke-indigo-500 dark:stroke-indigo-400"
                   />
                 ) : (
                   <DualScoreRing
@@ -810,7 +836,7 @@ const CandidateModal = ({ candidate, onClose, jobTitle, category }) => {
                   score={candidate.strength_score}
                   label="Resume Strength"
                   icon={Zap}
-                  colorClass="stroke-purple-500"
+                  colorClass="stroke-purple-500 dark:stroke-purple-400"
                 />
                 <ScoreRing
                   score={
@@ -834,15 +860,15 @@ const CandidateModal = ({ candidate, onClose, jobTitle, category }) => {
                       : "Skill Breadth"
                   }
                   icon={CheckCircle2}
-                  colorClass="stroke-cyan-500"
+                  colorClass="stroke-cyan-500 dark:stroke-cyan-400"
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                <div className="solid-card p-6 shadow-none">
-                  <div className="flex items-center gap-3 border-b border-slate-200 pb-4 mb-4">
-                    <Zap className="w-5 h-5 text-indigo-500" />
-                    <h3 className="text-lg font-bold text-slate-900">
+                <div className="solid-card p-6 shadow-none bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80">
+                  <div className="flex items-center gap-3 border-b border-slate-200 dark:border-slate-700 pb-4 mb-4">
+                    <Zap className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">
                       Extracted Skills
                     </h3>
                   </div>
@@ -850,23 +876,23 @@ const CandidateModal = ({ candidate, onClose, jobTitle, category }) => {
                     {candidate.extracted_skills?.map((skill, i) => (
                       <span
                         key={i}
-                        className="skill-tag px-3 py-1.5 rounded-lg text-sm font-semibold bg-indigo-50 text-indigo-600 border border-indigo-100"
+                        className="skill-tag px-3 py-1.5 rounded-lg text-sm font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800"
                       >
                         {skill}
                       </span>
                     ))}
                     {(!candidate.extracted_skills ||
                       candidate.extracted_skills.length === 0) && (
-                      <p className="text-slate-500 italic text-sm">
+                      <p className="text-slate-500 dark:text-slate-400 italic text-sm">
                         No specific skills detected.
                       </p>
                     )}
                   </div>
                 </div>
-                <div className="solid-card p-6 shadow-none">
-                  <div className="flex items-center gap-3 border-b border-slate-200 pb-4 mb-4">
+                <div className="solid-card p-6 shadow-none bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80">
+                  <div className="flex items-center gap-3 border-b border-slate-200 dark:border-slate-700 pb-4 mb-4">
                     <AlertCircle className="w-5 h-5 text-red-500" />
-                    <h3 className="text-lg font-bold text-slate-900">
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">
                       Skill Gaps
                     </h3>
                   </div>
@@ -875,21 +901,21 @@ const CandidateModal = ({ candidate, onClose, jobTitle, category }) => {
                       {candidate.missing_skills.map((skill, i) => (
                         <span
                           key={i}
-                          className="skill-tag px-3 py-1.5 rounded-lg text-sm font-semibold bg-red-50 text-red-600 border border-red-100"
+                          className="skill-tag px-3 py-1.5 rounded-lg text-sm font-semibold bg-red-50 dark:bg-rose-950/50 text-red-600 dark:text-rose-300 border border-red-100 dark:border-rose-800"
                         >
                           {skill}
                         </span>
                       ))}
                     </div>
                   ) : candidate.required_skill_count > 0 ? (
-                    <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100">
-                      <p className="text-emerald-600 text-sm font-medium">
+                    <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-800">
+                      <p className="text-emerald-600 dark:text-emerald-300 text-sm font-medium">
                         ✨ Candidate profile matches all target job skills!
                       </p>
                     </div>
                   ) : (
-                    <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
-                      <p className="text-slate-600 text-sm font-medium">
+                    <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700">
+                      <p className="text-slate-600 dark:text-slate-300 text-sm font-medium">
                         💡 General market screening active. Select a specific role
                         to analyze required skill gaps.
                       </p>
@@ -900,57 +926,57 @@ const CandidateModal = ({ candidate, onClose, jobTitle, category }) => {
 
               {/* Experience Section */}
               {candidate.experience && (
-                <div className="solid-card p-6 shadow-none mb-8">
-                  <div className="flex items-center gap-3 border-b border-slate-200 pb-4 mb-4">
+                <div className="solid-card p-6 shadow-none mb-8 bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80">
+                  <div className="flex items-center gap-3 border-b border-slate-200 dark:border-slate-700 pb-4 mb-4">
                     <Briefcase className="w-5 h-5 text-amber-500" />
-                    <h3 className="text-lg font-bold text-slate-900">
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">
                       Previous Experience
                     </h3>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                    <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
-                      <p className="text-xs font-bold uppercase tracking-widest text-amber-600/70 mb-1">
+                    <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-800/60">
+                      <p className="text-xs font-bold uppercase tracking-widest text-amber-600/70 dark:text-amber-400 mb-1">
                         Total Experience
                       </p>
-                      <p className="text-2xl font-black text-amber-700">
+                      <p className="text-2xl font-black text-amber-700 dark:text-amber-300">
                         {candidate.experience.total_years != null
                           ? `${candidate.experience.total_years} year${candidate.experience.total_years !== 1 ? "s" : ""}`
                           : "Not detected"}
                       </p>
                     </div>
-                    <div className="p-4 rounded-xl bg-violet-50 border border-violet-100">
-                      <p className="text-xs font-bold uppercase tracking-widest text-violet-600/70 mb-1">
+                    <div className="p-4 rounded-xl bg-violet-50 dark:bg-violet-950/30 border border-violet-100 dark:border-violet-800/60">
+                      <p className="text-xs font-bold uppercase tracking-widest text-violet-600/70 dark:text-violet-400 mb-1">
                         Seniority Level
                       </p>
-                      <p className="text-2xl font-black text-violet-700">
+                      <p className="text-2xl font-black text-violet-700 dark:text-violet-300">
                         {candidate.experience.seniority_level}
                       </p>
                     </div>
                   </div>
                   {candidate.experience.positions?.length > 0 && (
                     <div className="space-y-3">
-                      <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">
+                      <p className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                         Positions Found
                       </p>
                       {candidate.experience.positions.map((pos, i) => (
                         <div
                           key={i}
-                          className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100"
+                          className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800"
                         >
-                          <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-950/80 flex items-center justify-center flex-shrink-0 mt-0.5">
                             <Briefcase className="w-4 h-4 text-indigo-500" />
                           </div>
                           <div>
-                            <p className="text-sm font-bold text-slate-900">
+                            <p className="text-sm font-bold text-slate-900 dark:text-white">
                               {pos.title}
                             </p>
                             {pos.company && (
-                              <p className="text-xs text-slate-500">
+                              <p className="text-xs text-slate-500 dark:text-slate-400">
                                 {pos.company}
                               </p>
                             )}
                             {pos.duration && (
-                              <p className="text-xs text-slate-400 flex items-center gap-1 mt-1">
+                              <p className="text-xs text-slate-400 dark:text-slate-500 flex items-center gap-1 mt-1">
                                 <Calendar className="w-3 h-3" /> {pos.duration}
                               </p>
                             )}
@@ -970,8 +996,8 @@ const CandidateModal = ({ candidate, onClose, jobTitle, category }) => {
               )}
 
               {candidate.recommended_roles?.length > 0 && (
-                <div className="solid-card p-6 shadow-none bg-slate-50 border-slate-200">
-                  <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <div className="solid-card p-6 shadow-none bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                     <LayoutDashboard className="w-5 h-5 text-indigo-500" />{" "}
                     Recommended Alternative Roles
                   </h3>
@@ -979,7 +1005,7 @@ const CandidateModal = ({ candidate, onClose, jobTitle, category }) => {
                     {candidate.recommended_roles.map((role, i) => (
                       <span
                         key={i}
-                        className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-slate-700 font-bold text-sm shadow-sm"
+                        className="px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-200 font-bold text-sm shadow-sm"
                       >
                         {role}
                       </span>
@@ -1011,7 +1037,7 @@ const isAllowedFile = (name) => {
   return ALLOWED_EXTENSIONS.some((ext) => lower.endsWith(ext));
 };
 
-const OrganizationDashboard = () => {
+const OrganizationDashboard = ({ theme }) => {
   const [files, setFiles] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [selectedJobId, setSelectedJobId] = useState("");
@@ -1121,17 +1147,17 @@ const OrganizationDashboard = () => {
   return (
     <div className="space-y-8 relative">
       {results.length === 0 && !loading && (
-        <div className="solid-card p-8 bg-white">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">
+        <div className="solid-card p-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">
             Bulk Resume Analysis
           </h2>
 
           {/* 2-Dropdown Cascading Job Selector for Organization */}
-          <div className="mb-6 p-6 rounded-2xl bg-slate-50/80 border border-slate-200/80 shadow-sm space-y-4">
+          <div className="mb-6 p-6 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {/* Dropdown 1: Industry / Sector */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
                   🏢 1. Industry Sector
                 </label>
                 <select
@@ -1140,7 +1166,7 @@ const OrganizationDashboard = () => {
                     setSelectedCategory(e.target.value);
                     setSelectedJobId("");
                   }}
-                  className="w-full p-3.5 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 font-medium transition-all shadow-sm cursor-pointer"
+                  className="w-full p-3.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 dark:text-slate-100 font-medium transition-all shadow-sm cursor-pointer"
                 >
                   <option value="">🌐 All Sectors</option>
                   {[...new Set(jobs.map((j) => j.category || "Other"))].map(
@@ -1155,13 +1181,13 @@ const OrganizationDashboard = () => {
 
               {/* Dropdown 2: Target Opening */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
                   🎯 2. Target Job Opening
                 </label>
                 <select
                   value={selectedJobId}
                   onChange={(e) => setSelectedJobId(e.target.value)}
-                  className="w-full p-3.5 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 font-medium transition-all shadow-sm cursor-pointer"
+                  className="w-full p-3.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 dark:text-slate-100 font-medium transition-all shadow-sm cursor-pointer"
                 >
                   <option value="">Select Target Job Opening</option>
                   {filteredJobs.map((job) => (
@@ -1175,7 +1201,7 @@ const OrganizationDashboard = () => {
           </div>
 
           <div
-            className={`upload-zone min-h-[200px] flex flex-col items-center justify-center p-8 cursor-pointer ${dragOver ? "drag-over" : ""}`}
+            className={`upload-zone min-h-[200px] flex flex-col items-center justify-center p-8 cursor-pointer bg-slate-50 dark:bg-[#070b14] border-2 border-dashed border-slate-300 dark:border-slate-700/80 rounded-2xl hover:border-indigo-500 hover:dark:border-indigo-400 hover:bg-indigo-50/20 hover:dark:bg-indigo-950/30 transition-all ${dragOver ? "drag-over border-indigo-600 dark:border-indigo-400 bg-indigo-50/40 dark:bg-indigo-950/50" : ""}`}
             onDragOver={(e) => {
               e.preventDefault();
               setDragOver(true);
@@ -1192,22 +1218,24 @@ const OrganizationDashboard = () => {
               onChange={handleFileChange}
               accept=".pdf,.docx,.doc,.txt,.rtf,.md,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,application/rtf"
             />
-            <Upload className="w-10 h-10 text-indigo-400 mb-4" />
-            <h3 className="text-xl font-bold text-slate-900">
+            <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center mb-4 text-slate-700 dark:text-slate-300">
+              <Upload className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+            </div>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white">
               {files.length > 0
                 ? `${files.length} resumes selected`
                 : "Drop multiple resumes here"}
             </h3>
-            <p className="text-slate-400">or click to browse your files</p>
-            <p className="text-xs text-slate-500 pt-2 uppercase tracking-widest">
-              Supported: PDF, Word (DOCX, DOC), TXT, RTF
+            <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">or click to browse your files</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500 pt-2 uppercase tracking-widest font-mono">
+              Supported: PDF, DOCX, DOC, TXT, RTF
             </p>
           </div>
 
           <button
             onClick={handleUpload}
             disabled={files.length === 0 || loading}
-            className="w-full mt-6 py-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-30 text-white font-bold text-lg transition-all"
+            className="w-full mt-6 py-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-base transition-all shadow-md shadow-indigo-500/20"
           >
             {loading ? "Analyzing Batch..." : "Start Bulk Analysis"}
           </button>
@@ -1215,9 +1243,9 @@ const OrganizationDashboard = () => {
       )}
 
       {loading && (
-        <div className="solid-card p-12 flex flex-col items-center justify-center mt-8">
-          <div className="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4" />
-          <p className="text-lg font-bold text-slate-700">
+        <div className="solid-card p-12 flex flex-col items-center justify-center mt-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div className="w-16 h-16 border-4 border-indigo-200 dark:border-indigo-900 border-t-indigo-600 dark:border-t-indigo-400 rounded-full animate-spin mb-4" />
+          <p className="text-lg font-bold text-slate-700 dark:text-slate-200">
             Analyzing {files.length} candidates against the job description...
           </p>
         </div>
@@ -1225,12 +1253,12 @@ const OrganizationDashboard = () => {
 
       {results.length > 0 && !loading && (
         <div className="space-y-8 mt-8">
-          <div className="flex items-center justify-between bg-white solid-card p-6">
+          <div className="flex items-center justify-between bg-white dark:bg-slate-900 solid-card p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
             <div>
-              <h2 className="text-2xl font-black text-slate-900">
+              <h2 className="text-2xl font-black text-slate-900 dark:text-white">
                 Batch Analysis Complete
               </h2>
-              <p className="text-slate-500">
+              <p className="text-slate-500 dark:text-slate-400">
                 Successfully analyzed {results.length} candidate
                 {results.length !== 1 && "s"}.
               </p>
@@ -1240,7 +1268,7 @@ const OrganizationDashboard = () => {
                 setResults([]);
                 setFiles([]);
               }}
-              className="text-sm font-bold uppercase tracking-widest text-indigo-500 hover:text-indigo-600 transition-colors px-6 py-3 rounded-xl bg-indigo-50 hover:bg-indigo-100"
+              className="text-sm font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 transition-colors px-6 py-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-100 dark:border-indigo-800"
             >
               Analyze New Batch →
             </button>
@@ -1248,11 +1276,11 @@ const OrganizationDashboard = () => {
 
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
             <div className="xl:col-span-1">
-              <div className="solid-card p-8 bg-white">
-                <h3 className="text-xl font-bold text-slate-900 mb-2">
+              <div className="solid-card p-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
                   Recommended Career Paths
                 </h3>
-                <p className="text-sm text-slate-500 mb-8">
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-8">
                   Role Distribution Based on Candidate Profiles of{" "}
                   {results.length} candidates.
                 </p>
@@ -1274,13 +1302,13 @@ const OrganizationDashboard = () => {
                           strokeDasharray="3 3"
                           horizontal={true}
                           vertical={false}
-                          stroke="#e2e8f0"
+                          stroke={theme === "dark" ? "#1e293b" : "#e2e8f0"}
                         />
                         <XAxis
                           type="number"
                           axisLine={false}
                           tickLine={false}
-                          tick={{ fill: "#64748b", fontSize: 12 }}
+                          tick={{ fill: theme === "dark" ? "#94a3b8" : "#64748b", fontSize: 12 }}
                           allowDecimals={false}
                         />
                         <YAxis
@@ -1289,18 +1317,20 @@ const OrganizationDashboard = () => {
                           axisLine={false}
                           tickLine={false}
                           tick={{
-                            fill: "#475569",
+                            fill: theme === "dark" ? "#cbd5e1" : "#475569",
                             fontSize: 11,
                             fontWeight: "bold",
                           }}
                           width={100}
                         />
                         <Tooltip
-                          cursor={{ fill: "#f8fafc" }}
+                          cursor={{ fill: theme === "dark" ? "rgba(255,255,255,0.05)" : "#f8fafc" }}
                           contentStyle={{
                             borderRadius: "12px",
-                            border: "1px solid #e2e8f0",
-                            boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
+                            border: theme === "dark" ? "1px solid #1e293b" : "1px solid #e2e8f0",
+                            backgroundColor: theme === "dark" ? "#0f172a" : "#ffffff",
+                            color: theme === "dark" ? "#f8fafc" : "#0f172a",
+                            boxShadow: "0 10px 15px -3px rgba(0,0,0,0.3)",
                           }}
                         />
                         <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={32}>
@@ -1323,38 +1353,38 @@ const OrganizationDashboard = () => {
             </div>
 
             <div className="xl:col-span-2">
-              <div className="solid-card p-8 bg-white h-full overflow-hidden flex flex-col">
-                <h3 className="text-xl font-bold text-slate-900 mb-6">
+              <div className="solid-card p-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm h-full overflow-hidden flex flex-col">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
                   Ranked Candidates
                 </h3>
                 <div className="overflow-x-auto flex-grow">
                   <table className="w-full text-left border-collapse min-w-[700px]">
                     <thead>
-                      <tr className="border-b border-slate-200">
-                        <th className="p-4 text-sm font-bold text-slate-500 uppercase tracking-wider">
+                      <tr className="border-b border-slate-200 dark:border-slate-800">
+                        <th className="p-4 text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                           Candidate File
                         </th>
-                        <th className="p-4 text-sm font-bold text-slate-500 uppercase tracking-wider text-center">
+                        <th className="p-4 text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">
                           {selectedJobId ? "Match %" : "Single Best"}
                         </th>
                         {!selectedJobId && (
-                          <th className="p-4 text-sm font-bold text-slate-500 uppercase tracking-wider text-center">
+                          <th className="p-4 text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">
                             Overall Market
                           </th>
                         )}
-                        <th className="p-4 text-sm font-bold text-slate-500 uppercase tracking-wider text-center">
+                        <th className="p-4 text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">
                           Strength
                         </th>
-                        <th className="p-4 text-sm font-bold text-slate-500 uppercase tracking-wider">
+                        <th className="p-4 text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                           Experience
                         </th>
-                        <th className="p-4 text-sm font-bold text-slate-500 uppercase tracking-wider">
+                        <th className="p-4 text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                           Key Skills
                         </th>
-                        <th className="p-4 text-sm font-bold text-slate-500 uppercase tracking-wider">
+                        <th className="p-4 text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                           Top Role
                         </th>
-                        <th className="p-4 text-sm font-bold text-slate-500 uppercase tracking-wider">
+                        <th className="p-4 text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                           Action
                         </th>
                       </tr>
@@ -1363,10 +1393,10 @@ const OrganizationDashboard = () => {
                       {results.map((res, i) => (
                         <tr
                           key={i}
-                          className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
+                          className="border-b border-slate-100 dark:border-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
                         >
-                          <td className="p-4 font-semibold text-slate-900 flex items-center gap-3 whitespace-nowrap">
-                            <FileText className="w-5 h-5 text-indigo-400" />
+                          <td className="p-4 font-semibold text-slate-900 dark:text-white flex items-center gap-3 whitespace-nowrap">
+                            <FileText className="w-5 h-5 text-indigo-500" />
                             <span
                               className="truncate max-w-[200px]"
                               title={res.fileName}
@@ -1391,7 +1421,7 @@ const OrganizationDashboard = () => {
                               {res.error ? (
                                 "-"
                               ) : (
-                                <span className="inline-block px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-bold text-xs border border-emerald-200/90 shadow-sm">
+                                <span className="inline-block px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold text-xs border border-emerald-200/90 dark:border-emerald-800 shadow-sm">
                                   {res.global_market_match != null ? `${res.global_market_match}%` : "0%"}
                                 </span>
                               )}
@@ -1409,7 +1439,7 @@ const OrganizationDashboard = () => {
                               )}
                             </div>
                           </td>
-                          <td className="p-4 text-slate-600 text-sm whitespace-nowrap">
+                          <td className="p-4 text-slate-600 dark:text-slate-300 text-sm whitespace-nowrap">
                             {res.error ? (
                               "-"
                             ) : (
@@ -1421,20 +1451,20 @@ const OrganizationDashboard = () => {
                                     : "—"}
                                 </span>
                                 {res.experience?.seniority_level && (
-                                  <span className="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-100 font-bold">
+                                  <span className="text-xs px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-300 border border-amber-100 dark:border-amber-800 font-bold">
                                     {res.experience.seniority_level}
                                   </span>
                                 )}
                               </div>
                             )}
                           </td>
-                          <td className="p-4 max-w-[200px] truncate text-slate-600 text-sm">
+                          <td className="p-4 max-w-[200px] truncate text-slate-600 dark:text-slate-300 text-sm">
                             {res.error
                               ? "-"
                               : res.extracted_skills?.slice(0, 3).join(", ") ||
                                 "None"}
                           </td>
-                          <td className="p-4 text-slate-600 text-sm font-semibold max-w-[150px] truncate">
+                          <td className="p-4 text-slate-600 dark:text-slate-300 text-sm font-semibold max-w-[150px] truncate">
                             {res.error
                               ? "-"
                               : res.recommended_roles?.[0] ||
@@ -1446,7 +1476,7 @@ const OrganizationDashboard = () => {
                               className={`text-sm font-bold transition-colors px-4 py-2 rounded-full ${
                                 res.error
                                   ? "text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100"
-                                  : "text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100"
+                                  : "text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-100 dark:border-indigo-800"
                               }`}
                             >
                               View Details
@@ -1486,6 +1516,33 @@ function App() {
   const [jobs, setJobs] = useState([]);
   const [selectedJobId, setSelectedJobId] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+
+  // Theme Management (light / dark) with LocalStorage persistence
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem("astra-theme");
+    if (saved === "light" || saved === "dark") return saved;
+    return "light"; // Default to clean light mode unless toggled
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === "dark") {
+      root.classList.add("dark");
+      root.setAttribute("data-theme", "dark");
+      document.body.classList.add("dark");
+      root.style.colorScheme = "dark";
+    } else {
+      root.classList.remove("dark");
+      root.setAttribute("data-theme", "light");
+      document.body.classList.remove("dark");
+      root.style.colorScheme = "light";
+    }
+    localStorage.setItem("astra-theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  };
 
   const filteredJobs = selectedCategory
     ? jobs.filter((j) => (j.category || "Other") === selectedCategory)
@@ -1571,8 +1628,8 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
-      <Navbar mode={mode} setMode={setMode} />
+    <div className={`min-h-screen transition-colors ${theme === "dark" ? "bg-[#0b0f19] text-slate-100" : "bg-slate-50 text-slate-900"}`}>
+      <Navbar mode={mode} setMode={setMode} theme={theme} toggleTheme={toggleTheme} />
 
       <main className="relative z-10 pt-28 pb-20 px-6 max-w-7xl mx-auto">
         {mode === "individual" ? (
@@ -1584,14 +1641,14 @@ function App() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 tracking-wide mb-4 shadow-sm">
+                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-800 text-xs font-bold text-emerald-900 dark:text-emerald-200 tracking-wide mb-4 shadow-sm">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                   ATS Parsing Engine Active · 54 Industry Models
                 </span>
-                <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-slate-900 mb-4">
-                  Precision Resume & <span className="text-indigo-600">ATS Audit</span>
+                <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-slate-900 dark:text-white mb-4">
+                  Precision Resume & <span className="text-indigo-600 dark:text-indigo-400">ATS Audit</span>
                 </h1>
-                <p className="text-base sm:text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed">
+                <p className="text-base sm:text-lg text-slate-700 dark:text-slate-200 font-medium max-w-2xl mx-auto leading-relaxed">
                   Audit keyword density, verify experience timelines, and benchmark role readiness with parser-level accuracy.
                 </p>
               </motion.div>
@@ -1606,9 +1663,9 @@ function App() {
                   className="space-y-10"
                 >
                   {/* Upload Card */}
-                  <div className="solid-card bg-white p-8 md:p-10 border border-slate-200 shadow-sm">
+                  <div className="solid-card bg-white dark:bg-slate-900 p-8 md:p-10 border border-slate-200 dark:border-slate-800 shadow-sm">
                     <div
-                      className={`upload-zone min-h-[260px] flex flex-col items-center justify-center p-8 cursor-pointer ${dragOver ? "drag-over" : ""}`}
+                      className={`upload-zone min-h-[260px] flex flex-col items-center justify-center p-8 cursor-pointer bg-slate-50 dark:bg-[#070b14] border-2 border-dashed border-slate-300 dark:border-slate-700/80 rounded-2xl hover:border-indigo-500 hover:dark:border-indigo-400 hover:bg-indigo-50/30 hover:dark:bg-indigo-950/30 transition-all ${dragOver ? "drag-over border-indigo-600 dark:border-indigo-400 bg-indigo-50/50 dark:bg-indigo-950/50" : ""}`}
                       onDragOver={(e) => {
                         e.preventDefault();
                         setDragOver(true);
@@ -1625,15 +1682,15 @@ function App() {
                         accept=".pdf,.docx,.doc,.txt,.rtf,.md,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,application/rtf"
                       />
 
-                      <div className="w-14 h-14 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center mb-5 text-slate-700">
-                        <Upload className="w-6 h-6 text-indigo-600" />
+                      <div className="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 flex items-center justify-center mb-5 text-indigo-600 dark:text-indigo-400">
+                        <Upload className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
                       </div>
 
                       <div className="text-center space-y-2">
-                        <h3 className="text-xl font-bold text-slate-900">
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                           {fileName ? fileName : "Upload Candidate Document"}
                         </h3>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
                           {fileName
                             ? "File selected — ready for audit"
                             : "Drag and drop your resume file here, or click to browse"}
@@ -1642,7 +1699,7 @@ function App() {
                           {["PDF", "DOCX", "DOC", "TXT", "RTF"].map((ext) => (
                             <span
                               key={ext}
-                              className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-600 border border-slate-200"
+                              className="px-2.5 py-1 rounded-md text-[11px] font-mono font-bold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 shadow-2xs"
                             >
                               .{ext}
                             </span>
@@ -1655,20 +1712,20 @@ function App() {
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="mt-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2.5"
+                        className="mt-6 p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs font-semibold flex items-center gap-2.5"
                       >
-                        <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-600" />
+                        <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-600 dark:text-rose-400" />
                         {error}
                       </motion.div>
                     )}
 
                     {/* 2-Dropdown Cascading Job Selector */}
-                    <div className="mt-6 p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-4">
+                    <div className="mt-6 p-5 rounded-xl bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Dropdown 1: Industry / Sector */}
                         <div>
-                          <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1.5">
-                            <Briefcase className="w-3.5 h-3.5 text-slate-400" />
+                          <label className="block text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 mb-2 flex items-center gap-1.5">
+                            <Briefcase className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                             1. Industry Sector
                           </label>
                           <select
@@ -1677,7 +1734,7 @@ function App() {
                               setSelectedCategory(e.target.value);
                               setSelectedJobId(""); // Reset specific role on category switch
                             }}
-                            className="w-full p-3 rounded-lg border border-slate-300 bg-white focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 outline-none text-slate-800 text-sm font-medium transition-all shadow-sm cursor-pointer"
+                            className="w-full p-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:border-indigo-600 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 outline-none text-slate-900 dark:text-slate-100 text-sm font-semibold transition-all shadow-sm cursor-pointer"
                           >
                             <option value="">
                               All Sectors (Cross-Industry Evaluation)
@@ -1696,8 +1753,8 @@ function App() {
 
                         {/* Dropdown 2: Specific Job Role */}
                         <div>
-                          <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1.5">
-                            <Target className="w-3.5 h-3.5 text-slate-400" />
+                          <label className="block text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 mb-2 flex items-center gap-1.5">
+                            <Target className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                             2. Target Job Role (Optional)
                           </label>
                           <select
@@ -1705,7 +1762,7 @@ function App() {
                             onChange={(e) =>
                               setSelectedJobId(String(e.target.value))
                             }
-                            className="w-full p-3 rounded-lg border border-slate-300 bg-white focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 outline-none text-slate-800 text-sm font-medium transition-all shadow-sm cursor-pointer"
+                            className="w-full p-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:border-indigo-600 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 outline-none text-slate-900 dark:text-slate-100 text-sm font-semibold transition-all shadow-sm cursor-pointer"
                           >
                             <option value="">
                               General Analysis (Universal Profile Readiness)
@@ -1723,7 +1780,7 @@ function App() {
                     <button
                       onClick={handleUpload}
                       disabled={!file}
-                      className="w-full mt-6 py-4 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-white font-bold text-sm transition-all shadow-sm flex items-center justify-center gap-2 group"
+                      className="w-full mt-6 py-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-sm transition-all shadow-md shadow-indigo-600/20 flex items-center justify-center gap-2 group"
                     >
                       <span>Run ATS Evaluation & Audit</span>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -1774,14 +1831,14 @@ function App() {
                     className="space-y-8"
                   >
                     {/* View Switcher & Action Bar */}
-                    <div className="flex flex-wrap items-center justify-between gap-4 no-print bg-white/80 backdrop-blur-md p-4 rounded-2xl border border-slate-200 shadow-sm">
-                      <div className="flex items-center bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+                    <div className="flex flex-wrap items-center justify-between gap-4 no-print bg-white/90 dark:bg-slate-900/80 backdrop-blur-md p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                      <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
                         <button
                           onClick={() => setViewMode("dashboard")}
                           className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-xs transition-all ${
                             viewMode === "dashboard"
-                              ? "bg-white text-indigo-600 shadow-sm"
-                              : "text-slate-500 hover:text-slate-800"
+                              ? "bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm"
+                              : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                           }`}
                         >
                           <LayoutDashboard className="w-3.5 h-3.5" />
@@ -1791,8 +1848,8 @@ function App() {
                           onClick={() => setViewMode("report")}
                           className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-xs transition-all ${
                             viewMode === "report"
-                              ? "bg-white text-indigo-600 shadow-sm"
-                              : "text-slate-500 hover:text-slate-800"
+                              ? "bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm"
+                              : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                           }`}
                         >
                           <FileText className="w-3.5 h-3.5" />
@@ -1815,7 +1872,7 @@ function App() {
                             setFileName("");
                             setViewMode("dashboard");
                           }}
-                          className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors"
+                          className="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-colors"
                         >
                           Analyze New →
                         </button>
@@ -1833,17 +1890,17 @@ function App() {
                       <>
                         <div className="screen-only space-y-8">
                           {/* Score Overview */}
-                          <div className="solid-card bg-white p-8 md:p-10 border border-slate-200 shadow-sm">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-200 gap-2 mb-8">
+                          <div className="solid-card bg-white dark:bg-slate-900 p-8 md:p-10 border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-200 dark:border-slate-800 gap-2 mb-8">
                               <div>
-                                <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+                                <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
                                   Audit & Assessment Scorecard
                                 </h2>
-                                <p className="text-xs text-slate-500 mt-0.5">
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                                   Algorithmic evaluation benchmarked against verified industry models
                                 </p>
                               </div>
-                              <div className="text-xs font-mono font-bold text-slate-400">
+                              <div className="text-xs font-mono font-bold text-slate-400 dark:text-slate-500">
                                 PROFILE AUDIT
                               </div>
                             </div>
@@ -1855,7 +1912,7 @@ function App() {
                                   label="Target Job Match"
                                   badge="🎯 Specific Target Job"
                                   icon={Target}
-                                  colorClass="stroke-indigo-500"
+                                  colorClass="stroke-indigo-500 dark:stroke-indigo-400"
                                 />
                               ) : (
                                 <DualScoreRing
@@ -1871,7 +1928,7 @@ function App() {
                                 score={results.strength_score}
                                 label="Resume Strength"
                                 icon={Zap}
-                                colorClass="stroke-purple-500"
+                                colorClass="stroke-purple-500 dark:stroke-purple-400"
                               />
                               <ScoreRing
                                 score={
@@ -1896,22 +1953,22 @@ function App() {
                                     : "Skill Breadth"
                                 }
                                 icon={CheckCircle2}
-                                colorClass="stroke-cyan-500"
+                                colorClass="stroke-cyan-500 dark:stroke-cyan-400"
                               />
                             </div>
                           </div>
 
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Skills Section */}
-                            <div className="solid-card bg-white p-7 border border-slate-200 shadow-sm space-y-5">
-                              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                            <div className="solid-card bg-white dark:bg-slate-900 p-7 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
+                              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
                                 <div className="flex items-center gap-2.5">
-                                  <CheckCircle2 className="w-5 h-5 text-indigo-600" />
-                                  <h3 className="text-base font-bold text-slate-900 tracking-tight">
+                                  <CheckCircle2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                                  <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
                                     Extracted Competencies
                                   </h3>
                                 </div>
-                                <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
+                                <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                                   {results.extracted_skills?.length || 0} Detected
                                 </span>
                               </div>
@@ -1919,7 +1976,7 @@ function App() {
                                 {results.extracted_skills?.map((skill, i) => (
                                   <span
                                     key={i}
-                                    className="font-mono text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-slate-100 text-slate-800 border border-slate-200"
+                                    className="font-mono text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700"
                                   >
                                     {skill}
                                   </span>
@@ -1934,16 +1991,16 @@ function App() {
                             </div>
 
                             {/* Skill Gaps Section */}
-                            <div className="solid-card bg-white p-7 border border-slate-200 shadow-sm space-y-5">
-                              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                            <div className="solid-card bg-white dark:bg-slate-900 p-7 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
+                              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
                                 <div className="flex items-center gap-2.5">
-                                  <AlertCircle className="w-5 h-5 text-rose-600" />
-                                  <h3 className="text-base font-bold text-slate-900 tracking-tight">
+                                  <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+                                  <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
                                     Missing Role Keywords
                                   </h3>
                                 </div>
                                 {results.missing_skills?.length > 0 && (
-                                  <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200">
+                                  <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
                                     {results.missing_skills.length} Gaps
                                   </span>
                                 )}
@@ -1953,21 +2010,21 @@ function App() {
                                   {results.missing_skills.map((skill, i) => (
                                     <span
                                       key={i}
-                                      className="font-mono text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-rose-50 text-rose-700 border border-rose-200"
+                                      className="font-mono text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800"
                                     >
                                       {skill}
                                     </span>
                                   ))}
                                 </div>
                               ) : results.required_skill_count > 0 ? (
-                                <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200">
-                                  <p className="text-emerald-800 text-xs font-semibold">
+                                <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800">
+                                  <p className="text-emerald-800 dark:text-emerald-300 text-xs font-semibold">
                                     ✓ Perfect Keyword Match: Candidate profile contains all core skills required for this role.
                                   </p>
                                 </div>
                               ) : (
-                                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                                  <p className="text-slate-600 text-xs font-medium">
+                                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                                  <p className="text-slate-600 dark:text-slate-300 text-xs font-medium">
                                     Universal screening mode active. Select a specific target role above to evaluate exact keyword omissions.
                                   </p>
                                 </div>
@@ -1977,62 +2034,62 @@ function App() {
 
                           {/* Experience Section */}
                           {results.experience && (
-                            <div className="solid-card bg-white p-7 border border-slate-200 shadow-sm space-y-5">
-                              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                            <div className="solid-card bg-white dark:bg-slate-900 p-7 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
+                              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
                                 <div className="flex items-center gap-2.5">
-                                  <Briefcase className="w-5 h-5 text-slate-700" />
-                                  <h3 className="text-base font-bold text-slate-900 tracking-tight">
+                                  <Briefcase className="w-5 h-5 text-slate-700 dark:text-slate-300" />
+                                  <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
                                     Experience & Seniority Verification
                                   </h3>
                                 </div>
-                                <span className="text-xs font-mono font-bold text-slate-400">
+                                <span className="text-xs font-mono font-bold text-slate-400 dark:text-slate-500">
                                   TIMELINE AUDIT
                                 </span>
                               </div>
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-2">
-                                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
                                     Total Detected Tenure
                                   </p>
-                                  <p className="text-2xl font-black text-slate-900">
+                                  <p className="text-2xl font-black text-slate-900 dark:text-white">
                                     {results.experience.total_years != null
                                       ? `${results.experience.total_years} Year${results.experience.total_years !== 1 ? "s" : ""}`
                                       : "Not specified"}
                                   </p>
                                 </div>
-                                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
                                     Seniority Classification
                                   </p>
-                                  <p className="text-2xl font-black text-indigo-600">
+                                  <p className="text-2xl font-black text-indigo-600 dark:text-indigo-400">
                                     {results.experience.seniority_level || "Professional"}
                                   </p>
                                 </div>
                               </div>
                               {results.experience.positions?.length > 0 && (
                                 <div className="space-y-2.5 pt-2">
-                                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                  <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                                     Extracted Positions ({results.experience.positions.length})
                                   </p>
                                   {results.experience.positions.map((pos, i) => (
                                     <div
                                       key={i}
-                                      className="flex items-start gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200"
+                                      className="flex items-start gap-3 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700"
                                     >
-                                      <div className="w-7 h-7 rounded-lg bg-slate-200 flex items-center justify-center flex-shrink-0 mt-0.5 text-slate-700">
+                                      <div className="w-7 h-7 rounded-lg bg-slate-200 dark:bg-slate-700 flex items-center justify-center flex-shrink-0 mt-0.5 text-slate-700 dark:text-slate-300">
                                         <Briefcase className="w-3.5 h-3.5" />
                                       </div>
                                       <div>
-                                        <p className="text-sm font-bold text-slate-900">
+                                        <p className="text-sm font-bold text-slate-900 dark:text-white">
                                           {pos.title}
                                         </p>
                                         {pos.company && (
-                                          <p className="text-xs text-slate-600 font-medium">
+                                          <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">
                                             {pos.company}
                                           </p>
                                         )}
                                         {pos.duration && (
-                                          <p className="text-xs text-slate-400 flex items-center gap-1 mt-1 font-mono">
+                                          <p className="text-xs text-slate-400 dark:text-slate-500 flex items-center gap-1 mt-1 font-mono">
                                             <Calendar className="w-3 h-3" />{" "}
                                             {pos.duration}
                                           </p>
@@ -2043,7 +2100,7 @@ function App() {
                                 </div>
                               )}
                               {(!results.experience.positions ||
-                                results.experience.positions.length === 0) &&
+                                 results.experience.positions.length === 0) &&
                                 results.experience.total_years == null && (
                                   <p className="text-slate-400 italic text-xs">
                                     No explicit chronological positions detected in the resume text.
@@ -2054,15 +2111,15 @@ function App() {
 
                           {/* Role Recommendations */}
                           {results.recommended_roles?.length > 0 && (
-                            <div className="solid-card bg-white p-7 border border-slate-200 shadow-sm space-y-5">
-                              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                            <div className="solid-card bg-white dark:bg-slate-900 p-7 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
+                              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
                                 <div className="flex items-center gap-2.5">
-                                  <Compass className="w-5 h-5 text-indigo-600" />
+                                  <Compass className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                                   <div>
-                                    <h3 className="text-base font-bold text-slate-900 tracking-tight">
+                                    <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
                                       Market Role Alignment
                                     </h3>
-                                    <p className="text-xs text-slate-500">
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">
                                       High-confidence career tracks mapped to candidate skill profile
                                     </p>
                                   </div>
@@ -2072,17 +2129,17 @@ function App() {
                                 {results.recommended_roles.map((role, i) => (
                                   <div
                                     key={i}
-                                    className="p-5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between"
+                                    className="p-5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col justify-between"
                                   >
                                     <div>
-                                      <div className="text-slate-400 text-[10px] font-mono font-bold uppercase mb-1">
+                                      <div className="text-slate-400 dark:text-slate-500 text-[10px] font-mono font-bold uppercase mb-1">
                                         RANK #{i + 1}
                                       </div>
-                                      <div className="text-sm font-bold text-slate-900">
+                                      <div className="text-sm font-bold text-slate-900 dark:text-white">
                                         {role}
                                       </div>
                                     </div>
-                                    <div className="mt-4 flex items-center text-xs text-indigo-600 font-semibold">
+                                    <div className="mt-4 flex items-center text-xs text-indigo-600 dark:text-indigo-400 font-semibold">
                                       <span>Matched Profile</span>
                                       <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
                                     </div>
@@ -2112,45 +2169,134 @@ function App() {
         ) : (
           <div className="max-w-[1400px] mx-auto w-full">
             <div className="text-center mb-12">
-              <h1 className="text-4xl font-black tracking-tight mb-4 text-slate-900">
+              <h1 className="text-4xl font-black tracking-tight mb-4 text-slate-900 dark:text-white">
                 Organization Dashboard
               </h1>
-              <p className="text-slate-500 text-lg">
+              <p className="text-slate-500 dark:text-slate-400 text-lg">
                 Upload and rank multiple candidate resumes against a specific
                 job role.
               </p>
             </div>
-            <OrganizationDashboard />
+            <OrganizationDashboard theme={theme} />
           </div>
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-200 py-12 px-6 mt-20 relative z-10">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2 grayscale opacity-50">
-            <BrainCircuit className="w-5 h-5" />
-            <span className="text-sm font-bold tracking-tight text-slate-900">
-              Astra AI
-            </span>
+      {/* Redesigned Enterprise Footer */}
+      <footer className="border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-950/60 backdrop-blur-md pt-16 pb-12 px-6 mt-24 relative z-10 transition-colors">
+        <div className="max-w-7xl mx-auto space-y-12">
+          {/* Top Row: Brand & Columns */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+            {/* Column 1: Brand & Status */}
+            <div className="md:col-span-2 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-slate-900 dark:bg-indigo-600 flex items-center justify-center shadow-sm">
+                  <Layers className="text-white w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+                    Astra<span className="text-indigo-600 dark:text-indigo-400 font-semibold ml-0.5">ATS</span>
+                  </span>
+                  <span className="ml-2 text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/80 uppercase tracking-wider">
+                    v2.4 Enterprise
+                  </span>
+                </div>
+              </div>
+              <p className="text-sm text-slate-700 dark:text-slate-300 font-medium max-w-md leading-relaxed">
+                Next-generation neural resume parser and recruitment screening engine. Benchmarking candidates with verified TF-IDF vector models across 54+ industry roles.
+              </p>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-800 text-xs font-bold text-emerald-900 dark:text-emerald-200 shadow-2xs">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>All Engine Nodes Active · 54 ML Models Loaded</span>
+              </div>
+            </div>
+
+            {/* Column 2: Audit Engine */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold uppercase tracking-widest text-slate-900 dark:text-white">
+                Core Capabilities
+              </h4>
+              <ul className="space-y-2 text-xs text-slate-700 dark:text-slate-300 font-semibold">
+                <li
+                  className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer"
+                  onClick={() => {
+                    setMode("individual");
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                >
+                  Candidate Audit (Single)
+                </li>
+                <li
+                  className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer"
+                  onClick={() => {
+                    setMode("organization");
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                >
+                  Recruiter Batch Pool
+                </li>
+                <li>54 Industry Sector Gazetteers</li>
+                <li>Chronological Timeline Audit</li>
+                <li>Executive PDF Export</li>
+              </ul>
+            </div>
+
+            {/* Column 3: Standards & Compliance */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold uppercase tracking-widest text-slate-900 dark:text-white">
+                Standards & Compliance
+              </h4>
+              <ul className="space-y-2 text-xs text-slate-700 dark:text-slate-300 font-semibold">
+                <li className="flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>ATS Format Compliant</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                  <span>TF-IDF Cosine Matcher</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <Zap className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                  <span>Sub-15ms Scoring Latency</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <BrainCircuit className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                  <span>Regex Gazetteers v2.4</span>
+                </li>
+              </ul>
+            </div>
           </div>
-          <p className="text-slate-500 text-xs">
-            © 2026 Astra AI Resume Analyzer. Built for professionals, by
-            professionals.
-          </p>
-          <div className="flex gap-6">
-            <a
-              href="#"
-              className="text-slate-500 hover:text-slate-900 transition-colors text-xs"
-            >
-              Privacy Policy
-            </a>
-            <a
-              href="#"
-              className="text-slate-500 hover:text-slate-900 transition-colors text-xs"
-            >
-              Terms of Service
-            </a>
+
+          {/* Bottom Bar: Copyright, Theme quick toggle & Links */}
+          <div className="pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-600 dark:text-slate-400 font-medium">
+            <div className="flex items-center gap-2">
+              <span>© {new Date().getFullYear()} Astra AI Resume Analyzer. Built for professionals.</span>
+            </div>
+
+            <div className="flex items-center gap-6">
+              <button
+                onClick={toggleTheme}
+                className="flex items-center gap-1.5 hover:text-indigo-600 dark:hover:text-white transition-colors font-bold"
+              >
+                {theme === "dark" ? (
+                  <>
+                    <Sun className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Light Mode</span>
+                  </>
+                ) : (
+                  <>
+                    <Moon className="w-3.5 h-3.5 text-slate-700" />
+                    <span>Dark Mode</span>
+                  </>
+                )}
+              </button>
+              <button
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                className="hover:text-indigo-600 dark:hover:text-white transition-colors font-bold"
+              >
+                Back to Top ↑
+              </button>
+            </div>
           </div>
         </div>
       </footer>
