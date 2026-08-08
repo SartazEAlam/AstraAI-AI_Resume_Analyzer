@@ -79,12 +79,7 @@ const ScoreRing = ({ score, label, badge, icon: Icon, colorClass }) => {
   const offset = circumference - (displayScore / 100) * circumference;
 
   return (
-    <div className="flex flex-col items-center gap-3 text-center">
-      {badge && (
-        <span className="text-[11px] font-bold px-3 py-1 rounded-full shadow-sm max-w-[220px] truncate bg-indigo-50 text-indigo-700 border border-indigo-200/80">
-          {badge}
-        </span>
-      )}
+    <div className="flex flex-col items-center text-center h-full">
       <div className="relative w-36 h-36">
         <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
           <circle
@@ -115,11 +110,18 @@ const ScoreRing = ({ score, label, badge, icon: Icon, colorClass }) => {
           </span>
         </div>
       </div>
-      <div className="flex items-center gap-2">
-        <Icon className="w-4 h-4 text-slate-400" />
-        <span className="text-xs font-bold uppercase tracking-widest text-slate-500">
-          {label}
-        </span>
+      <div className="flex flex-col items-center gap-1.5 mt-3">
+        <div className="flex items-center gap-2">
+          {Icon && <Icon className="w-4 h-4 text-slate-400" />}
+          <span className="text-xs font-bold uppercase tracking-widest text-slate-500">
+            {label}
+          </span>
+        </div>
+        {badge && (
+          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm max-w-[200px] truncate bg-indigo-50 text-indigo-700 border border-indigo-200/80">
+            {badge}
+          </span>
+        )}
       </div>
     </div>
   );
@@ -140,16 +142,10 @@ const DualScoreRing = ({ topScore, topRole, globalScore }) => {
   const globalOffset = circumference - (displayGlobal / 100) * circumference;
 
   return (
-    <div className="flex flex-col items-center gap-2 w-full">
+    <div className="flex flex-col items-center text-center h-full w-full">
       <div className="flex items-center justify-center gap-3 w-full">
         {/* Ring 1: Top Fit Domain */}
-        <div className="flex flex-col items-center gap-1.5 flex-1 min-w-0">
-          <span
-            className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/80 max-w-[120px] truncate"
-            title={`Top Match: ${topRole || "General"}`}
-          >
-            🎯 {topRole || "Top Fit"}
-          </span>
+        <div className="flex flex-col items-center flex-1 min-w-0">
           <div className="relative w-24 h-24">
             <svg className="w-full h-full -rotate-90" viewBox="0 0 76 76">
               <circle
@@ -180,19 +176,21 @@ const DualScoreRing = ({ topScore, topRole, globalScore }) => {
               </span>
             </div>
           </div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 text-center">
-            Single Best
-          </span>
+          <div className="flex flex-col items-center gap-1 mt-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 text-center">
+              Single Best
+            </span>
+            <span
+              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/80 max-w-[120px] truncate"
+              title={`Top Match: ${topRole || "General"}`}
+            >
+              🎯 {topRole || "Top Fit"}
+            </span>
+          </div>
         </div>
 
         {/* Ring 2: Global Market Fit */}
-        <div className="flex flex-col items-center gap-1.5 flex-1 min-w-0">
-          <span
-            className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 max-w-[120px] truncate"
-            title="Evaluated across all 54 jobs in all sectors"
-          >
-            🌐 All 54 Jobs
-          </span>
+        <div className="flex flex-col items-center flex-1 min-w-0">
           <div className="relative w-24 h-24">
             <svg className="w-full h-full -rotate-90" viewBox="0 0 76 76">
               <circle
@@ -223,9 +221,17 @@ const DualScoreRing = ({ topScore, topRole, globalScore }) => {
               </span>
             </div>
           </div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 text-center">
-            Overall Market
-          </span>
+          <div className="flex flex-col items-center gap-1 mt-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 text-center">
+              Overall Market
+            </span>
+            <span
+              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 max-w-[120px] truncate"
+              title="Evaluated across all 54 jobs in all sectors"
+            >
+              🌐 All 54 Jobs
+            </span>
+          </div>
         </div>
       </div>
     </div>
