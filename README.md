@@ -40,24 +40,6 @@ flowchart LR
     Backend <==>|"JSON Payloads & NLP Requests"| ML
 ```
 
-```
-┌──────────────────┐       ┌────────────────────┐       ┌─────────────────────┐
-│                  │       │                    │       │                     │
-│   React + Vite   │──────▶│  Node.js + Express │──────▶│  Python + FastAPI   │
-│   (Frontend)     │◀──────│  (Backend API)     │◀──────│  (ML Microservice)  │
-│   Port 3000      │       │  Port 5000         │       │  Port 8000          │
-│                  │       │                    │       │                     │
-└──────────────────┘       └─────────┬──────────┘       └─────────────────────┘
-                                     │
-                            ┌────────▼───────────┐
-                            │                    │
-                            │   MySQL Database   │
-                            │   resume_analyzer  │
-                            │   Port 3306        │
-                            │                    │
-                            └────────────────────┘
-```
-
 ### Tech Stack
 
 | Layer | Technology |
