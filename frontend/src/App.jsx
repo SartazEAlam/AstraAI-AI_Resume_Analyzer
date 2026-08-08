@@ -17,6 +17,10 @@ import {
   Briefcase,
   Calendar,
   Download,
+  Layers,
+  ShieldCheck,
+  Compass,
+  FileCheck2,
 } from "lucide-react";
 import {
   BarChart,
@@ -31,39 +35,52 @@ import {
 
 const COLORS = [
   "#4f46e5",
-  "#ec4899",
   "#06b6d4",
   "#10b981",
   "#f59e0b",
   "#8b5cf6",
+  "#ec4899",
   "#ef4444",
 ];
 
 /* ── Components ── */
 
 const Navbar = ({ mode, setMode }) => (
-  <nav className="fixed top-0 left-0 right-0 z-50 solid-panel px-6 py-4">
+  <nav className="fixed top-0 left-0 right-0 z-50 solid-panel px-6 py-3.5">
     <div className="max-w-7xl mx-auto flex items-center justify-between">
-      <div className="flex items-center gap-2">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-          <BrainCircuit className="text-white w-6 h-6" />
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center shadow-sm">
+          <Layers className="text-white w-5 h-5" />
         </div>
-        <span className="text-xl font-bold tracking-tight text-slate-900 hidden sm:block">
-          Astra<span className="text-indigo-600">AI</span>
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-lg font-bold tracking-tight text-slate-900">
+            Astra<span className="text-indigo-600 font-semibold ml-0.5">ATS</span>
+          </span>
+          <span className="hidden sm:inline-flex text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200 uppercase tracking-wider">
+            Enterprise
+          </span>
+        </div>
       </div>
-      <div className="flex items-center gap-2 bg-slate-200 p-1 rounded-full">
+      <div className="flex items-center gap-1 bg-slate-100/90 p-1 rounded-xl border border-slate-200/80">
         <button
           onClick={() => setMode("individual")}
-          className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${mode === "individual" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+          className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            mode === "individual"
+              ? "bg-white text-slate-900 shadow-sm"
+              : "text-slate-500 hover:text-slate-800"
+          }`}
         >
-          Individual
+          Candidate Audit
         </button>
         <button
           onClick={() => setMode("organization")}
-          className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${mode === "organization" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+          className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            mode === "organization"
+              ? "bg-white text-slate-900 shadow-sm"
+              : "text-slate-500 hover:text-slate-800"
+          }`}
         >
-          Organization
+          Recruiter Pool
         </button>
       </div>
     </div>
@@ -277,35 +294,37 @@ const MiniScoreRing = ({ score, colorClass }) => {
 };
 
 const FeatureCard = ({ icon: Icon, title, desc }) => (
-  <div className="solid-card p-6 flex flex-col gap-4">
-    <div className="w-12 h-12 rounded-lg bg-indigo-500/10 flex items-center justify-center">
-      <Icon className="w-6 h-6 text-indigo-400" />
+  <div className="solid-card p-6 flex flex-col gap-3.5 bg-white border border-slate-200">
+    <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700">
+      <Icon className="w-5 h-5 text-indigo-600" />
     </div>
-    <h3 className="text-lg font-bold text-slate-900">{title}</h3>
-    <p className="text-sm text-slate-400 leading-relaxed">{desc}</p>
+    <div>
+      <h3 className="text-base font-bold text-slate-900 tracking-tight">{title}</h3>
+      <p className="text-xs text-slate-500 leading-relaxed mt-1">{desc}</p>
+    </div>
   </div>
 );
 
 const LoadingOverlay = () => (
-  <div className="space-y-8 py-10">
+  <div className="space-y-8 py-12">
     <div className="flex flex-col items-center justify-center gap-4">
-      <div className="relative w-20 h-20">
-        <div className="absolute inset-0 rounded-full border-4 border-indigo-500/20" />
-        <div className="absolute inset-0 rounded-full border-4 border-t-indigo-500 animate-spin" />
-        <BrainCircuit className="absolute inset-0 m-auto w-8 h-8 text-indigo-400 animate-pulse" />
+      <div className="relative w-16 h-16">
+        <div className="absolute inset-0 rounded-full border-2 border-slate-200" />
+        <div className="absolute inset-0 rounded-full border-2 border-indigo-600 border-t-transparent animate-spin" />
+        <Layers className="absolute inset-0 m-auto w-6 h-6 text-indigo-600" />
       </div>
       <div className="text-center">
-        <h3 className="text-xl font-bold text-slate-900 mb-2">
-          Analyzing Your Profile
+        <h3 className="text-lg font-bold text-slate-900 tracking-tight">
+          Executing Resume & ATS Audit
         </h3>
-        <p className="text-slate-400 text-sm">
-          Our AI is extracting skills and mapping career paths...
+        <p className="text-slate-500 text-xs mt-0.5">
+          Extracting competencies, calculating TF-IDF vectors, and verifying timeline records...
         </p>
       </div>
     </div>
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="solid-card p-8 h-48 shimmer" />
+        <div key={i} className="solid-card p-6 h-40 shimmer border border-slate-200 rounded-2xl" />
       ))}
     </div>
   </div>
@@ -1555,40 +1574,25 @@ function App() {
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <Navbar mode={mode} setMode={setMode} />
 
-      {/* Background Decorative Elements */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-600/10 blur-[120px] animate-float" />
-        <div
-          className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-600/10 blur-[120px] animate-float"
-          style={{ animationDelay: "-5s" }}
-        />
-        <div
-          className="absolute top-[20%] right-[10%] w-[30%] h-[30%] rounded-full bg-cyan-600/5 blur-[100px] animate-float"
-          style={{ animationDelay: "-10s" }}
-        />
-      </div>
-
-      <main className="relative z-10 pt-32 pb-20 px-6 max-w-7xl mx-auto">
+      <main className="relative z-10 pt-28 pb-20 px-6 max-w-7xl mx-auto">
         {mode === "individual" ? (
           <>
             {/* Hero Section */}
-            <div className="text-center mb-16 space-y-6">
+            <div className="text-center mb-12 space-y-4">
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
+                transition={{ duration: 0.5 }}
               >
-                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-xs font-bold text-indigo-400 uppercase tracking-widest mb-6">
-                  <Sparkles className="w-3 h-3" /> Powered by Advanced AI
+                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 tracking-wide mb-4 shadow-sm">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  ATS Parsing Engine Active · 54 Industry Models
                 </span>
-                <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-6">
-                  Optimize Your{" "}
-                  <span className="text-gradient">Career Path</span>
+                <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-slate-900 mb-4">
+                  Precision Resume & <span className="text-indigo-600">ATS Audit</span>
                 </h1>
-                <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
-                  Upload your resume and let Astra analyze your skills, identify
-                  gaps, and recommend the best roles tailored to your unique
-                  profile.
+                <p className="text-base sm:text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed">
+                  Audit keyword density, verify experience timelines, and benchmark role readiness with parser-level accuracy.
                 </p>
               </motion.div>
             </div>
@@ -1597,146 +1601,154 @@ function App() {
             <div className="max-w-4xl mx-auto">
               {!results && !loading && (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="space-y-12"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="space-y-10"
                 >
                   {/* Upload Card */}
-                  <div className="solid-card p-1 bg-gradient-to-br from-indigo-500/50 via-purple-500/50 to-slate-800">
-                    <div className="solid-card bg-white p-8 md:p-12">
-                      <div
-                        className={`upload-zone min-h-[300px] flex flex-col items-center justify-center p-10 cursor-pointer ${dragOver ? "drag-over" : ""}`}
-                        onDragOver={(e) => {
-                          e.preventDefault();
-                          setDragOver(true);
-                        }}
-                        onDragLeave={() => setDragOver(false)}
-                        onDrop={handleDrop}
-                        onClick={() => fileInputRef.current?.click()}
-                      >
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          className="hidden"
-                          onChange={handleFileChange}
-                          accept=".pdf,.docx,.doc,.txt,.rtf,.md,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,application/rtf"
-                        />
+                  <div className="solid-card bg-white p-8 md:p-10 border border-slate-200 shadow-sm">
+                    <div
+                      className={`upload-zone min-h-[260px] flex flex-col items-center justify-center p-8 cursor-pointer ${dragOver ? "drag-over" : ""}`}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        setDragOver(true);
+                      }}
+                      onDragLeave={() => setDragOver(false)}
+                      onDrop={handleDrop}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        className="hidden"
+                        onChange={handleFileChange}
+                        accept=".pdf,.docx,.doc,.txt,.rtf,.md,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,application/rtf"
+                      />
 
-                        <div className="w-20 h-20 rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-6 ring-1 ring-indigo-500/20">
-                          <Upload className="w-10 h-10 text-indigo-400" />
-                        </div>
-
-                        <div className="text-center space-y-2">
-                          <h3 className="text-2xl font-bold text-slate-900">
-                            {fileName ? fileName : "Drop your resume here"}
-                          </h3>
-                          <p className="text-slate-400">
-                            {fileName
-                              ? "Ready for analysis"
-                              : "or click to browse your files"}
-                          </p>
-                          <p className="text-xs text-slate-500 pt-4 uppercase tracking-widest">
-                            Supported formats: PDF, Word (DOCX, DOC), TXT, RTF
-                          </p>
-                        </div>
+                      <div className="w-14 h-14 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center mb-5 text-slate-700">
+                        <Upload className="w-6 h-6 text-indigo-600" />
                       </div>
 
-                      {error && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-3"
-                        >
-                          <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                          {error}
-                        </motion.div>
-                      )}
-                      {/* 2-Dropdown Cascading Job Selector */}
-                      <div className="mt-8 p-6 rounded-2xl bg-slate-50/80 border border-slate-200/80 shadow-sm space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                          {/* Dropdown 1: Industry / Sector */}
-                          <div>
-                            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
-                              🏢 1. Industry Sector
-                            </label>
-                            <select
-                              value={selectedCategory}
-                              onChange={(e) => {
-                                setSelectedCategory(e.target.value);
-                                setSelectedJobId(""); // Reset specific role on category switch
-                              }}
-                              className="w-full p-3.5 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 font-medium transition-all shadow-sm cursor-pointer"
+                      <div className="text-center space-y-2">
+                        <h3 className="text-xl font-bold text-slate-900">
+                          {fileName ? fileName : "Upload Candidate Document"}
+                        </h3>
+                        <p className="text-sm text-slate-500">
+                          {fileName
+                            ? "File selected — ready for audit"
+                            : "Drag and drop your resume file here, or click to browse"}
+                        </p>
+                        <div className="flex items-center justify-center gap-2 pt-3">
+                          {["PDF", "DOCX", "DOC", "TXT", "RTF"].map((ext) => (
+                            <span
+                              key={ext}
+                              className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-600 border border-slate-200"
                             >
-                              <option value="">
-                                🌐 All Sectors (View All Roles)
-                              </option>
-                              {[
-                                ...new Set(
-                                  jobs.map((j) => j.category || "Other"),
-                                ),
-                              ].map((category) => (
-                                <option key={category} value={category}>
-                                  {category}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-
-                          {/* Dropdown 2: Specific Job Role */}
-                          <div>
-                            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
-                              🎯 2. Target Job Role (Optional)
-                            </label>
-                            <select
-                              value={selectedJobId}
-                              onChange={(e) =>
-                                setSelectedJobId(String(e.target.value))
-                              }
-                              className="w-full p-3.5 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 font-medium transition-all shadow-sm cursor-pointer"
-                            >
-                              <option value="">
-                                General Analysis (No Target Job)
-                              </option>
-                              {filteredJobs.map((job) => (
-                                <option key={job.id} value={String(job.id)}>
-                                  {job.title}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
+                              .{ext}
+                            </span>
+                          ))}
                         </div>
                       </div>
-
-                      <button
-                        onClick={handleUpload}
-                        disabled={!file}
-                        className="w-full mt-8 py-5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-30 disabled:cursor-not-allowed text-white font-bold text-lg transition-all shadow-xl shadow-indigo-600/20 flex items-center justify-center gap-3 group"
-                      >
-                        🚀 Start Analysis
-                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                      </button>
                     </div>
+
+                    {error && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2.5"
+                      >
+                        <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-600" />
+                        {error}
+                      </motion.div>
+                    )}
+
+                    {/* 2-Dropdown Cascading Job Selector */}
+                    <div className="mt-6 p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Dropdown 1: Industry / Sector */}
+                        <div>
+                          <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1.5">
+                            <Briefcase className="w-3.5 h-3.5 text-slate-400" />
+                            1. Industry Sector
+                          </label>
+                          <select
+                            value={selectedCategory}
+                            onChange={(e) => {
+                              setSelectedCategory(e.target.value);
+                              setSelectedJobId(""); // Reset specific role on category switch
+                            }}
+                            className="w-full p-3 rounded-lg border border-slate-300 bg-white focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 outline-none text-slate-800 text-sm font-medium transition-all shadow-sm cursor-pointer"
+                          >
+                            <option value="">
+                              All Sectors (Cross-Industry Evaluation)
+                            </option>
+                            {[
+                              ...new Set(
+                                jobs.map((j) => j.category || "Other"),
+                              ),
+                            ].map((category) => (
+                              <option key={category} value={category}>
+                                {category}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Dropdown 2: Specific Job Role */}
+                        <div>
+                          <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1.5">
+                            <Target className="w-3.5 h-3.5 text-slate-400" />
+                            2. Target Job Role (Optional)
+                          </label>
+                          <select
+                            value={selectedJobId}
+                            onChange={(e) =>
+                              setSelectedJobId(String(e.target.value))
+                            }
+                            className="w-full p-3 rounded-lg border border-slate-300 bg-white focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 outline-none text-slate-800 text-sm font-medium transition-all shadow-sm cursor-pointer"
+                          >
+                            <option value="">
+                              General Analysis (Universal Profile Readiness)
+                            </option>
+                            {filteredJobs.map((job) => (
+                              <option key={job.id} value={String(job.id)}>
+                                {job.title}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={handleUpload}
+                      disabled={!file}
+                      className="w-full mt-6 py-4 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-white font-bold text-sm transition-all shadow-sm flex items-center justify-center gap-2 group"
+                    >
+                      <span>Run ATS Evaluation & Audit</span>
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </button>
                   </div>
 
                   {/* Features Grid */}
                   <div
                     id="how-it-works"
-                    className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-12"
+                    className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-6"
                   >
                     <FeatureCard
                       icon={Target}
-                      title="Skill Mapping"
-                      desc="Intelligent extraction of technical and soft skills from your resume text."
+                      title="Keyword Taxonomy"
+                      desc="Direct technical and domain skill extraction from verified industry gazetteers."
                     />
                     <FeatureCard
                       icon={TrendingUp}
-                      title="Market Fit"
-                      desc="Calculate how well you match with industry-standard job requirements."
+                      title="Multi-Sector Alignment"
+                      desc="TF-IDF cosine similarity benchmarking across 54+ live market roles."
                     />
                     <FeatureCard
-                      icon={Zap}
-                      title="Smart Gaps"
-                      desc="Identify specific skills you need to acquire for your target career goals."
+                      icon={ShieldCheck}
+                      title="Omission Detection"
+                      desc="Pinpoint missing required qualifications before submitting to recruiter ATS."
                     />
                   </div>
                 </motion.div>
@@ -1821,19 +1833,22 @@ function App() {
                       <>
                         <div className="screen-only space-y-8">
                           {/* Score Overview */}
-                          <div className="solid-card p-8 md:p-12 glow-primary">
-                            <div className="flex items-center justify-between mb-10">
+                          <div className="solid-card bg-white p-8 md:p-10 border border-slate-200 shadow-sm">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-200 gap-2 mb-8">
                               <div>
-                                <h2 className="text-3xl font-black text-slate-900">
-                                  Analysis Results
+                                <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+                                  Audit & Assessment Scorecard
                                 </h2>
-                                <p className="text-slate-400">
-                                  Comprehensive breakdown of your professional profile
+                                <p className="text-xs text-slate-500 mt-0.5">
+                                  Algorithmic evaluation benchmarked against verified industry models
                                 </p>
+                              </div>
+                              <div className="text-xs font-mono font-bold text-slate-400">
+                                PROFILE AUDIT
                               </div>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-12 py-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 py-2">
                               {results.required_skill_count > 0 ? (
                                 <ScoreRing
                                   score={results.match_percentage}
@@ -1886,65 +1901,74 @@ function App() {
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Skills Section */}
-                            <div className="solid-card p-8 space-y-6">
-                              <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
-                                <Zap className="w-5 h-5 text-indigo-500" />
-                                <h3 className="text-xl font-bold text-slate-900">
-                                  Extracted Skills
-                                </h3>
+                            <div className="solid-card bg-white p-7 border border-slate-200 shadow-sm space-y-5">
+                              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                                <div className="flex items-center gap-2.5">
+                                  <CheckCircle2 className="w-5 h-5 text-indigo-600" />
+                                  <h3 className="text-base font-bold text-slate-900 tracking-tight">
+                                    Extracted Competencies
+                                  </h3>
+                                </div>
+                                <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
+                                  {results.extracted_skills?.length || 0} Detected
+                                </span>
                               </div>
                               <div className="flex flex-wrap gap-2">
                                 {results.extracted_skills?.map((skill, i) => (
                                   <span
                                     key={i}
-                                    className="skill-tag px-3 py-1.5 rounded-lg text-sm font-semibold bg-indigo-50 text-indigo-600 border border-indigo-100"
+                                    className="font-mono text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-slate-100 text-slate-800 border border-slate-200"
                                   >
                                     {skill}
                                   </span>
                                 ))}
                                 {(!results.extracted_skills ||
                                   results.extracted_skills.length === 0) && (
-                                  <p className="text-slate-500 italic text-sm">
-                                    No specific skills detected.
+                                  <p className="text-slate-400 italic text-xs">
+                                    No specific competencies detected from resume text.
                                   </p>
                                 )}
                               </div>
                             </div>
 
                             {/* Skill Gaps Section */}
-                            <div className="solid-card p-8 space-y-6">
-                              <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
-                                <AlertCircle className="w-5 h-5 text-red-500" />
-                                <h3 className="text-xl font-bold text-slate-900">
-                                  Skill Gaps
-                                </h3>
+                            <div className="solid-card bg-white p-7 border border-slate-200 shadow-sm space-y-5">
+                              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                                <div className="flex items-center gap-2.5">
+                                  <AlertCircle className="w-5 h-5 text-rose-600" />
+                                  <h3 className="text-base font-bold text-slate-900 tracking-tight">
+                                    Missing Role Keywords
+                                  </h3>
+                                </div>
+                                {results.missing_skills?.length > 0 && (
+                                  <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200">
+                                    {results.missing_skills.length} Gaps
+                                  </span>
+                                )}
                               </div>
                               {results.missing_skills?.length > 0 ? (
                                 <div className="flex flex-wrap gap-2">
                                   {results.missing_skills.map((skill, i) => (
                                     <span
                                       key={i}
-                                      className="skill-tag px-3 py-1.5 rounded-lg text-sm font-semibold bg-red-50 text-red-600 border border-red-100"
+                                      className="font-mono text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-rose-50 text-rose-700 border border-rose-200"
                                     >
                                       {skill}
                                     </span>
                                   ))}
                                 </div>
                               ) : results.required_skill_count > 0 ? (
-                                <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100">
-                                  <p className="text-emerald-600 text-sm font-medium">
-                                    ✨ Your profile matches all target skills
-                                    perfectly!
+                                <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200">
+                                  <p className="text-emerald-800 text-xs font-semibold">
+                                    ✓ Perfect Keyword Match: Candidate profile contains all core skills required for this role.
                                   </p>
                                 </div>
                               ) : (
-                                <div className="p-4 rounded-xl bg-indigo-50/60 border border-indigo-100">
-                                  <p className="text-indigo-700 text-sm font-medium">
-                                    💡 General analysis mode active. Select a specific
-                                    role above to see targeted skill gaps, or explore
-                                    your recommended career roles below!
+                                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                                  <p className="text-slate-600 text-xs font-medium">
+                                    Universal screening mode active. Select a specific target role above to evaluate exact keyword omissions.
                                   </p>
                                 </div>
                               )}
@@ -1953,57 +1977,62 @@ function App() {
 
                           {/* Experience Section */}
                           {results.experience && (
-                            <div className="solid-card p-8 space-y-6">
-                              <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
-                                <Briefcase className="w-5 h-5 text-amber-500" />
-                                <h3 className="text-xl font-bold text-slate-900">
-                                  Previous Experience
-                                </h3>
+                            <div className="solid-card bg-white p-7 border border-slate-200 shadow-sm space-y-5">
+                              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                                <div className="flex items-center gap-2.5">
+                                  <Briefcase className="w-5 h-5 text-slate-700" />
+                                  <h3 className="text-base font-bold text-slate-900 tracking-tight">
+                                    Experience & Seniority Verification
+                                  </h3>
+                                </div>
+                                <span className="text-xs font-mono font-bold text-slate-400">
+                                  TIMELINE AUDIT
+                                </span>
                               </div>
-                              <div className="grid grid-cols-2 gap-4 mb-2">
-                                <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
-                                  <p className="text-xs font-bold uppercase tracking-widest text-amber-600/70 mb-1">
-                                    Total Experience
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-2">
+                                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                                    Total Detected Tenure
                                   </p>
-                                  <p className="text-2xl font-black text-amber-700">
+                                  <p className="text-2xl font-black text-slate-900">
                                     {results.experience.total_years != null
-                                      ? `${results.experience.total_years} year${results.experience.total_years !== 1 ? "s" : ""}`
-                                      : "Not detected"}
+                                      ? `${results.experience.total_years} Year${results.experience.total_years !== 1 ? "s" : ""}`
+                                      : "Not specified"}
                                   </p>
                                 </div>
-                                <div className="p-4 rounded-xl bg-violet-50 border border-violet-100">
-                                  <p className="text-xs font-bold uppercase tracking-widest text-violet-600/70 mb-1">
-                                    Seniority Level
+                                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                                    Seniority Classification
                                   </p>
-                                  <p className="text-2xl font-black text-violet-700">
-                                    {results.experience.seniority_level}
+                                  <p className="text-2xl font-black text-indigo-600">
+                                    {results.experience.seniority_level || "Professional"}
                                   </p>
                                 </div>
                               </div>
                               {results.experience.positions?.length > 0 && (
-                                <div className="space-y-3">
-                                  <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">
-                                    Positions Found
+                                <div className="space-y-2.5 pt-2">
+                                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                    Extracted Positions ({results.experience.positions.length})
                                   </p>
                                   {results.experience.positions.map((pos, i) => (
                                     <div
                                       key={i}
-                                      className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100"
+                                      className="flex items-start gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200"
                                     >
-                                      <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                        <Briefcase className="w-4 h-4 text-indigo-500" />
+                                      <div className="w-7 h-7 rounded-lg bg-slate-200 flex items-center justify-center flex-shrink-0 mt-0.5 text-slate-700">
+                                        <Briefcase className="w-3.5 h-3.5" />
                                       </div>
                                       <div>
                                         <p className="text-sm font-bold text-slate-900">
                                           {pos.title}
                                         </p>
                                         {pos.company && (
-                                          <p className="text-xs text-slate-500">
+                                          <p className="text-xs text-slate-600 font-medium">
                                             {pos.company}
                                           </p>
                                         )}
                                         {pos.duration && (
-                                          <p className="text-xs text-slate-400 flex items-center gap-1 mt-1">
+                                          <p className="text-xs text-slate-400 flex items-center gap-1 mt-1 font-mono">
                                             <Calendar className="w-3 h-3" />{" "}
                                             {pos.duration}
                                           </p>
@@ -2016,9 +2045,8 @@ function App() {
                               {(!results.experience.positions ||
                                 results.experience.positions.length === 0) &&
                                 results.experience.total_years == null && (
-                                  <p className="text-slate-400 italic text-sm">
-                                    No specific work experience detected in the
-                                    resume.
+                                  <p className="text-slate-400 italic text-xs">
+                                    No explicit chronological positions detected in the resume text.
                                   </p>
                                 )}
                             </div>
@@ -2026,33 +2054,37 @@ function App() {
 
                           {/* Role Recommendations */}
                           {results.recommended_roles?.length > 0 && (
-                            <div className="solid-card p-8 md:p-10">
-                              <div className="flex items-center gap-3 border-b border-slate-200 pb-6 mb-6">
-                                <LayoutDashboard className="w-6 h-6 text-indigo-500" />
-                                <div>
-                                  <h3 className="text-2xl font-bold text-slate-900">
-                                    Recommended Career Paths
-                                  </h3>
-                                  <p className="text-sm text-slate-400">
-                                    Based on your current skill set and potential
-                                  </p>
+                            <div className="solid-card bg-white p-7 border border-slate-200 shadow-sm space-y-5">
+                              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                                <div className="flex items-center gap-2.5">
+                                  <Compass className="w-5 h-5 text-indigo-600" />
+                                  <div>
+                                    <h3 className="text-base font-bold text-slate-900 tracking-tight">
+                                      Market Role Alignment
+                                    </h3>
+                                    <p className="text-xs text-slate-500">
+                                      High-confidence career tracks mapped to candidate skill profile
+                                    </p>
+                                  </div>
                                 </div>
                               </div>
                               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 {results.recommended_roles.map((role, i) => (
                                   <div
                                     key={i}
-                                    className="group p-6 rounded-2xl bg-white border border-slate-200 hover:border-indigo-500/50 transition-all hover:translate-y-[-4px]"
+                                    className="p-5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between"
                                   >
-                                    <div className="text-slate-500 text-xs font-bold uppercase mb-2">
-                                      Recommendation {i + 1}
+                                    <div>
+                                      <div className="text-slate-400 text-[10px] font-mono font-bold uppercase mb-1">
+                                        RANK #{i + 1}
+                                      </div>
+                                      <div className="text-sm font-bold text-slate-900">
+                                        {role}
+                                      </div>
                                     </div>
-                                    <div className="text-lg font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
-                                      {role}
-                                    </div>
-                                    <div className="mt-4 flex items-center text-xs text-indigo-400 font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                                      View Roadmap{" "}
-                                      <ArrowRight className="w-3 h-3 ml-2" />
+                                    <div className="mt-4 flex items-center text-xs text-indigo-600 font-semibold">
+                                      <span>Matched Profile</span>
+                                      <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
                                     </div>
                                   </div>
                                 ))}
