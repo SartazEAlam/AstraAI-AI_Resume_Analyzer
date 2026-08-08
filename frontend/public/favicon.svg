@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="astra-grad" x1="16" y1="14" x2="48" y2="34" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="#0f172a"/>
+  <!-- Top Layer -->
+  <path d="M32 15L48 24L32 33L16 24L32 15Z" fill="url(#astra-grad)"/>
+  <!-- Middle Layer -->
+  <path d="M16 32L32 41L48 32" stroke="#818cf8" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Bottom Layer -->
+  <path d="M16 40L32 49L48 40" stroke="#38bdf8" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
