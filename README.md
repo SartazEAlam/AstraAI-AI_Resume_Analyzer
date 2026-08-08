@@ -187,13 +187,59 @@ ML_SERVICE_URL=http://localhost:8000
 
 ## 🔌 API Endpoints
 
-### Backend (Node.js — Port 5000)
+### Backend API (Node.js — Port 5000)
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/api/health` | Health check endpoint |
-| `GET` | `/api/jobs` | Retrieve all job roles categorized by sector |
-| `POST` | `/api/upload` | Upload resume file (`.pdf`, `.docx`, `.doc`, `.txt`, `.rtf`, `.md`) + optional `jobId` |
+| `GET` | `/api/health` | Health check endpoint — returns `{ status: "ok" }` |
+| `GET` | `/api/jobs` | Retrieve all job roles categorized by sector with required skills |
+| `POST` | `/api/upload` | Upload resume file (`.pdf`, `.docx`, `.doc`, `.txt`, `.rtf`, `.md`) with optional `jobId` |
+
+#### `POST /api/upload` Sample Response:
+```json
+{
+  "match_percentage": 67.42,
+  "strength_score": 68.0,
+  "matched_skills": ["pandas", "pytorch", "deep learning", "nlp", "sql"],
+  "missing_skills": ["mlops"],
+  "extracted_skills": ["pandas", "pytorch", "deep learning", "nlp", "sql", "git", "docker"],
+  "required_skill_count": 8,
+  "matched_skill_count": 7,
+  "recommended_roles": ["Machine Learning Engineer", "Data Scientist", "AI Researcher"],
+  "best_role": "Machine Learning Engineer",
+  "top_role_match": 84.5,
+  "global_market_match": 42.1,
+  "experience": {
+    "total_years": 3.5,
+    "seniority_level": "Mid-Level",
+    "positions": [
+      {
+        "title": "Data Science Associate",
+        "company": "Tech Solutions Inc.",
+        "duration": "2022 – Present"
+      }
+    ]
+  }
+}
+```
+
+### ML Microservice (Python FastAPI — Port 8000)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/` | Service root and health confirmation |
+| `POST` | `/analyze` | Accepts `resume_text` + optional `job_description` & `required_skills` → returns NLP extraction and scoring |
+
+---
+
+## 🗄️ Database Schema
+
+| Table | Purpose | Key Columns |
+|---|---|---|
+| `Users` | Registered user profiles | `id`, `name`, `email`, `created_at` |
+| `Jobs` | Multi-sector job repository | `id`, `title`, `category`, `description`, `required_skills` (JSON) |
+| `Resumes` | Uploaded applicant records | `id`, `user_id`, `file_name`, `extracted_text`, `uploaded_at` |
+| `Analysis_History` | Audit trail of past evaluations | `id`, `resume_id`, `job_id`, `match_score`, `strength_score`, `analyzed_at` |
 
 ---
 
@@ -203,10 +249,10 @@ ML_SERVICE_URL=http://localhost:8000
    - Automatically detects MIME type / file extension. Uses `pdf-parse` for PDFs and `mammoth` for DOCX/DOC documents, with UTF-8 stream fallback for text/markdown files.
 
 2. **Skill Extraction & Multi-Sector Gazetteer**
-   - Combines spaCy tokenization with regex matching across comprehensive technical and business skill taxonomies.
+   - Combines spaCy tokenization with regex matching across comprehensive technical and business skill taxonomies (60+ technical and domain competencies).
 
 3. **Experience & Timeline Parsing**
-   - Parses dates, titles, seniority keywords (Fresher, Mid-Level, Senior, Lead), and previous employers.
+   - Parses dates, titles, seniority keywords (Fresher, Mid-Level, Senior, Lead), and previous employers using regex heuristics and spaCy NER (`ORG`).
 
 4. **Hybrid Target Job Matching Formula**
    - When a target job is selected, the **Target Job Match** score is computed as:
@@ -246,6 +292,14 @@ cd backend && npm run dev
 # ML Microservice (Uvicorn auto-reload)
 cd ml_service && uvicorn main:app --reload --port 8000
 ```
+
+---
+
+## ❓ Troubleshooting & FAQs
+
+- **MySQL Connection Error (`ECONNREFUSED` / `Access denied`)**: Verify that MySQL 8.0 is running and that your credentials in `backend/.env` match (`DB_USER=root`, `DB_PASSWORD=your_password`).
+- **spaCy Model Not Found (`Can't find model 'en_core_web_sm'`)**: Run `python -m spacy download en_core_web_sm` inside your Python virtual environment.
+- **Port Conflicts**: Ensure ports `3000` (Frontend), `5000` (Backend API), and `8000` (ML Service) are free.
 
 ---
 
