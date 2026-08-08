@@ -2,17 +2,63 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Global Enterprise Theme ── */
-:root {
+/* ── Global Enterprise Design System & High-Contrast Theme Engine ── */
+:root,
+html[data-theme="light"],
+html:not(.dark) {
+  color-scheme: light;
+  --bg-app: #f8fafc;
+  --bg-navbar: rgba(255, 255, 255, 0.96);
+  --bg-card: #ffffff;
+  --bg-card-subtle: #f8fafc;
+  --bg-dropzone: #f8fafc;
+  --bg-dropzone-hover: #eef2ff;
+  --bg-input: #ffffff;
+  --bg-badge: #f1f5f9;
+  --border-color: #cbd5e1;
+  --border-strong: #94a3b8;
+  --border-dashed: #94a3b8;
+  --text-title: #0f172a;
+  --text-main: #1e293b;
+  --text-body: #334155;
+  --text-muted: #475569;
+  --text-dim: #64748b;
   --primary: #4f46e5;
   --primary-hover: #4338ca;
-  --bg-page: #f8fafc;
-  --surface: #ffffff;
-  --border-subtle: #e2e8f0;
-  --border-strong: #cbd5e1;
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
+  --btn-main-bg: #4f46e5;
+  --btn-main-hover: #4338ca;
+  --btn-main-text: #ffffff;
+  --card-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+  --card-shadow-hover: 0 12px 24px -4px rgba(0, 0, 0, 0.08), 0 6px 12px -2px rgba(0, 0, 0, 0.04);
+}
+
+html.dark,
+html[data-theme="dark"],
+body.dark {
+  color-scheme: dark;
+  --bg-app: #0b0f19;
+  --bg-navbar: rgba(11, 15, 25, 0.92);
+  --bg-card: #0f172a;
+  --bg-card-subtle: #090d16;
+  --bg-dropzone: #070b14;
+  --bg-dropzone-hover: rgba(99, 102, 241, 0.12);
+  --bg-input: #1e293b;
+  --bg-badge: #1e293b;
+  --border-color: #1e293b;
+  --border-strong: #334155;
+  --border-dashed: #273549;
+  --text-title: #ffffff;
+  --text-main: #f8fafc;
+  --text-body: #e2e8f0;
+  --text-muted: #cbd5e1;
+  --text-dim: #94a3b8;
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --btn-main-bg: #6366f1;
+  --btn-main-hover: #4f46e5;
+  --btn-main-text: #ffffff;
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --card-shadow-hover: 0 12px 28px -4px rgba(0, 0, 0, 0.6), 0 6px 12px -2px rgba(0, 0, 0, 0.4);
 }
 
 * {
@@ -21,61 +67,191 @@
   box-sizing: border-box;
 }
 
-body {
+html, body {
+  background-color: var(--bg-app);
+  color: var(--text-main);
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--bg-page);
-  color: var(--text-primary);
   overflow-x: hidden;
-  background-image: radial-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+body {
+  background-image: radial-gradient(rgba(148, 163, 184, 0.15) 1px, transparent 1px);
   background-size: 24px 24px;
+}
+
+html.dark body,
+html[data-theme="dark"] body {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Plus Jakarta Sans', sans-serif;
   letter-spacing: -0.025em;
+  color: var(--text-title);
 }
 
-/* ── Precision Enterprise UI Surfaces ── */
+/* ── UI Surfaces ── */
 .solid-panel {
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--bg-navbar);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .solid-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 1.25rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--card-shadow);
+  color: var(--text-main);
+  transition: all 0.2s ease;
 }
 
 .solid-card:hover {
-  border-color: #cbd5e1;
-  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+  border-color: var(--border-strong);
+  box-shadow: var(--card-shadow-hover);
 }
 
-/* ── Upload Canvas ── */
 .upload-zone {
   position: relative;
-  background: #fafbfc;
-  border: 2px dashed #cbd5e1;
+  background-color: var(--bg-dropzone);
+  border: 2px dashed var(--border-dashed);
   border-radius: 1rem;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .upload-zone:hover {
-  border-color: #6366f1;
-  background: #f5f7ff;
+  border-color: var(--primary);
+  background-color: var(--bg-dropzone-hover);
 }
 
 .upload-zone.drag-over {
-  border-color: #4f46e5;
-  background: #eef2ff;
+  border-color: var(--primary);
+  background-color: var(--bg-dropzone-hover);
   transform: scale(1.005);
+}
+
+/* ── Bright & Razor-Sharp Light Mode Contrast Enhancements ── */
+html:not(.dark),
+html[data-theme="light"] {
+  /* Ensure all muted text in light mode has strong, legible contrast */
+  .text-slate-400,
+  .text-slate-500 {
+    color: #334155 !important;
+  }
+
+  .text-slate-600 {
+    color: #1e293b !important;
+  }
+
+  /* Badge and Pill light mode brightness */
+  .bg-slate-100 {
+    background-color: #f1f5f9 !important;
+  }
+}
+
+/* ── Media Query Immunity Overrides (Prevents Rogue Dark Media Styles in Light Mode) ── */
+@media (prefers-color-scheme: dark) {
+  html:not(.dark),
+  html[data-theme="light"],
+  body:not(.dark) {
+    background-color: #f8fafc !important;
+    color: #1e293b !important;
+  }
+
+  html:not(.dark) .solid-panel,
+  html[data-theme="light"] .solid-panel {
+    background: rgba(255, 255, 255, 0.96) !important;
+    border-color: #cbd5e1 !important;
+  }
+
+  html:not(.dark) .solid-card,
+  html[data-theme="light"] .solid-card {
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #1e293b !important;
+  }
+
+  html:not(.dark) .upload-zone,
+  html[data-theme="light"] .upload-zone {
+    background-color: #f8fafc !important;
+    border-color: #94a3b8 !important;
+  }
+
+  html:not(.dark) .dark\:text-white,
+  html[data-theme="light"] .dark\:text-white {
+    color: #0f172a !important;
+  }
+
+  html:not(.dark) .dark\:text-slate-100,
+  html[data-theme="light"] .dark\:text-slate-100 {
+    color: #0f172a !important;
+  }
+
+  html:not(.dark) .dark\:text-slate-200,
+  html[data-theme="light"] .dark\:text-slate-200 {
+    color: #1e293b !important;
+  }
+
+  html:not(.dark) .dark\:text-slate-300,
+  html[data-theme="light"] .dark\:text-slate-300 {
+    color: #1e293b !important;
+    font-weight: 600;
+  }
+
+  html:not(.dark) .dark\:text-slate-400,
+  html[data-theme="light"] .dark\:text-slate-400 {
+    color: #334155 !important;
+  }
+
+  html:not(.dark) .dark\:text-slate-500,
+  html[data-theme="light"] .dark\:text-slate-500 {
+    color: #475569 !important;
+  }
+
+  html:not(.dark) .dark\:bg-slate-900,
+  html[data-theme="light"] .dark\:bg-slate-900 {
+    background-color: #ffffff !important;
+  }
+
+  html:not(.dark) .dark\:bg-slate-800,
+  html[data-theme="light"] .dark\:bg-slate-800 {
+    background-color: #f1f5f9 !important;
+  }
+
+  html:not(.dark) .dark\:bg-slate-800\/80,
+  html:not(.dark) .dark\:bg-slate-800\/90,
+  html[data-theme="light"] .dark\:bg-slate-800\/80,
+  html[data-theme="light"] .dark\:bg-slate-800\/90 {
+    background-color: #f1f5f9 !important;
+  }
+
+  html:not(.dark) .dark\:bg-slate-950,
+  html:not(.dark) .dark\:bg-slate-950\/50,
+  html:not(.dark) .dark\:bg-slate-950\/60,
+  html[data-theme="light"] .dark\:bg-slate-950,
+  html[data-theme="light"] .dark\:bg-slate-950\/50,
+  html[data-theme="light"] .dark\:bg-slate-950\/60 {
+    background-color: #f8fafc !important;
+  }
+
+  html:not(.dark) .dark\:bg-\[\#070b14\],
+  html:not(.dark) .dark\:bg-\[\#0b0f19\],
+  html[data-theme="light"] .dark\:bg-\[\#070b14\],
+  html[data-theme="light"] .dark\:bg-\[\#0b0f19\] {
+    background-color: #f8fafc !important;
+  }
+
+  html:not(.dark) .dark\:border-slate-800,
+  html:not(.dark) .dark\:border-slate-700,
+  html[data-theme="light"] .dark\:border-slate-800,
+  html[data-theme="light"] .dark\:border-slate-700 {
+    border-color: #cbd5e1 !important;
+  }
 }
 
 /* ── Custom Scrollbar ── */
@@ -85,16 +261,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--bg-app);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--border-strong);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--text-dim);
 }
 
 /* ── Progress Ring ── */
@@ -110,17 +286,22 @@ h1, h2, h3, h4, h5, h6 {
   animation: shimmer 1.5s infinite;
 }
 
+html.dark .shimmer,
+html[data-theme="dark"] .shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0.02) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.02) 75%);
+  background-size: 200% 100%;
+}
+
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
 
-/* ── Screen vs Print Helper Classes ── */
+/* ── Print Helper Classes ── */
 .print-only {
   display: none !important;
 }
 
-/* ── High Quality Executive Print / PDF Export Styles ── */
 @media print {
   @page {
     size: A4 portrait;
@@ -140,7 +321,6 @@ h1, h2, h3, h4, h5, h6 {
   *::after {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-    color-adjust: exact !important;
     box-shadow: none !important;
     text-shadow: none !important;
   }
@@ -151,7 +331,6 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 11pt;
   }
 
-  /* Hide UI chrome, navbar, footers, background ambient blurs */
   nav,
   footer,
   .no-print,
@@ -167,7 +346,6 @@ h1, h2, h3, h4, h5, h6 {
     max-width: 100% !important;
   }
 
-  /* Ensure the Executive Report expands to full A4 page width with perfect pagination */
   .report-root {
     box-shadow: none !important;
     border: none !important;
@@ -183,4 +361,3 @@ h1, h2, h3, h4, h5, h6 {
     page-break-inside: avoid !important;
   }
 }
-
