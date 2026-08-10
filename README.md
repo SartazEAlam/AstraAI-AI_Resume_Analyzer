@@ -11,10 +11,11 @@ Upload your resume in any format, select a target role or explore universal mark
 | Feature | Description |
 |---|---|
 | **Multi-Format Support** | Seamless text extraction for **PDF, Word (DOCX/DOC), TXT, RTF, and Markdown** using `mammoth` and native stream parsers. |
-| **Cascading Job Selector** | 2-level cascading selector: filter by **Industry Sector / Domain** (Tech, Finance, Healthcare, Marketing, HR, Operations, Design, Legal, Engineering) then select a **Specific Job Role**. |
-| **Hybrid ATS Match Engine** | Blends 70% direct technical skill overlap with 30% TF-IDF full-text contextual semantic similarity for realistic ATS grading. |
+| **Cascading Job Selector & Custom JDs** | Filter by Industry Sector, select a Specific Job Role, or **Paste a Custom Job Description** for on-the-fly keyword extraction. |
+| **Hybrid ATS Match Engine** | Blends direct technical skill overlap with **AI Semantic Concept Matching** (`sentence-transformers`) for realistic ATS grading and fewer false negatives. |
+| **Live In-Browser Resume Editor** | Iteratively refine your extracted resume text and re-run the ATS evaluation instantaneously without re-uploading PDFs. |
+| **AI Bullet Point Enhancer** | Evaluates individual resume bullet points against an action verbs gazetteer and STAR methodology, providing actionable feedback to boost impact. |
 | **Dual General & Global Market Fit** | When no specific job is chosen, calculates both **Primary Domain Best Fit** (0–100%) and **Global Multi-Sector Market Fit** across 54+ industry roles. |
-| **Skill Gap & Extracted Skills** | Real-time gap detection showing missing essential skills alongside extracted competencies from a 100+ multi-industry gazetteer. |
 | **Experience & Seniority Parsing** | Automatically extracts total years of experience, inferred seniority level, and previous job titles with company and date ranges. |
 | **Executive ATS Report & PDF Export** | Toggle between an interactive web dashboard and a formal, printable **Executive ATS Assessment Report** optimized for clean A4 PDF export. |
 | **Dual Mode UI** | **Individual Mode** for self-assessment, and **Organization Dashboard** for recruiters to bulk upload, rank, and evaluate candidate pools. |
@@ -175,7 +176,9 @@ ML_SERVICE_URL=http://localhost:8000
 |--------|----------|-------------|
 | `GET` | `/api/health` | Health check endpoint — returns `{ status: "ok" }` |
 | `GET` | `/api/jobs` | Retrieve all job roles categorized by sector with required skills |
-| `POST` | `/api/upload` | Upload resume file (`.pdf`, `.docx`, `.doc`, `.txt`, `.rtf`, `.md`) with optional `jobId` |
+| `POST` | `/api/upload` | Upload resume file with optional `jobId` or `customJD` |
+| `POST` | `/api/analyze-text` | Directly analyze raw resume text (used by the Live Editor) |
+| `POST` | `/api/enhance-bullet` | Audit a single bullet point for STAR methodology and action verbs |
 
 #### `POST /api/upload` Sample Response:
 ```json
@@ -210,7 +213,8 @@ ML_SERVICE_URL=http://localhost:8000
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/` | Service root and health confirmation |
-| `POST` | `/analyze` | Accepts `resume_text` + optional `job_description` & `required_skills` → returns NLP extraction and scoring |
+| `POST` | `/analyze` | Accepts `resume_text` + optional `job_description` & `required_skills` → returns NLP extraction and hybrid scoring |
+| `POST` | `/enhance-bullet` | Accepts a text string and returns actionable feedback based on action verbs and metrics |
 
 ---
 
@@ -231,17 +235,19 @@ ML_SERVICE_URL=http://localhost:8000
    - Automatically detects MIME type / file extension. Uses `pdf-parse` for PDFs and `mammoth` for DOCX/DOC documents, with UTF-8 stream fallback for text/markdown files.
 
 2. **Skill Extraction & Multi-Sector Gazetteer**
-   - Combines spaCy tokenization with regex matching across comprehensive technical and business skill taxonomies (60+ technical and domain competencies).
+   - Combines spaCy tokenization with regex matching across comprehensive technical and business skill taxonomies (60+ technical and domain competencies). Dynamic extraction is run on Custom Job Descriptions.
 
-3. **Experience & Timeline Parsing**
+3. **Hybrid Semantic Skill Gap Analysis**
+   - Identifies exact skill matches. Any missing skills are routed through `all-MiniLM-L6-v2` (`sentence-transformers`) to calculate cosine similarity with the candidate's existing skills. Matches > 72% are classified as "AI Semantic Concept Matches", bridging terminology gaps (e.g., "Frontend" ≈ "ReactJS").
+
+4. **Experience & Timeline Parsing**
    - Parses dates, titles, seniority keywords (Fresher, Mid-Level, Senior, Lead), and previous employers using regex heuristics and spaCy NER (`ORG`).
 
-4. **Hybrid Target Job Matching Formula**
+5. **Target Job Matching Formula**
    - When a target job is selected, the **Target Job Match** score is computed as:
      $$\text{Target Job Match} = (70\% \times \text{Skill Match Ratio}) + (30\% \times \text{TF-IDF Cosine Similarity})$$
-   - **Target Skill Match**: Measures direct required keyword coverage ($\frac{\text{Matched Skills}}{\text{Total Required Skills}}$).
 
-5. **Universal Market Fit (No Target Job Selected)**
+6. **Universal Market Fit (No Target Job Selected)**
    - **Primary Domain Fit (0–100%)**: Evaluates fit against candidate's single best-matching discipline.
    - **Global Market Fit**: Quantifies overall versatility across all 54 roles in all sectors.
 
