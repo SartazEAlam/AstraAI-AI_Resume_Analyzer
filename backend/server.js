@@ -118,6 +118,7 @@ app.post('/api/upload', upload.single('resume'), async (req, res) => {
         }
 
         const jobId = req.body.jobId;
+        const customJD = req.body.customJD;
 
         // 1. Extract text from uploaded document (PDF, DOCX, DOC, TXT, RTF, MD)
         let extractedText = '';
@@ -138,11 +139,11 @@ app.post('/api/upload', upload.single('resume'), async (req, res) => {
             });
         }
 
-        // 3. Get the Job Description from MySQL
-        let jobDescription = '';
+        // 3. Get the Job Description from MySQL or Custom Input
+        let jobDescription = customJD || '';
         let requiredSkills = [];
 
-        if (jobId) {
+        if (jobId && !customJD) {
 
             const [rows] = await pool.query(
                 `
@@ -210,6 +211,64 @@ app.post('/api/upload', upload.single('resume'), async (req, res) => {
     }
 });
 
+// ── Enhance Bullet Point Endpoint ──
+app.post('/api/enhance-bullet', async (req, res) => {
+    try {
+        const { text } = req.body;
+        if (!text) {
+            return res.status(400).json({ error: 'Text is required' });
+        }
+        
+        const mlServiceUrl = process.env.ML_SERVICE_URL || 'http://localhost:8000';
+        const pythonResponse = await axios.post(`${mlServiceUrl}/enhance-bullet`, { text });
+        
+        res.json(pythonResponse.data);
+    } catch (error) {
+        console.error('Error enhancing bullet:', error.message);
+        res.status(500).json({ error: 'Failed to communicate with ML service' });
+    }
+});
+
+// ── Analyze Text Endpoint (For Live Editor) ──
+app.post('/api/analyze-text', async (req, res) => {
+    try {
+        const { text, jobId, customJD } = req.body;
+        if (!text) {
+            return res.status(400).json({ error: 'Text is required' });
+        }
+
+        let jobDescription = customJD || '';
+        let requiredSkills = [];
+
+        if (jobId && !customJD) {
+            const [rows] = await pool.query(
+                'SELECT description, required_skills FROM Jobs WHERE id = ?',
+                [jobId]
+            );
+            if (rows.length > 0) {
+                jobDescription = rows[0].description;
+                requiredSkills = typeof rows[0].required_skills === 'string'
+                    ? JSON.parse(rows[0].required_skills)
+                    : (rows[0].required_skills || []);
+            }
+        }
+
+        const mlServiceUrl = process.env.ML_SERVICE_URL || 'http://localhost:8000';
+        const pythonResponse = await axios.post(
+            `${mlServiceUrl}/analyze`,
+            {
+                resume_text: text,
+                job_description: jobDescription || "",
+                required_skills: requiredSkills || [],
+            }
+        );
+
+        res.json(pythonResponse.data);
+    } catch (error) {
+        console.error('Error analyzing text:', error.message);
+        res.status(500).json({ error: 'Internal server error during text analysis.' });
+    }
+});
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`\n🚀 Node.js Backend running at http://localhost:${PORT}`);
