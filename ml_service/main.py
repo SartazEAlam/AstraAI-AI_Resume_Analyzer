@@ -3,6 +3,7 @@ from pydantic import BaseModel
 import spacy
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from sentence_transformers import SentenceTransformer
 import re
 from datetime import datetime
 
@@ -13,6 +14,13 @@ except OSError:
     import spacy.cli
     spacy.cli.download("en_core_web_sm")
     nlp = spacy.load("en_core_web_sm")
+
+# Load SentenceTransformer model (Lightweight model for semantic similarity)
+try:
+    sbert_model = SentenceTransformer('all-MiniLM-L6-v2')
+except Exception as e:
+    print(f"Warning: Could not load sentence-transformers model. Semantic search will be disabled. Error: {e}")
+    sbert_model = None
 
 app = FastAPI()
 
@@ -455,15 +463,53 @@ def analyze_resume(request: AnalysisRequest):
             normalize_skill(skill)
             for skill in request.required_skills
         }
+        
+        # Auto-extract skills if JD is provided but required_skills array is empty (Custom JD Support)
+        if job_desc.strip() and not job_skills:
+            job_skills = {
+                normalize_skill(skill)
+                for skill in extract_skills(job_desc)
+            }
+
 
         resume_skills = {
             normalize_skill(skill)
             for skill in extract_skills(request.resume_text)
         }
         
-        # 2. Skill Gap Analysis
-        missing_skills = list(job_skills - resume_skills)
+        # 2. Skill Gap Analysis (Exact + Semantic Hybrid)
+        exact_missing_skills = list(job_skills - resume_skills)
         matched_skills = list(job_skills & resume_skills)
+        
+        final_missing_skills = []
+        semantic_matches = []
+
+        if sbert_model and exact_missing_skills and resume_skills:
+            # Generate embeddings for missing job skills and all resume skills
+            missing_embeddings = sbert_model.encode(exact_missing_skills)
+            resume_embeddings = sbert_model.encode(list(resume_skills))
+            
+            # Compute cosine similarities between all missing skills and all resume skills
+            sim_matrix = cosine_similarity(missing_embeddings, resume_embeddings)
+            
+            for i, m_skill in enumerate(exact_missing_skills):
+                # Find the best matching resume skill for this missing job skill
+                best_match_idx = sim_matrix[i].argmax()
+                best_score = sim_matrix[i][best_match_idx]
+                
+                if best_score > 0.72: # Threshold for semantic similarity
+                    matched_skills.append(m_skill)
+                    semantic_matches.append({
+                        "job_skill": m_skill,
+                        "matched_with": list(resume_skills)[best_match_idx],
+                        "score": round(float(best_score), 2)
+                    })
+                else:
+                    final_missing_skills.append(m_skill)
+        else:
+            final_missing_skills = exact_missing_skills
+
+        missing_skills = final_missing_skills
         
         # 3. Match Percentage Calculation
 
@@ -492,7 +538,7 @@ def analyze_resume(request: AnalysisRequest):
             skill_match_ratio = len(matched_skills) / len(job_skills)
         
         is_general_analysis = (
-            len(request.required_skills) == 0
+            len(job_skills) == 0
         )
 
             
@@ -691,6 +737,7 @@ def analyze_resume(request: AnalysisRequest):
             "global_market_match": round(global_market_match, 2),
             "missing_skills": missing_skills,
             "matched_skills": matched_skills,
+            "semantic_matches": semantic_matches,
             "strength_score": round(strength_score, 2),
             "extracted_skills": list(resume_skills),
             "experience": experience,
@@ -701,6 +748,7 @@ def analyze_resume(request: AnalysisRequest):
             "is_general_analysis": is_general_analysis,
             "matched_skill_count": len(matched_skills),
             "required_skill_count": len(job_skills),
+            "parsed_text": resume_text,
         }
 
         
@@ -708,3 +756,57 @@ def analyze_resume(request: AnalysisRequest):
         import traceback
         print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
+
+class BulletRequest(BaseModel):
+    text: str
+
+from action_verbs import get_suggestion_for_weak_verb, ACTION_VERBS
+
+@app.post("/enhance-bullet")
+def enhance_bullet(request: BulletRequest):
+    """Provides actionable feedback on a resume bullet point."""
+    text = request.text.strip()
+    if not text:
+        return {"feedback": [], "enhanced": False, "score": 0}
+        
+    feedback = []
+    score = 100
+    
+    # 1. Weak verb check
+    verb_suggestion = get_suggestion_for_weak_verb(text)
+    if verb_suggestion:
+        feedback.append(verb_suggestion)
+        score -= 20
+        
+    # 2. Metrics / Number check
+    has_metrics = bool(re.search(r'\d+', text)) or '%' in text or '$' in text
+    if not has_metrics:
+        feedback.append("Missing metrics: Add numbers, percentages, or dollar amounts to quantify your impact.")
+        score -= 30
+        
+    # 3. Length check
+    words = text.split()
+    if len(words) < 8:
+        feedback.append("Too short: Expand on the context or the result of your action.")
+        score -= 10
+    elif len(words) > 30:
+        feedback.append("Too long: Keep bullet points concise (aim for 1-2 lines).")
+        score -= 10
+        
+    # 4. STAR method formatting
+    # Basic check: looks for "by", "resulting in", "leading to", "achieving"
+    impact_keywords = ['by', 'resulting in', 'leading to', 'achieving', 'to', 'which']
+    has_impact = any(keyword in text.lower() for keyword in impact_keywords)
+    if not has_impact and score > 50:
+        feedback.append("Format suggestion: Try using the 'Action + Context + Result' format. What was the impact of your work?")
+        score -= 15
+        
+    if score == 100:
+        feedback.append("✨ Strong bullet point! It starts with a good verb and includes quantifiable metrics.")
+        
+    return {
+        "original": text,
+        "feedback": feedback,
+        "score": max(0, score),
+        "enhanced": score > 80
+    }
