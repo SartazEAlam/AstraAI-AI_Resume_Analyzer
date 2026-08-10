@@ -792,7 +792,7 @@ function App() {
               
               <BulletPointEnhancer />
 
-              {results.parsed_text && (
+              {results?.parsed_text && (
                 <LiveEditor
                   initialText={results.parsed_text}
                   onReAnalyze={handleReAnalyze}
