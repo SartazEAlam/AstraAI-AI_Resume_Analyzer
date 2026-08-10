@@ -20,6 +20,7 @@ import {
   Compass,
   Sun,
   Moon,
+  ExternalLink,
 } from "lucide-react";
 
 /* ── Modular Component Imports ── */
@@ -178,6 +179,46 @@ function App() {
     } catch (err) {
       console.error("Re-analyze error:", err);
       setError("Failed to re-analyze text.");
+      setLoading(false);
+    }
+  };
+
+  const handleQuickAnalyze = async (roleTitle) => {
+    if (!results?.parsed_text) return;
+    
+    const foundJob = jobs.find(j => j.title.toLowerCase() === roleTitle.toLowerCase());
+    
+    let targetJobId = null;
+    let targetCustomJD = null;
+    
+    if (foundJob) {
+      targetJobId = String(foundJob.id);
+      setSelectedCategory(foundJob.category || "");
+      setSelectedJobId(targetJobId);
+    } else {
+      targetJobId = "custom";
+      targetCustomJD = `Role: ${roleTitle}. Seeking candidates with experience in ${roleTitle}.`;
+      setSelectedJobId("custom");
+      setCustomJD(targetCustomJD);
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await axios.post("http://localhost:5000/api/analyze-text", {
+        text: results.parsed_text,
+        jobId: targetJobId === "custom" ? null : targetJobId,
+        customJD: targetJobId === "custom" ? targetCustomJD : null,
+      });
+
+      setResults(response.data);
+      setViewMode("dashboard");
+      setLoading(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      console.error("Quick analyze error:", err);
+      setError(`Failed to re-analyze for role: ${roleTitle}`);
       setLoading(false);
     }
   };
@@ -764,9 +805,13 @@ function App() {
                                         {role}
                                       </div>
                                     </div>
-                                    <div className="mt-4 flex items-center text-xs text-indigo-600 dark:text-indigo-400 font-semibold">
-                                      <span>Matched Profile</span>
-                                      <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+                                    <div className="mt-4 flex flex-col gap-2">
+                                      <button onClick={() => handleQuickAnalyze(role)} className="flex items-center text-[11px] text-indigo-600 dark:text-indigo-400 font-bold hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors">
+                                        <Target className="w-3.5 h-3.5 mr-1.5" /> Re-Analyze for this Role
+                                      </button>
+                                      <a href={`https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(role)}`} target="_blank" rel="noopener noreferrer" className="flex items-center text-[11px] text-slate-500 dark:text-slate-400 font-bold hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                                        <ExternalLink className="w-3.5 h-3.5 mr-1.5" /> Search on LinkedIn
+                                      </a>
                                     </div>
                                   </div>
                                 ))}
