@@ -180,7 +180,8 @@ app.post('/api/upload', upload.single('resume'), async (req, res) => {
                 }
             );
         } catch (axiosErr) {
-            console.error('ML service error:', axiosErr.response ? axiosErr.response.data : axiosErr.message);
+            console.error('ML service error:', axiosErr.message);
+            if (axiosErr.response) console.error('ML service response:', axiosErr.response.data);
             safeCleanup(req.file.path);
             return res.status(500).json({ error: 'Failed to communicate with the ML analysis service. Make sure it is running.' });
         }
@@ -266,6 +267,7 @@ app.post('/api/analyze-text', async (req, res) => {
         res.json(pythonResponse.data);
     } catch (error) {
         console.error('Error analyzing text:', error.message);
+        if (error.response) console.error('ML service response:', error.response.data);
         res.status(500).json({ error: 'Internal server error during text analysis.' });
     }
 });
