@@ -664,7 +664,7 @@ function App() {
                                   {results.extracted_skills?.length || 0} Detected
                                 </span>
                               </div>
-                              <div className="flex flex-wrap gap-2 flex-grow">
+                              <div className="flex flex-wrap gap-2 flex-grow items-start content-start">
                                 {results.extracted_skills?.map((skill, i) => (
                                   <span
                                     key={i}
@@ -699,7 +699,7 @@ function App() {
                               </div>
                               <div className="flex-grow">
                                 {results.missing_skills?.length > 0 ? (
-                                  <div className="flex flex-wrap gap-2">
+                                  <div className="flex flex-wrap gap-2 items-start content-start">
                                     {results.missing_skills.map((skill, i) => (
                                       <span
                                         key={i}

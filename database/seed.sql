@@ -1,250 +1,61 @@
--- ============================================================
--- Multi-Sector Seed Data: 54 High-Demand Job Roles Across 10 Industries
--- ============================================================
-
 USE resume_analyzer;
-
--- Clean existing seeded jobs to avoid duplicate IDs
+SET FOREIGN_KEY_CHECKS=0;
 TRUNCATE TABLE Analysis_History;
-DELETE FROM Jobs;
-
+TRUNCATE TABLE Jobs;
+SET FOREIGN_KEY_CHECKS=1;
 INSERT INTO Jobs (id, title, category, description, required_skills) VALUES
-
--- 💻 1. TECHNOLOGY & SOFTWARE DEVELOPMENT
-(1, 'Frontend Developer', 'Technology', 
- 'Build responsive web interfaces using modern frameworks, component-based architectures, and state management.',
- '["HTML", "CSS", "JavaScript", "React", "TypeScript", "Tailwind CSS", "Git", "REST APIs", "Webpack"]'),
-
-(2, 'Backend Developer', 'Technology',
- 'Design scalable server-side architectures, RESTful/GraphQL APIs, database models, and microservices.',
- '["Node.js", "Express", "Python", "MySQL", "MongoDB", "REST APIs", "Docker", "Git", "Redis"]'),
-
-(3, 'Full Stack Engineer', 'Technology',
- 'Deliver end-to-end web applications combining robust backend services with polished frontend UI/UX.',
- '["React", "Node.js", "TypeScript", "PostgreSQL", "REST APIs", "Docker", "AWS", "Git", "GraphQL"]'),
-
-(4, 'DevOps & Cloud Engineer', 'Technology',
- 'Manage CI/CD pipelines, container orchestration, cloud infrastructure (AWS/Azure), and system reliability.',
- '["Docker", "Kubernetes", "AWS", "CI/CD", "Linux", "Terraform", "Jenkins", "Git", "Monitoring"]'),
-
-(5, 'Cybersecurity Analyst', 'Technology',
- 'Monitor threat vectors, conduct vulnerability assessments, manage firewalls, SIEM, and incident responses.',
- '["Network Security", "Firewalls", "SIEM", "Penetration Testing", "Linux", "Python", "Compliance", "Incident Response"]'),
-
-(6, 'Mobile App Developer', 'Technology',
- 'Build native and cross-platform mobile apps with smooth animations, offline persistence, and API integration.',
- '["React Native", "Flutter", "iOS", "Android", "Swift", "Kotlin", "REST APIs", "Git"]'),
-
-(7, 'QA & Automation Test Engineer', 'Technology',
- 'Write automated test suites, end-to-end integration tests, regression suites, and maintain test pipelines.',
- '["Selenium", "Cypress", "Jest", "Automation Testing", "CI/CD", "Python", "Postman", "Git"]'),
-
-(8, 'IT Systems Administrator', 'Technology',
- 'Maintain server infrastructure, Active Directory, network switches, enterprise backup systems, and IT support.',
- '["Linux", "Windows Server", "Active Directory", "Networking", "Bash", "VMware", "Troubleshooting"]'),
-
-
--- 🤖 2. DATA SCIENCE & ARTIFICIAL INTELLIGENCE
-(9, 'Data Scientist', 'Data Science & AI',
- 'Develop predictive machine learning models, statistical analyses, feature engineering, and data insights.',
- '["Python", "Pandas", "NumPy", "scikit-learn", "Machine Learning", "SQL", "Statistics", "Data Visualization"]'),
-
-(10, 'Machine Learning / AI Engineer', 'Data Science & AI',
- 'Train deep learning architectures, deploy model inference endpoints, MLOps pipelines, and computer vision systems.',
- '["PyTorch", "TensorFlow", "Deep Learning", "Python", "Docker", "MLOps", "Computer Vision", "NLP"]'),
-
-(11, 'Data Engineer', 'Data Science & AI',
- 'Build distributed data pipelines, ETL workflows, data warehousing schemas, and real-time streaming architectures.',
- '["Python", "SQL", "Spark", "ETL", "Snowflake", "Airflow", "Data Warehousing", "Kafka"]'),
-
-(12, 'BI & Data Analytics Specialist', 'Data Science & AI',
- 'Create executive BI dashboards, data modeling, KPI reporting, and strategic data-driven business insights.',
- '["Power BI", "Tableau", "SQL", "Excel", "Data Visualization", "DAX", "Business Intelligence"]'),
-
-(13, 'NLP & LLM Engineer', 'Data Science & AI',
- 'Fine-tune large language models, build retrieval-augmented generation (RAG) pipelines, and prompt frameworks.',
- '["NLP", "LangChain", "Transformers", "Python", "PyTorch", "FastAPI", "Vector Databases"]'),
-
-
--- 📈 3. FINANCE, BANKING & ACCOUNTING
-(14, 'Financial Analyst', 'Finance & Banking',
- 'Perform financial modeling, forecasting, variance analysis, company valuations, and investment presentations.',
- '["Financial Modeling", "Valuation", "Excel", "Financial Analysis", "Forecasting", "Accounting", "Power BI", "Corporate Finance"]'),
-
-(15, 'Senior Accountant & Auditor', 'Finance & Banking',
- 'Manage general ledger, month-end closing, GAAP/IFRS compliance, internal audits, and tax preparations.',
- '["GAAP", "General Ledger", "Auditing", "Tax Preparation", "QuickBooks", "SAP", "Account Reconciliation", "CPA"]'),
-
-(16, 'Investment Banking Associate', 'Finance & Banking',
- 'Execute M&A due diligence, pitch books, leveraged buyout (LBO) models, and capital market transactions.',
- '["M&A", "Due Diligence", "LBO Modeling", "Valuation", "Pitch Books", "Capital Markets", "Financial Modeling"]'),
-
-(17, 'Risk & Compliance Officer', 'Finance & Banking',
- 'Oversee enterprise risk assessments, credit risk models, anti-money laundering (AML), and regulatory adherence.',
- '["Risk Management", "Compliance", "Internal Audit", "AML", "Regulatory Compliance", "Credit Risk", "Reporting"]'),
-
-(18, 'Tax Consultant / Specialist', 'Finance & Banking',
- 'Provide corporate tax strategy, IRS audit defense, tax return preparation, and multi-state compliance.',
- '["Tax Planning", "Tax Preparation", "Corporate Tax", "GAAP", "CPA", "Accounting", "Excel"]'),
-
-(19, 'Wealth & Portfolio Manager', 'Finance & Banking',
- 'Manage high-net-worth client asset allocations, mutual funds, equities, and wealth preservation strategies.',
- '["Portfolio Management", "Asset Allocation", "Equity Research", "Financial Planning", "Wealth Management", "CFA"]'),
-
-
--- 🏥 4. HEALTHCARE, MEDICINE & LIFE SCIENCES
-(20, 'Registered Nurse (RN)', 'Healthcare',
- 'Provide direct patient care, administer medications, monitor vital signs, triage, and collaborate with physicians.',
- '["Patient Care", "Medication Administration", "Triage", "BLS", "ACLS", "EMR", "Clinical Assessment", "Infection Control"]'),
-
-(21, 'Clinical Research Coordinator', 'Healthcare',
- 'Manage clinical trials, protocol compliance, patient recruitment, FDA regulations, and data collection.',
- '["GCP", "Clinical Trials", "IRB", "Protocol Compliance", "Patient Recruitment", "Data Management", "FDA Regulations"]'),
-
-(22, 'Healthcare Administrator', 'Healthcare',
- 'Oversee hospital operations, healthcare billing, HIPAA compliance, staff scheduling, and quality assurance.',
- '["Healthcare Management", "HIPAA", "Medical Billing", "Electronic Health Records", "EHR", "Budgeting", "Quality Assurance"]'),
-
-(23, 'Medical Laboratory Technologist', 'Healthcare',
- 'Perform diagnostic lab testing, hematology assays, chemical analyses, and calibrate diagnostic equipment.',
- '["Clinical Laboratory", "Hematology", "Phlebotomy", "Quality Control", "Microbiology", "Lab Safety"]'),
-
-(24, 'Clinical Pharmacist', 'Healthcare',
- 'Dispense medications, review drug interactions, provide patient medication therapy, and verify dosages.',
- '["Pharmacology", "Medication Therapy", "Patient Counseling", "Drug Interactions", "Pharmacy Practice", "Clinical Assessment"]'),
-
-(25, 'Biomedical Engineer', 'Healthcare',
- 'Design and maintain medical equipment, biomaterials, physiological monitoring sensors, and FDA test validations.',
- '["Medical Devices", "Biomedical Instrumentation", "FDA Regulations", "MATLAB", "CAD", "Quality Assurance"]'),
-
-
--- 📣 5. MARKETING, SALES & GROWTH
-(26, 'Digital Marketing Specialist', 'Marketing & Sales',
- 'Drive growth via performance marketing, Google Ads, SEO, content strategy, email campaigns, and web analytics.',
- '["SEO", "Google Analytics", "Content Marketing", "Social Media Marketing", "Email Marketing", "PPC", "Copywriting", "HubSpot"]'),
-
-(27, 'Enterprise Account Executive', 'Marketing & Sales',
- 'Generate B2B leads, deliver product demonstrations, negotiate enterprise contracts, and achieve sales quotas.',
- '["B2B Sales", "Lead Generation", "Salesforce", "Cold Calling", "Negotiation", "CRM", "Contract Negotiation", "Pipeline Management"]'),
-
-(28, 'Brand & Content Strategist', 'Marketing & Sales',
- 'Develop brand storytelling, creative campaigns, audience research, PR communications, and social growth.',
- '["Brand Strategy", "Content Strategy", "Copywriting", "Public Relations", "Social Media", "Market Research", "Storytelling"]'),
-
-(29, 'SEO & Growth Marketing Manager', 'Marketing & Sales',
- 'Optimize technical search ranking, backlink acquisition, A/B testing conversion funnels, and organic traffic growth.',
- '["SEO", "Google Search Console", "A/B Testing", "SEM", "Google Analytics", "Keyword Research", "Conversion Optimization"]'),
-
-(30, 'Product Marketing Manager (PMM)', 'Marketing & Sales',
- 'Orchestrate go-to-market launches, competitive positioning, value proposition messaging, and sales enablement.',
- '["Product Marketing", "Go-To-Market", "Competitive Analysis", "Product Positioning", "Market Research", "Sales Enablement"]'),
-
-(31, 'Customer Success Manager (CSM)', 'Marketing & Sales',
- 'Drive product adoption, reduce customer churn, run quarterly business reviews, and expand account value.',
- '["Customer Retention", "Account Management", "Onboarding", "CRM", "Zendesk", "Customer Support", "Communication"]'),
-
-
--- 👥 6. HUMAN RESOURCES & PEOPLE OPERATIONS
-(32, 'Human Resources Manager', 'Human Resources',
- 'Lead talent management, employee relations, performance reviews, organizational culture, and HR compliance.',
- '["Employee Relations", "Talent Management", "HR Compliance", "Performance Management", "Conflict Resolution", "HR Policies"]'),
-
-(33, 'Technical Recruiter / Talent Acquisition', 'Human Resources',
- 'Source engineering candidates, manage applicant tracking systems (ATS), conduct behavioral interviews, and negotiate offers.',
- '["Talent Sourcing", "ATS", "Interviewing", "Candidate Screening", "LinkedIn Recruiter", "Offer Negotiation", "Headhunting"]'),
-
-(34, 'HR Business Partner (HRBP)', 'Human Resources',
- 'Align business objectives with talent strategies, workforce planning, succession planning, and executive coaching.',
- '["Strategic HR", "Workforce Planning", "Organizational Development", "Leadership Development", "Change Management"]'),
-
-(35, 'Compensation & Benefits Specialist', 'Human Resources',
- 'Design total reward programs, manage healthcare benefits, salary benchmarking, 401(k) plans, and payroll audits.',
- '["Compensation Planning", "Benefits Administration", "Salary Benchmarking", "Payroll", "Workday", "Job Evaluation"]'),
-
-(36, 'Learning & Development (L&D) Specialist', 'Human Resources',
- 'Design corporate training modules, onboarding curricula, LMS administration, and professional development programs.',
- '["Instructional Design", "Training Delivery", "LMS", "Employee Training", "Curriculum Development", "E-Learning"]'),
-
-
--- 📦 7. SUPPLY CHAIN, OPERATIONS & LOGISTICS
-(37, 'Supply Chain Analyst', 'Supply Chain & Operations',
- 'Optimize inventory levels, demand forecasting, logistics routing, vendor relationships, and supplier metrics.',
- '["Supply Chain Management", "Inventory Control", "Demand Forecasting", "Logistics", "SAP", "ERP", "Vendor Management", "Excel"]'),
-
-(38, 'Operations & Plant Manager', 'Supply Chain & Operations',
- 'Direct day-to-day facility operations, Lean Six Sigma processes, production schedules, safety, and KPIs.',
- '["Operations Management", "Lean Manufacturing", "Six Sigma", "Process Optimization", "Quality Control", "Team Leadership"]'),
-
-(39, 'Procurement & Sourcing Specialist', 'Supply Chain & Operations',
- 'Manage supplier RFPs, contract negotiation, cost reduction initiatives, purchase orders, and supplier risk.',
- '["Strategic Sourcing", "Procurement", "Vendor Management", "Contract Negotiation", "SAP", "Cost Analysis"]'),
-
-(40, 'Logistics & Freight Coordinator', 'Supply Chain & Operations',
- 'Coordinate freight shipments, carrier dispatching, customs clearance, warehouse transfers, and route optimization.',
- '["Logistics", "Freight Forwarding", "Supply Chain", "Dispatching", "Route Optimization", "TMS", "Warehouse Operations"]'),
-
-(41, 'Warehouse & Inventory Manager', 'Supply Chain & Operations',
- 'Manage distribution center operations, pick/pack/ship workflows, inventory counts, and OSHA safety compliance.',
- '["Warehouse Management", "Inventory Management", "WMS", "Distribution", "Safety Compliance", "Logistics"]'),
-
-
--- 🎨 8. DESIGN, PRODUCT & CREATIVE
-(42, 'UI/UX Product Designer', 'Design & Creative',
- 'Design intuitive user experiences, wireframes, high-fidelity prototypes, user research, and design systems.',
- '["Figma", "UI Design", "UX Research", "Wireframing", "Prototyping", "Design Systems", "User Testing", "Adobe XD"]'),
-
-(43, 'Graphic & Brand Designer', 'Design & Creative',
- 'Create visual branding, logos, marketing collateral, typography, and vector illustrations.',
- '["Adobe Photoshop", "Adobe Illustrator", "InDesign", "Typography", "Brand Identity", "Visual Design", "Motion Graphics"]'),
-
-(44, 'Technical Product Manager', 'Design & Creative',
- 'Define product roadmaps, groom engineering backlogs, write detailed user stories, and drive Agile sprints.',
- '["Product Management", "Agile", "Scrum", "Product Roadmaps", "User Stories", "JIRA", "Wireframing"]'),
-
-(45, 'Motion Graphics & Video Producer', 'Design & Creative',
- 'Produce animated video content, promo reels, visual effects (VFX), sound design, and video editing.',
- '["Adobe After Effects", "Premiere Pro", "Motion Graphics", "Video Editing", "Animation", "Storyboarding"]'),
-
-(46, '3D & Industrial Product Designer', 'Design & Creative',
- 'Model 3D components, physical prototypes, industrial product aesthetics, and render photorealistic designs.',
- '["SolidWorks", "CAD", "3D Modeling", "Blender", "Rapid Prototyping", "Rendering", "Industrial Design"]'),
-
-
--- ⚖️ 9. LEGAL, GOVERNANCE & COMPLIANCE
-(47, 'Corporate Legal Counsel', 'Legal & Compliance',
- 'Draft commercial agreements, manage corporate governance, intellectual property protection, and risk mitigation.',
- '["Corporate Law", "Contract Drafting", "Legal Compliance", "Risk Mitigation", "Due Diligence", "M&A"]'),
-
-(48, 'Paralegal / Legal Assistant', 'Legal & Compliance',
- 'Conduct legal case research, prepare court filings, organize discovery documents, and draft legal summaries.',
- '["Legal Research", "Document Drafting", "Case Management", "Discovery", "Litigation Support", "Westlaw"]'),
-
-(49, 'Regulatory Affairs Specialist', 'Legal & Compliance',
- 'Ensure statutory and regulatory compliance, manage regulatory submissions, licenses, and audits.',
- '["Regulatory Compliance", "Policy Development", "Audit Management", "Risk Analysis", "Government Relations"]'),
-
-(50, 'Contract Administrator', 'Legal & Compliance',
- 'Manage end-to-end contract lifecycles, SLAs, contract renegotiations, compliance verifications, and archiving.',
- '["Contract Management", "Negotiation", "SLA Management", "Compliance", "Procurement", "Legal Writing"]'),
-
-
--- 🏗️ 10. ENGINEERING & CONSTRUCTION
-(51, 'Mechanical Engineer', 'Engineering & Construction',
- 'Design mechanical systems, heat transfer components, 3D CAD modeling, structural FEA, and GD&T drawings.',
- '["AutoCAD", "SolidWorks", "Mechanical Engineering", "FEA", "Thermodynamics", "GD&T", "Product Design"]'),
-
-(52, 'Electrical Engineer', 'Engineering & Construction',
- 'Design circuit boards, PCB layouts, microcontrollers, embedded hardware firmware, and power systems.',
- '["Circuit Design", "PCB Design", "MATLAB", "Embedded Systems", "Microcontrollers", "Electrical Engineering"]'),
-
-(53, 'Civil & Structural Engineer', 'Engineering & Construction',
- 'Design structural foundations, concrete/steel frameworks, civil blueprints, and perform site load calculations.',
- '["AutoCAD", "Revit", "Structural Analysis", "Civil Engineering", "Site Inspection", "Construction Management"]'),
-
-(54, 'Construction Project Manager', 'Engineering & Construction',
- 'Oversee construction site operations, subcontractor scheduling, project budgets, and OSHA safety standards.',
- '["Construction Management", "Project Scheduling", "Primavera P6", "Budgeting", "Safety Management", "OSHA"]');
-
--- Sample User
-INSERT IGNORE INTO Users (name, email) VALUES
-('Test Candidate', 'candidate@example.com');
+(1, 'Software Engineer', 'Software & IT', 'Comprehensive evaluation for Software Engineer role.', '["react", "node", "nodejs", "python", "javascript", "typescript", "html", "css", "sql", "git", "docker", "aws", "java", "c++", "c#"]'),
+(2, 'Backend Developer', 'Software & IT', 'Comprehensive evaluation for Backend Developer role.', '["python", "node", "nodejs", "java", "sql", "postgresql", "mongodb", "docker", "aws", "express", "fastapi", "rest api", "microservices"]'),
+(3, 'Frontend Developer', 'Software & IT', 'Comprehensive evaluation for Frontend Developer role.', '["react", "javascript", "typescript", "html", "css", "vue", "angular", "tailwind", "next.js", "ui design", "redux"]'),
+(4, 'Full Stack Developer', 'Software & IT', 'Comprehensive evaluation for Full Stack Developer role.', '["react", "node", "nodejs", "javascript", "python", "sql", "mongodb", "express", "html", "css", "docker", "aws", "git"]'),
+(5, 'Mobile App Developer', 'Software & IT', 'Comprehensive evaluation for Mobile App Developer role.', '["swift", "kotlin", "react native", "flutter", "ios", "android", "mobile development", "java", "objective-c"]'),
+(6, 'Game Developer', 'Software & IT', 'Comprehensive evaluation for Game Developer role.', '["unity", "unreal engine", "c#", "c++", "game design", "3d modeling", "gameplay programming"]'),
+(7, 'DevOps / Cloud Engineer', 'Software & IT', 'Comprehensive evaluation for DevOps / Cloud Engineer role.', '["aws", "docker", "kubernetes", "linux", "ci/cd", "terraform", "jenkins", "azure", "gcp", "bash"]'),
+(8, 'Cybersecurity Analyst', 'Software & IT', 'Comprehensive evaluation for Cybersecurity Analyst role.', '["cybersecurity", "network security", "linux", "python", "vulnerability assessment", "incident response", "siem", "penetration testing", "firewalls"]'),
+(9, 'Systems Administrator', 'Software & IT', 'Comprehensive evaluation for Systems Administrator role.', '["linux", "windows server", "active directory", "networking", "troubleshooting", "vmware", "bash", "powershell", "system administration"]'),
+(10, 'Database Administrator', 'Software & IT', 'Comprehensive evaluation for Database Administrator role.', '["sql", "oracle", "postgresql", "mysql", "database design", "performance tuning", "nosql", "database administration"]'),
+(11, 'QA / Test Engineer', 'Software & IT', 'Comprehensive evaluation for QA / Test Engineer role.', '["quality assurance", "automated testing", "selenium", "manual testing", "jira", "python", "java", "api testing", "cypress"]'),
+(12, 'Data Scientist', 'Data & AI', 'Comprehensive evaluation for Data Scientist role.', '["python", "machine learning", "deep learning", "sql", "tensorflow", "pytorch", "pandas", "nlp", "statistics", "r"]'),
+(13, 'Data Analyst', 'Data & AI', 'Comprehensive evaluation for Data Analyst role.', '["sql", "excel", "tableau", "power bi", "data visualization", "data analysis", "python", "pandas", "reporting"]'),
+(14, 'Data Engineer', 'Data & AI', 'Comprehensive evaluation for Data Engineer role.', '["python", "sql", "spark", "hadoop", "etl", "aws", "data warehousing", "airflow", "scala"]'),
+(15, 'Data & AI Specialist', 'Data & AI', 'Comprehensive evaluation for Data & AI Specialist role.', '["python", "machine learning", "deep learning", "tensorflow", "pytorch", "nlp", "scikit-learn", "pandas", "numpy", "sql", "llm", "generative ai"]'),
+(16, 'Mechanical Engineer', 'Engineering & Architecture', 'Comprehensive evaluation for Mechanical Engineer role.', '["autocad", "solidworks", "mechanical engineering", "fea", "matlab", "ansys", "cad", "manufacturing"]'),
+(17, 'Civil / Structural Engineer', 'Engineering & Architecture', 'Comprehensive evaluation for Civil / Structural Engineer role.', '["autocad", "civil engineering", "structural analysis", "construction management", "site supervision", "building codes", "revit", "microstation"]'),
+(18, 'Electrical Engineer', 'Engineering & Architecture', 'Comprehensive evaluation for Electrical Engineer role.', '["electrical engineering", "circuit design", "autocad", "matlab", "pcb design", "power systems", "plc", "schematics", "electronics"]'),
+(19, 'Hardware Engineer', 'Engineering & Architecture', 'Comprehensive evaluation for Hardware Engineer role.', '["hardware design", "verilog", "vhdl", "fpga", "pcb", "embedded systems", "c", "c++", "microcontrollers"]'),
+(20, 'Chemical Engineer', 'Engineering & Architecture', 'Comprehensive evaluation for Chemical Engineer role.', '["chemical engineering", "process engineering", "p&id", "process simulation", "chemistry", "matlab", "aspen hysys"]'),
+(21, 'Biomedical Engineer', 'Engineering & Architecture', 'Comprehensive evaluation for Biomedical Engineer role.', '["biomedical engineering", "medical devices", "fda regulations", "matlab", "solidworks", "biomechanics", "biomaterials"]'),
+(22, 'Aerospace Engineer', 'Engineering & Architecture', 'Comprehensive evaluation for Aerospace Engineer role.', '["aerospace engineering", "aerodynamics", "matlab", "solidworks", "ansys", "cad", "propulsion", "catia"]'),
+(23, 'Industrial Engineer', 'Engineering & Architecture', 'Comprehensive evaluation for Industrial Engineer role.', '["industrial engineering", "lean manufacturing", "six sigma", "supply chain", "process improvement", "logistics", "operations research"]'),
+(24, 'Architect', 'Engineering & Architecture', 'Comprehensive evaluation for Architect role.', '["architecture", "autocad", "revit", "sketchup", "building design", "urban planning", "3d rendering", "construction documents"]'),
+(25, 'Project Manager', 'Business, Management & Operations', 'Comprehensive evaluation for Project Manager role.', '["project management", "agile", "scrum", "budgeting", "risk management", "stakeholder management", "jira", "pmp", "scheduling", "leadership"]'),
+(26, 'Product Manager', 'Business, Management & Operations', 'Comprehensive evaluation for Product Manager role.', '["product management", "agile", "scrum", "product strategy", "roadmap planning", "market research", "jira", "user stories", "cross-functional leadership"]'),
+(27, 'Business Analyst', 'Business, Management & Operations', 'Comprehensive evaluation for Business Analyst role.', '["business analysis", "requirements gathering", "sql", "process improvement", "stakeholder management", "jira", "agile", "excel"]'),
+(28, 'Management Consultant', 'Business, Management & Operations', 'Comprehensive evaluation for Management Consultant role.', '["management consulting", "strategy", "data analysis", "excel", "powerpoint", "problem solving", "market analysis", "financial modeling"]'),
+(29, 'Operations Manager', 'Business, Management & Operations', 'Comprehensive evaluation for Operations Manager role.', '["operations management", "process improvement", "budgeting", "logistics", "supply chain", "team leadership", "kpis"]'),
+(30, 'Supply Chain Manager', 'Business, Management & Operations', 'Comprehensive evaluation for Supply Chain Manager role.', '["supply chain management", "inventory management", "logistics", "procurement", "lean manufacturing", "erp", "sap", "vendor management"]'),
+(31, 'Investment Banker', 'Finance & Accounting', 'Comprehensive evaluation for Investment Banker role.', '["financial modeling", "valuation", "excel", "m&a", "corporate finance", "due diligence", "lbo modeling", "private equity", "investment banking"]'),
+(32, 'Accountant / Auditor', 'Finance & Accounting', 'Comprehensive evaluation for Accountant / Auditor role.', '["accounting", "general ledger", "gaap", "ifrs", "auditing", "tax preparation", "internal audit", "accounts payable", "accounts receivable", "reconciliation", "cpa"]'),
+(33, 'Financial Analyst', 'Finance & Accounting', 'Comprehensive evaluation for Financial Analyst role.', '["financial analysis", "excel", "financial modeling", "forecasting", "budgeting", "corporate finance", "variance analysis"]'),
+(34, 'Registered Nurse', 'Healthcare & Medical', 'Comprehensive evaluation for Registered Nurse role.', '["patient care", "nursing", "medication administration", "triage", "vital signs", "bls", "acls", "cpr", "emr", "ehr", "clinical assessment"]'),
+(35, 'Clinical Research Coordinator', 'Healthcare & Medical', 'Comprehensive evaluation for Clinical Research Coordinator role.', '["clinical trials", "gcp", "irb", "protocol compliance", "patient recruitment", "fda regulations", "hipaa", "data analysis"]'),
+(36, 'Medical Doctor / Physician', 'Healthcare & Medical', 'Comprehensive evaluation for Medical Doctor / Physician role.', '["patient care", "diagnosis", "treatment planning", "medical terminology", "ehr", "clinical research", "surgery", "internal medicine"]'),
+(37, 'Pharmacist', 'Healthcare & Medical', 'Comprehensive evaluation for Pharmacist role.', '["pharmacy", "medication management", "pharmacology", "patient counseling", "prescription filling", "clinical pharmacy"]'),
+(38, 'Healthcare Administrator', 'Healthcare & Medical', 'Comprehensive evaluation for Healthcare Administrator role.', '["healthcare administration", "budgeting", "hipaa", "compliance", "emr", "patient scheduling", "healthcare management"]'),
+(39, 'Marketing Manager', 'Marketing & Sales', 'Comprehensive evaluation for Marketing Manager role.', '["digital marketing", "seo", "content strategy", "social media marketing", "google analytics", "brand management", "campaign management", "email marketing"]'),
+(40, 'SEO Specialist', 'Marketing & Sales', 'Comprehensive evaluation for SEO Specialist role.', '["seo", "sem", "search engine optimization", "google analytics", "google ads", "content strategy", "copywriting", "digital marketing"]'),
+(41, 'Social Media Manager', 'Marketing & Sales', 'Comprehensive evaluation for Social Media Manager role.', '["social media marketing", "content creation", "copywriting", "instagram", "twitter", "linkedin", "facebook", "hootsuite", "community management"]'),
+(42, 'B2B Sales Executive', 'Marketing & Sales', 'Comprehensive evaluation for B2B Sales Executive role.', '["b2b sales", "lead generation", "salesforce", "cold calling", "negotiation", "crm", "pipeline management", "customer acquisition"]'),
+(43, 'Account Executive', 'Marketing & Sales', 'Comprehensive evaluation for Account Executive role.', '["b2b sales", "account management", "salesforce", "crm", "negotiation", "presentation skills", "lead generation", "closing"]'),
+(44, 'Public Relations Specialist', 'Marketing & Sales', 'Comprehensive evaluation for Public Relations Specialist role.', '["public relations", "press releases", "media relations", "corporate communications", "copywriting", "event planning"]'),
+(45, 'Product Designer', 'Design & Creative', 'Comprehensive evaluation for Product Designer role.', '["ui design", "ux design", "ux research", "figma", "prototyping", "design systems", "user testing", "wireframing"]'),
+(46, 'Graphic Designer', 'Design & Creative', 'Comprehensive evaluation for Graphic Designer role.', '["adobe photoshop", "adobe illustrator", "indesign", "typography", "brand identity", "graphic design", "visual design", "layout design"]'),
+(47, 'UX Researcher', 'Design & Creative', 'Comprehensive evaluation for UX Researcher role.', '["ux research", "user testing", "usability testing", "interviews", "surveys", "data analysis", "wireframing", "persona development"]'),
+(48, 'Art Director', 'Design & Creative', 'Comprehensive evaluation for Art Director role.', '["art direction", "graphic design", "creative strategy", "adobe creative suite", "branding", "leadership", "visual design"]'),
+(49, 'Copywriter', 'Design & Creative', 'Comprehensive evaluation for Copywriter role.', '["copywriting", "content creation", "seo", "editing", "proofreading", "blogging", "creative writing", "advertising"]'),
+(50, 'Video Editor', 'Design & Creative', 'Comprehensive evaluation for Video Editor role.', '["video editing", "adobe premiere pro", "final cut pro", "after effects", "motion graphics", "color grading", "audio editing"]'),
+(51, 'HR & Talent Acquisition Specialist', 'HR & Legal', 'Comprehensive evaluation for HR & Talent Acquisition Specialist role.', '["human resources", "talent management", "talent acquisition", "recruiting", "ats", "employee relations", "onboarding", "workday"]'),
+(52, 'Corporate Legal & Compliance Counsel', 'HR & Legal', 'Comprehensive evaluation for Corporate Legal & Compliance Counsel role.', '["corporate law", "contract drafting", "legal compliance", "risk mitigation", "due diligence", "litigation support", "contract management", "legal research"]'),
+(53, 'Paralegal', 'HR & Legal', 'Comprehensive evaluation for Paralegal role.', '["legal research", "document drafting", "case management", "litigation support", "legal writing", "contracts"]'),
+(54, 'Teacher / Educator', 'Education', 'Comprehensive evaluation for Teacher / Educator role.', '["lesson planning", "classroom management", "curriculum development", "student assessment", "special education", "tutoring"]'),
+(55, 'Instructional Designer', 'Education', 'Comprehensive evaluation for Instructional Designer role.', '["instructional design", "e-learning", "curriculum development", "articulate storyline", "lms", "adult learning theory", "training materials"]');
