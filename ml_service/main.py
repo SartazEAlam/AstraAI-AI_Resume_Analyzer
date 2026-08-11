@@ -197,6 +197,11 @@ ROLE_SKILLS = {
     "Instructional Designer": ["instructional design", "e-learning", "curriculum development", "articulate storyline", "lms", "adult learning theory", "training materials"]
 }
 
+# Dynamically add all skills from ROLE_SKILLS to the extraction gazetteer
+all_role_skills = set().union(*ROLE_SKILLS.values())
+TECHNICAL_SKILLS.update(all_role_skills)
+
+
 class AnalysisRequest(BaseModel):
     resume_text: str
     job_description: str = ""
@@ -653,22 +658,52 @@ def analyze_resume(request: AnalysisRequest):
             100
         )
 
-        # 5. Role Recommendations
-        # If match is low, suggest roles based on extracted resume skills
+        # 5. Role Recommendations (Hybrid Semantic + Exact Match)
         role_scores = {}
         skill_depth_score = min(1.0, len(resume_skills) / 12.0) * 100
         has_exp = 100 if len(experience.get("positions", [])) > 0 or project_count > 0 else 30
 
+        # Calculate TF-IDF semantic similarities
+        role_names = list(ROLE_SKILLS.keys())
+        role_texts = [f"{role} {' '.join(skills)}" for role, skills in ROLE_SKILLS.items()]
+        
+        tfidf_scores = {r: 0 for r in role_names}
+        if request.resume_text.strip():
+            try:
+                vectorizer = TfidfVectorizer(stop_words='english', ngram_range=(1,2))
+                corpus = [clean_text(request.resume_text)] + role_texts
+                tfidf = vectorizer.fit_transform(corpus)
+                sims = cosine_similarity(tfidf[0:1], tfidf[1:])[0]
+                tfidf_scores = {role_names[i]: sims[i] * 100 for i in range(len(role_names))}
+            except Exception as e:
+                print(f"TF-IDF role matching failed: {e}")
+
         for role, skills in ROLE_SKILLS.items():
             matched_in_role = [s for s in skills if s in resume_skills]
-            domain_score = (len(matched_in_role) / max(len(skills), 8)) * 100 if skills else 0
+            matched_count = len(matched_in_role)
             
-            if domain_score == 0:
+            # Exact Match Score with Confidence Penalty
+            confidence_penalty = 1.0
+            if matched_count == 0:
+                domain_score = 0
+            else:
+                if matched_count == 1:
+                    confidence_penalty = 0.3
+                elif matched_count == 2:
+                    confidence_penalty = 0.7
+                    
+                domain_score = (matched_count / max(len(skills), 8)) * 100
+            
+            exact_match_score = domain_score * confidence_penalty
+            semantic_score = min(100.0, tfidf_scores.get(role, 0) * 5) # Scale up semantic signal
+            
+            if exact_match_score == 0 and semantic_score < 10:
                 raw_match = 0
             else:
-                # Scale the baseline by how well they match the domain
-                domain_multiplier = min(1.0, (len(matched_in_role) / 3.0)) 
-                raw_match = (domain_score * 0.70) + (skill_depth_score * 0.20 * domain_multiplier) + (has_exp * 0.10 * domain_multiplier)
+                # Use whichever signal is stronger: exact keywords or semantic context
+                base_score = max(exact_match_score, semantic_score)
+                domain_multiplier = min(1.0, (max(matched_count, semantic_score/15) / 3.0)) 
+                raw_match = (base_score * 0.70) + (skill_depth_score * 0.20 * domain_multiplier) + (has_exp * 0.10 * domain_multiplier)
             
             role_scores[role] = min(98.0, max(0.0, round(raw_match, 2)))
 
@@ -751,7 +786,7 @@ def analyze_resume(request: AnalysisRequest):
             "role_scores": role_scores,
             "role_confidence": role_confidence,
             "is_general_analysis": is_general_analysis,
-            "is_market_role": bool(request.job_description.strip() in ROLE_SKILLS and not request.required_skills),
+            "is_market_role": is_general_analysis,
             "matched_skill_count": len(matched_skills),
             "required_skill_count": len(job_skills),
             "parsed_text": resume_text,
