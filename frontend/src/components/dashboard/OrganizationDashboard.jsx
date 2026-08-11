@@ -5,6 +5,7 @@ import {
   Upload,
   FileText,
   Briefcase,
+  ChevronDown,
 } from "lucide-react";
 import {
   BarChart,
@@ -56,10 +57,6 @@ const OrganizationDashboard = ({ theme }) => {
       .get("http://localhost:5000/api/jobs")
       .then((res) => {
         setJobs(res.data);
-
-        if (res.data.length > 0) {
-          setSelectedJobId(String(res.data[0].id));
-        }
       })
       .catch((err) => console.error("Error fetching jobs:", err));
   }, []);
@@ -158,23 +155,28 @@ const OrganizationDashboard = ({ theme }) => {
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
                   🏢 1. Industry Sector
                 </label>
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => {
-                    setSelectedCategory(e.target.value);
-                    setSelectedJobId("");
-                  }}
-                  className="w-full p-3.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 dark:text-slate-100 font-medium transition-all shadow-sm cursor-pointer"
-                >
-                  <option value="">🌐 All Sectors</option>
-                  {[...new Set(jobs.map((j) => j.category || "Other"))].map(
-                    (category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ),
-                  )}
-                </select>
+                <div className="relative">
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => {
+                      setSelectedCategory(e.target.value);
+                      setSelectedJobId("");
+                    }}
+                    className="appearance-none w-full p-3.5 pr-10 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-slate-800 dark:text-slate-100 font-medium transition-all shadow-sm cursor-pointer"
+                  >
+                    <option value="">🌐 All Sectors (Cross-Industry Evaluation)</option>
+                    {[...new Set(jobs.map((j) => j.category || "Other"))].map(
+                      (category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ),
+                    )}
+                  </select>
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <ChevronDown className="w-4 h-4 text-slate-400" />
+                  </div>
+                </div>
               </div>
 
               {/* Dropdown 2: Target Opening */}
@@ -182,18 +184,23 @@ const OrganizationDashboard = ({ theme }) => {
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
                   🎯 2. Target Job Opening
                 </label>
-                <select
-                  value={selectedJobId}
-                  onChange={(e) => setSelectedJobId(e.target.value)}
-                  className="w-full p-3.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 dark:text-slate-100 font-medium transition-all shadow-sm cursor-pointer"
-                >
-                  <option value="">Select Target Job Opening</option>
-                  {filteredJobs.map((job) => (
-                    <option key={job.id} value={String(job.id)}>
-                      {job.title}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    value={selectedJobId}
+                    onChange={(e) => setSelectedJobId(e.target.value)}
+                    className="appearance-none w-full p-3.5 pr-10 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-slate-800 dark:text-slate-100 font-medium transition-all shadow-sm cursor-pointer"
+                  >
+                    <option value="">General Analysis (Universal Profile Readiness)</option>
+                    {filteredJobs.map((job) => (
+                      <option key={job.id} value={String(job.id)}>
+                        {job.title}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <ChevronDown className="w-4 h-4 text-slate-400" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
