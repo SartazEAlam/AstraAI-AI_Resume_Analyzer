@@ -21,6 +21,8 @@ import {
   Sun,
   Moon,
   ExternalLink,
+  ChevronDown,
+  Globe,
 } from "lucide-react";
 
 /* ── Modular Component Imports ── */
@@ -186,21 +188,13 @@ function App() {
   const handleQuickAnalyze = async (roleTitle) => {
     if (!results?.parsed_text) return;
     
-    const foundJob = jobs.find(j => j.title.toLowerCase() === roleTitle.toLowerCase());
+    // Market Role Alignment buttons should ALWAYS map to the global industry dictionary, 
+    // never to a specific, idiosyncratic DB job.
+    let targetJobId = "custom";
+    let targetCustomJD = roleTitle;
     
-    let targetJobId = null;
-    let targetCustomJD = null;
-    
-    if (foundJob) {
-      targetJobId = String(foundJob.id);
-      setSelectedCategory(foundJob.category || "");
-      setSelectedJobId(targetJobId);
-    } else {
-      targetJobId = "custom";
-      targetCustomJD = `Role: ${roleTitle}. Seeking candidates with experience in ${roleTitle}.`;
-      setSelectedJobId("custom");
-      setCustomJD(targetCustomJD);
-    }
+    setSelectedJobId("custom");
+    setCustomJD(targetCustomJD);
 
     setLoading(true);
     setError("");
@@ -219,6 +213,28 @@ function App() {
     } catch (err) {
       console.error("Quick analyze error:", err);
       setError(`Failed to re-analyze for role: ${roleTitle}`);
+      setLoading(false);
+    }
+  };
+
+  const handleQuickAnalyzeFromDropdown = async (jobIdVal) => {
+    if (!results?.parsed_text) return;
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await axios.post("http://localhost:5000/api/analyze-text", {
+        text: results.parsed_text,
+        jobId: jobIdVal === "" ? null : jobIdVal,
+        customJD: null,
+      });
+
+      setResults(response.data);
+      setLoading(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      console.error(err);
+      setError("Failed to re-analyze for selected role.");
       setLoading(false);
     }
   };
@@ -324,27 +340,32 @@ function App() {
                             <Briefcase className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                             1. Industry Sector
                           </label>
-                          <select
-                            value={selectedCategory}
-                            onChange={(e) => {
-                              setSelectedCategory(e.target.value);
-                              setSelectedJobId(""); // Reset specific role on category switch
-                            }}
-                            className="w-full p-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:border-indigo-600 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 outline-none text-slate-900 dark:text-slate-100 text-sm font-semibold transition-all shadow-sm cursor-pointer"
-                          >
-                            <option value="">
-                              All Sectors (Cross-Industry Evaluation)
-                            </option>
-                            {[
-                              ...new Set(
-                                jobs.map((j) => j.category || "Other"),
-                              ),
-                            ].map((category) => (
-                              <option key={category} value={category}>
-                                {category}
+                          <div className="relative">
+                            <select
+                              value={selectedCategory}
+                              onChange={(e) => {
+                                setSelectedCategory(e.target.value);
+                                setSelectedJobId(""); // Reset specific role on category switch
+                              }}
+                              className="appearance-none w-full p-3 pr-10 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:border-indigo-600 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 outline-none text-slate-900 dark:text-slate-100 text-sm font-semibold transition-all shadow-sm cursor-pointer"
+                            >
+                              <option value="">
+                                All Sectors (Cross-Industry Evaluation)
                               </option>
-                            ))}
-                          </select>
+                              {[
+                                ...new Set(
+                                  jobs.map((j) => j.category || "Other"),
+                                ),
+                              ].map((category) => (
+                                <option key={category} value={category}>
+                                  {category}
+                                </option>
+                              ))}
+                            </select>
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                              <ChevronDown className="w-4 h-4 text-slate-400" />
+                            </div>
+                          </div>
                         </div>
 
                         {/* Dropdown 2: Specific Job Role */}
@@ -353,25 +374,30 @@ function App() {
                             <Target className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                             2. Target Job Role (Optional)
                           </label>
-                          <select
-                            value={selectedJobId}
-                            onChange={(e) =>
-                              setSelectedJobId(String(e.target.value))
-                            }
-                            className="w-full p-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:border-indigo-600 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 outline-none text-slate-900 dark:text-slate-100 text-sm font-semibold transition-all shadow-sm cursor-pointer"
-                          >
-                            <option value="">
-                              General Analysis (Universal Profile Readiness)
-                            </option>
-                            <option value="custom">
-                              ✨ Custom Job Description (Paste Text)
-                            </option>
-                            {filteredJobs.map((job) => (
-                              <option key={job.id} value={String(job.id)}>
-                                {job.title}
+                          <div className="relative">
+                            <select
+                              value={selectedJobId}
+                              onChange={(e) =>
+                                setSelectedJobId(String(e.target.value))
+                              }
+                              className="appearance-none w-full p-3 pr-10 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:border-indigo-600 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 outline-none text-slate-900 dark:text-slate-100 text-sm font-semibold transition-all shadow-sm cursor-pointer"
+                            >
+                              <option value="">
+                                General Analysis (Universal Profile Readiness)
                               </option>
-                            ))}
-                          </select>
+                              <option value="custom">
+                                ✨ Custom Job Description (Paste Text)
+                              </option>
+                              {filteredJobs.map((job) => (
+                                <option key={job.id} value={String(job.id)}>
+                                  {job.title}
+                                </option>
+                              ))}
+                            </select>
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                              <ChevronDown className="w-4 h-4 text-slate-400" />
+                            </div>
+                          </div>
                         </div>
                       </div>
                       
@@ -482,12 +508,39 @@ function App() {
                       </div>
 
                       <div className="flex items-center gap-3">
+                        <div className="relative group hidden sm:block">
+                          <select 
+                            value={selectedJobId || "general"}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (val === "general") {
+                                setSelectedJobId("");
+                                handleQuickAnalyzeFromDropdown("");
+                              } else if (val !== "custom") {
+                                setSelectedJobId(val);
+                                handleQuickAnalyzeFromDropdown(val);
+                              }
+                            }}
+                            className="appearance-none pr-8 pl-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold transition-colors outline-none cursor-pointer border border-slate-200 dark:border-slate-700"
+                          >
+                            <option value="general">Global Market Profile</option>
+                            <optgroup label="Your ATS Jobs">
+                              {jobs.map(j => (
+                                <option key={j.id} value={String(j.id)}>{j.title}</option>
+                              ))}
+                            </optgroup>
+                          </select>
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                             <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
+                          </div>
+                        </div>
+
                         <button
                           onClick={() => window.print()}
                           className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-md shadow-indigo-500/20"
                         >
                           <Download className="w-3.5 h-3.5" />
-                          Print / Export PDF
+                          Print
                         </button>
                         <button
                           onClick={() => {
@@ -520,9 +573,24 @@ function App() {
                                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
                                   Audit & Assessment Scorecard
                                 </h2>
-                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                                  Algorithmic evaluation benchmarked against verified industry models
-                                </p>
+                                <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-3">
+                                  {results.is_market_role ? (
+                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300 text-xs font-bold border border-sky-200 dark:border-sky-800/60 shadow-sm">
+                                      <Globe className="w-3.5 h-3.5" />
+                                      Global Industry Benchmark
+                                    </span>
+                                  ) : (
+                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-xs font-bold border border-indigo-200 dark:border-indigo-800/60 shadow-sm">
+                                      <Target className="w-3.5 h-3.5" />
+                                      Custom Target Job
+                                    </span>
+                                  )}
+                                  <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+                                    {results.is_market_role
+                                      ? "Evaluated against standardized, cross-company market requirements."
+                                      : "Evaluated precisely against the required skills from your job description."}
+                                  </span>
+                                </div>
                               </div>
                               <div className="text-xs font-mono font-bold text-slate-400 dark:text-slate-500">
                                 PROFILE AUDIT
@@ -534,9 +602,9 @@ function App() {
                                 <ScoreRing
                                   score={results.match_percentage}
                                   label="Target Job Match"
-                                  badge="🎯 Specific Target Job"
-                                  icon={Target}
-                                  colorClass="stroke-indigo-500 dark:stroke-indigo-400"
+                                  badge={results.is_market_role ? "🌎 Global Industry Benchmark" : "🎯 Specific Target Job"}
+                                  icon={results.is_market_role ? Globe : Target}
+                                  colorClass={results.is_market_role ? "stroke-sky-500 dark:stroke-sky-400" : "stroke-indigo-500 dark:stroke-indigo-400"}
                                 />
                               ) : (
                                 <DualScoreRing
