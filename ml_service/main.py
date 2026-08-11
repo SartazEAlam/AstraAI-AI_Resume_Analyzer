@@ -120,6 +120,83 @@ COMMON_JOB_TITLES = [
     "legal counsel", "compliance officer", "attorney", "paralegal"
 ]
 
+ROLE_SKILLS = {
+    # Software & IT
+    "Software Engineer": ["react", "node", "nodejs", "python", "javascript", "typescript", "html", "css", "sql", "git", "docker", "aws", "java", "c++", "c#"],
+    "Backend Developer": ["python", "node", "nodejs", "java", "sql", "postgresql", "mongodb", "docker", "aws", "express", "fastapi", "rest api", "microservices"],
+    "Frontend Developer": ["react", "javascript", "typescript", "html", "css", "vue", "angular", "tailwind", "next.js", "ui design", "redux"],
+    "Full Stack Developer": ["react", "node", "nodejs", "javascript", "python", "sql", "mongodb", "express", "html", "css", "docker", "aws", "git"],
+    "Mobile App Developer": ["swift", "kotlin", "react native", "flutter", "ios", "android", "mobile development", "java", "objective-c"],
+    "Game Developer": ["unity", "unreal engine", "c#", "c++", "game design", "3d modeling", "gameplay programming"],
+    "DevOps / Cloud Engineer": ["aws", "docker", "kubernetes", "linux", "ci/cd", "terraform", "jenkins", "azure", "gcp", "bash"],
+    "Cybersecurity Analyst": ["cybersecurity", "network security", "linux", "python", "vulnerability assessment", "incident response", "siem", "penetration testing", "firewalls"],
+    "Systems Administrator": ["linux", "windows server", "active directory", "networking", "troubleshooting", "vmware", "bash", "powershell", "system administration"],
+    "Database Administrator": ["sql", "oracle", "postgresql", "mysql", "database design", "performance tuning", "nosql", "database administration"],
+    "QA / Test Engineer": ["quality assurance", "automated testing", "selenium", "manual testing", "jira", "python", "java", "api testing", "cypress"],
+
+    # Data & AI
+    "Data Scientist": ["python", "machine learning", "deep learning", "sql", "tensorflow", "pytorch", "pandas", "nlp", "statistics", "r"],
+    "Data Analyst": ["sql", "excel", "tableau", "power bi", "data visualization", "data analysis", "python", "pandas", "reporting"],
+    "Data Engineer": ["python", "sql", "spark", "hadoop", "etl", "aws", "data warehousing", "airflow", "scala"],
+    "Data & AI Specialist": ["python", "machine learning", "deep learning", "tensorflow", "pytorch", "nlp", "scikit-learn", "pandas", "numpy", "sql", "llm", "generative ai"],
+
+    # Engineering & Architecture
+    "Mechanical Engineer": ["autocad", "solidworks", "mechanical engineering", "fea", "matlab", "ansys", "cad", "manufacturing"],
+    "Civil / Structural Engineer": ["autocad", "civil engineering", "structural analysis", "construction management", "site supervision", "building codes", "revit", "microstation"],
+    "Electrical Engineer": ["electrical engineering", "circuit design", "autocad", "matlab", "pcb design", "power systems", "plc", "schematics", "electronics"],
+    "Hardware Engineer": ["hardware design", "verilog", "vhdl", "fpga", "pcb", "embedded systems", "c", "c++", "microcontrollers"],
+    "Chemical Engineer": ["chemical engineering", "process engineering", "p&id", "process simulation", "chemistry", "matlab", "aspen hysys"],
+    "Biomedical Engineer": ["biomedical engineering", "medical devices", "fda regulations", "matlab", "solidworks", "biomechanics", "biomaterials"],
+    "Aerospace Engineer": ["aerospace engineering", "aerodynamics", "matlab", "solidworks", "ansys", "cad", "propulsion", "catia"],
+    "Industrial Engineer": ["industrial engineering", "lean manufacturing", "six sigma", "supply chain", "process improvement", "logistics", "operations research"],
+    "Architect": ["architecture", "autocad", "revit", "sketchup", "building design", "urban planning", "3d rendering", "construction documents"],
+
+    # Business, Management & Operations
+    "Project Manager": ["project management", "agile", "scrum", "budgeting", "risk management", "stakeholder management", "jira", "pmp", "scheduling", "leadership"],
+    "Product Manager": ["product management", "agile", "scrum", "product strategy", "roadmap planning", "market research", "jira", "user stories", "cross-functional leadership"],
+    "Business Analyst": ["business analysis", "requirements gathering", "sql", "process improvement", "stakeholder management", "jira", "agile", "excel"],
+    "Management Consultant": ["management consulting", "strategy", "data analysis", "excel", "powerpoint", "problem solving", "market analysis", "financial modeling"],
+    "Operations Manager": ["operations management", "process improvement", "budgeting", "logistics", "supply chain", "team leadership", "kpis"],
+    "Supply Chain Manager": ["supply chain management", "inventory management", "logistics", "procurement", "lean manufacturing", "erp", "sap", "vendor management"],
+
+    # Finance & Accounting
+    "Investment Banker": ["financial modeling", "valuation", "excel", "m&a", "corporate finance", "due diligence", "lbo modeling", "private equity", "investment banking"],
+    "Accountant / Auditor": ["accounting", "general ledger", "gaap", "ifrs", "auditing", "tax preparation", "internal audit", "accounts payable", "accounts receivable", "reconciliation", "cpa"],
+    "Financial Analyst": ["financial analysis", "excel", "financial modeling", "forecasting", "budgeting", "corporate finance", "variance analysis"],
+
+    # Healthcare & Medical
+    "Registered Nurse": ["patient care", "nursing", "medication administration", "triage", "vital signs", "bls", "acls", "cpr", "emr", "ehr", "clinical assessment"],
+    "Clinical Research Coordinator": ["clinical trials", "gcp", "irb", "protocol compliance", "patient recruitment", "fda regulations", "hipaa", "data analysis"],
+    "Medical Doctor / Physician": ["patient care", "diagnosis", "treatment planning", "medical terminology", "ehr", "clinical research", "surgery", "internal medicine"],
+    "Pharmacist": ["pharmacy", "medication management", "pharmacology", "patient counseling", "prescription filling", "clinical pharmacy"],
+    "Healthcare Administrator": ["healthcare administration", "budgeting", "hipaa", "compliance", "emr", "patient scheduling", "healthcare management"],
+
+    # Marketing & Sales
+    "Marketing Manager": ["digital marketing", "seo", "content strategy", "social media marketing", "google analytics", "brand management", "campaign management", "email marketing"],
+    "SEO Specialist": ["seo", "sem", "search engine optimization", "google analytics", "google ads", "content strategy", "copywriting", "digital marketing"],
+    "Social Media Manager": ["social media marketing", "content creation", "copywriting", "instagram", "twitter", "linkedin", "facebook", "hootsuite", "community management"],
+    "B2B Sales Executive": ["b2b sales", "lead generation", "salesforce", "cold calling", "negotiation", "crm", "pipeline management", "customer acquisition"],
+    "Account Executive": ["b2b sales", "account management", "salesforce", "crm", "negotiation", "presentation skills", "lead generation", "closing"],
+    "Public Relations Specialist": ["public relations", "press releases", "media relations", "corporate communications", "copywriting", "event planning"],
+
+    # Design & Creative
+    "Product Designer": ["ui design", "ux design", "ux research", "figma", "prototyping", "design systems", "user testing", "wireframing"],
+    "Graphic Designer": ["adobe photoshop", "adobe illustrator", "indesign", "typography", "brand identity", "graphic design", "visual design", "layout design"],
+    "UX Researcher": ["ux research", "user testing", "usability testing", "interviews", "surveys", "data analysis", "wireframing", "persona development"],
+    "Art Director": ["art direction", "graphic design", "creative strategy", "adobe creative suite", "branding", "leadership", "visual design"],
+    "Copywriter": ["copywriting", "content creation", "seo", "editing", "proofreading", "blogging", "creative writing", "advertising"],
+    "Video Editor": ["video editing", "adobe premiere pro", "final cut pro", "after effects", "motion graphics", "color grading", "audio editing"],
+
+    # HR & Legal
+    "HR & Talent Acquisition Specialist": ["human resources", "talent management", "talent acquisition", "recruiting", "ats", "employee relations", "onboarding", "workday"],
+    "Corporate Legal & Compliance Counsel": ["corporate law", "contract drafting", "legal compliance", "risk mitigation", "due diligence", "litigation support", "contract management", "legal research"],
+    "Paralegal": ["legal research", "document drafting", "case management", "litigation support", "legal writing", "contracts"],
+
+    # Education
+    "Teacher / Educator": ["lesson planning", "classroom management", "curriculum development", "student assessment", "special education", "tutoring"],
+    "Instructional Designer": ["instructional design", "e-learning", "curriculum development", "articulate storyline", "lms", "adult learning theory", "training materials"]
+}
+
 class AnalysisRequest(BaseModel):
     resume_text: str
     job_description: str = ""
@@ -465,11 +542,14 @@ def analyze_resume(request: AnalysisRequest):
         }
         
         # Auto-extract skills if JD is provided but required_skills array is empty (Custom JD Support)
-        if job_desc.strip() and not job_skills:
-            job_skills = {
-                normalize_skill(skill)
-                for skill in extract_skills(job_desc)
-            }
+        if request.job_description.strip() and not job_skills:
+            if request.job_description.strip() in ROLE_SKILLS:
+                job_skills = {normalize_skill(skill) for skill in ROLE_SKILLS[request.job_description.strip()]}
+            else:
+                job_skills = {
+                    normalize_skill(skill)
+                    for skill in extract_skills(job_desc)
+                }
 
 
         resume_skills = {
@@ -575,126 +655,50 @@ def analyze_resume(request: AnalysisRequest):
 
         # 5. Role Recommendations
         # If match is low, suggest roles based on extracted resume skills
-                # 5. Universal Multi-Sector Role Recommendations
-        role_skills = {
-            "Software Engineer": [
-                "react", "node", "nodejs", "python", "javascript", "typescript", "html", "css", "sql", "git", "docker", "aws"
-            ],
-            "Data & AI Specialist": [
-                "python", "machine learning", "deep learning", "tensorflow", "pytorch", "nlp", "scikit-learn", "pandas", "numpy", "sql"
-            ],
-            "Financial & Investment Analyst": [
-                "financial modeling", "valuation", "excel", "financial analysis", "forecasting", "accounting", "corporate finance", "m&a", "gaap"
-            ],
-            "Healthcare / Nursing Practitioner": [
-                "patient care", "nursing", "medication administration", "triage", "bls", "acls", "emr", "ehr", "hipaa", "clinical assessment"
-            ],
-            "Digital Marketer & Strategist": [
-                "digital marketing", "seo", "google analytics", "content marketing", "social media marketing", "copywriting", "hubspot", "b2b sales"
-            ],
-            "HR & Talent Acquisition Specialist": [
-                "human resources", "talent management", "talent acquisition", "recruiting", "ats", "employee relations", "onboarding", "workday"
-            ],
-            "Operations & Supply Chain Lead": [
-                "supply chain management", "inventory management", "logistics", "procurement", "lean manufacturing", "six sigma", "erp", "sap"
-            ],
-            "UI/UX & Product Designer": [
-                "figma", "ui design", "ux design", "ux research", "wireframing", "prototyping", "design systems", "adobe photoshop", "adobe illustrator"
-            ],
-            "Corporate Legal & Compliance Counsel": [
-                "corporate law", "contract drafting", "legal compliance", "risk mitigation", "due diligence", "litigation support", "contract management", "legal research"
-            ],
-            "Civil / Mechanical Engineer": [
-                "autocad", "solidworks", "mechanical engineering", "civil engineering", "structural analysis", "fea", "matlab", "circuit design", "construction management"
-            ]
-        }
-
-
         role_scores = {}
+        skill_depth_score = min(1.0, len(resume_skills) / 12.0) * 100
+        has_exp = 100 if len(experience.get("positions", [])) > 0 or project_count > 0 else 30
 
-        for role, skills in role_skills.items():
+        for role, skills in ROLE_SKILLS.items():
+            matched_in_role = [s for s in skills if s in resume_skills]
+            domain_score = (len(matched_in_role) / max(len(skills), 8)) * 100 if skills else 0
+            
+            if domain_score == 0:
+                raw_match = 0
+            else:
+                # Scale the baseline by how well they match the domain
+                domain_multiplier = min(1.0, (len(matched_in_role) / 3.0)) 
+                raw_match = (domain_score * 0.70) + (skill_depth_score * 0.20 * domain_multiplier) + (has_exp * 0.10 * domain_multiplier)
+            
+            role_scores[role] = min(98.0, max(0.0, round(raw_match, 2)))
 
-            score = 0
-
-            for skill in skills:
-
-                if skill in resume_skills:
-
-                    if skill in [
-                        "machine learning",
-                        "deep learning",
-                        "tensorflow",
-                        "pytorch",
-                        "nlp",
-                        "computer vision"
-                    ]:
-                        score += 5
-
-                    elif skill in [
-                        "python",
-                        "sql",
-                        "pandas",
-                        "numpy",
-                        "power bi",
-                        "tableau"
-                    ]:
-                        score += 4
-
-                    elif skill in [
-                        "react",
-                        "node",
-                        "express",
-                        "mongodb"
-                    ]:
-                        score += 3
-
-                    else:
-                        score += 1
-
-            role_scores[role] = score
-
-
-        # OUTSIDE the loop
-
-        highest_score = max(role_scores.values())
+        highest_score = max(role_scores.values()) if role_scores else 0
 
         if highest_score == 0:
-
-            best_role = "Software Developer"
-
+            if len(experience.get("positions", [])) > 0:
+                best_role = experience["positions"][0]["title"]
+            else:
+                best_role = "Unclassified Professional"
         else:
+            best_role = max(role_scores, key=role_scores.get)
 
-            best_role = max(
-                role_scores,
-                key=role_scores.get
-            )
-            
-
+        # Get top 6 roles for recommendations
         top_roles = sorted(
             role_scores.items(),
             key=lambda x: x[1],
             reverse=True
-        )[:3]
+        )[:6]
 
         recommended_roles = [
             role
             for role, score in top_roles
-            if score > 0
+            if score > 35
         ]
 
-        total_score = sum(
-            role_scores.values()
-        )
-
+        total_score = sum(role_scores.values())
         if total_score > 0:
-
-            role_confidence = round(
-                (highest_score / total_score) * 100,
-                2
-            )
-
+            role_confidence = round((highest_score / total_score) * 100, 2)
         else:
-
             role_confidence = 0
 
         # 6. Calculate Match Percentage (Top Domain vs Global Market Coverage)
@@ -702,32 +706,33 @@ def analyze_resume(request: AnalysisRequest):
         global_market_match = 0
         
         if is_general_analysis:
-            best_role_skills = role_skills.get(best_role, [])
-            matched_in_best = [s for s in best_role_skills if s in resume_skills]
-            
-            # A. Option 2: Primary Domain Fit (0 - 100)
-            domain_score = (len(matched_in_best) / max(len(best_role_skills), 8)) * 100 if best_role_skills else 0
-            skill_depth_score = min(1.0, len(resume_skills) / 12.0) * 100
-            has_exp = 100 if len(experience.get("positions", [])) > 0 or project_count > 0 else 30
-            raw_match = (domain_score * 0.60) + (skill_depth_score * 0.25) + (has_exp * 0.15)
-            top_role_match = min(98.0, max(15.0, round(raw_match, 2))) if len(resume_skills) > 0 else 0
+            best_role_skills = ROLE_SKILLS.get(best_role, [])
+            top_role_match = role_scores.get(best_role, 0)
             
             # B. Option 1: True Global Market Fit Across All Industry Sectors (typically 1.5% - 5%)
-            all_sector_skills = set().union(*role_skills.values())
+            all_sector_skills = set().union(*ROLE_SKILLS.values())
             matched_global = resume_skills & all_sector_skills
             if len(all_sector_skills) > 0:
                 global_ratio = len(matched_global) / len(all_sector_skills)
-                global_market_match = round((global_ratio / len(role_skills)) * 100, 2)
+                global_market_match = round((global_ratio / len(ROLE_SKILLS)) * 100, 2)
             if global_market_match == 0 and len(resume_skills) > 0:
                 global_market_match = round(min(4.5, len(resume_skills) * 0.35), 2)
                 
             final_match_percentage = top_role_match
         else:
-            final_match_percentage = round(
-                (cosine_sim * 30)
-                + (skill_match_ratio * 70),
-                2
-            )
+            if request.job_description.strip() in ROLE_SKILLS and not request.required_skills:
+                # Harmonize with Market Role Alignment scoring
+                final_match_percentage = role_scores.get(request.job_description.strip(), 0)
+            else:
+                # Unify the DB Job scoring formula with the Market Role formula
+                domain_multiplier = min(1.0, (len(matched_skills) / 3.0)) if len(job_skills) > 0 else 0
+                raw_match = ((skill_match_ratio * 100) * 0.70) + (skill_depth_score * 0.20 * domain_multiplier) + (has_exp * 0.10 * domain_multiplier)
+                
+                # Boost slightly if there is high semantic text similarity, but don't let it drag the score down to 0
+                if cosine_sim > 0.1:
+                    raw_match += (cosine_sim * 10)
+                    
+                final_match_percentage = round(min(98.0, max(0.0, raw_match)), 2)
             top_role_match = final_match_percentage
             global_market_match = 0
 
@@ -746,6 +751,7 @@ def analyze_resume(request: AnalysisRequest):
             "role_scores": role_scores,
             "role_confidence": role_confidence,
             "is_general_analysis": is_general_analysis,
+            "is_market_role": bool(request.job_description.strip() in ROLE_SKILLS and not request.required_skills),
             "matched_skill_count": len(matched_skills),
             "required_skill_count": len(job_skills),
             "parsed_text": resume_text,
