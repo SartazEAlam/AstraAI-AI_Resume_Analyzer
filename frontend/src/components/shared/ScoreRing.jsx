@@ -49,7 +49,7 @@ const ScoreRing = ({ score, label, badge, icon: Icon, colorClass }) => {
           </span>
         </div>
         {badge && (
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/80 max-w-[140px] truncate">
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/80 whitespace-nowrap">
             {badge}
           </span>
         )}
