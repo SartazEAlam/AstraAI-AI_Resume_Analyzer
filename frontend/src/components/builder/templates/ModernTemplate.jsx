@@ -25,6 +25,12 @@ const ModernTemplate = ({ data, customization }) => {
   // Lighten accent for backgrounds
   const accentBg = accent + "12";
 
+  const normalizedSkills = Array.isArray(skills)
+    ? skills.filter((s) => typeof s === "string" && s.trim())
+    : typeof skills === "string"
+      ? skills.split(/[,;\n•·|]+/).map((s) => s.trim()).filter(Boolean)
+      : [];
+
   const SectionTitle = ({ children, light }) => (
     <h2
       style={{
@@ -123,11 +129,11 @@ const ModernTemplate = ({ data, customization }) => {
         </div>
 
         {/* Skills */}
-        {skills.length > 0 && (
+        {normalizedSkills.length > 0 && (
           <div>
             <SectionTitle light>Skills</SectionTitle>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-              {skills.map((skill, i) => (
+              {normalizedSkills.map((skill, i) => (
                 <span
                   key={i}
                   style={{

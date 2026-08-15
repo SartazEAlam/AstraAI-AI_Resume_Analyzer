@@ -48,6 +48,12 @@ const MinimalTemplate = ({ data, customization }) => {
     </h2>
   );
 
+  const normalizedSkills = Array.isArray(skills)
+    ? skills.filter((s) => typeof s === "string" && s.trim())
+    : typeof skills === "string"
+      ? skills.split(/[,;\n•·|]+/).map((s) => s.trim()).filter(Boolean)
+      : [];
+
   const renderSection = (key) => {
     switch (key) {
       case "summary":
@@ -111,11 +117,11 @@ const MinimalTemplate = ({ data, customization }) => {
         ) : null;
 
       case "skills":
-        return skills.length > 0 ? (
+        return normalizedSkills.length > 0 ? (
           <div key="skills" style={{ marginBottom: 28 }}>
             <SectionTitle>Skills</SectionTitle>
             <p style={{ fontSize: 10.5 * sizeScale, color: "#4b5563", lineHeight: 1.8, fontFamily, margin: 0 }}>
-              {skills.join("    ·    ")}
+              {normalizedSkills.join("    ·    ")}
             </p>
           </div>
         ) : null;

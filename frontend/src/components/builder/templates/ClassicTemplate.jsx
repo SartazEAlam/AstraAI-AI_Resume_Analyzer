@@ -53,6 +53,12 @@ const ClassicTemplate = ({ data, customization }) => {
     </div>
   );
 
+  const normalizedSkills = Array.isArray(skills)
+    ? skills.filter((s) => typeof s === "string" && s.trim())
+    : typeof skills === "string"
+      ? skills.split(/[,;\n•·|]+/).map((s) => s.trim()).filter(Boolean)
+      : [];
+
   const renderSection = (key) => {
     switch (key) {
       case "summary":
@@ -111,11 +117,11 @@ const ClassicTemplate = ({ data, customization }) => {
         ) : null;
 
       case "skills":
-        return skills.length > 0 ? (
+        return normalizedSkills.length > 0 ? (
           <div key="skills">
             <SectionDivider title="Technical Skills" />
             <p style={{ fontSize: 10.5 * sizeScale, color: "#374151", lineHeight: 1.7, fontFamily, margin: 0 }}>
-              {skills.join("  ·  ")}
+              {normalizedSkills.join("  ·  ")}
             </p>
           </div>
         ) : null;

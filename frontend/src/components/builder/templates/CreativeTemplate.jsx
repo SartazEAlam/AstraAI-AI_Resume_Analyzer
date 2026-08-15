@@ -33,6 +33,12 @@ const CreativeTemplate = ({ data, customization }) => {
   const accentLight = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.08)`;
   const accentMedium = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15)`;
 
+  const normalizedSkills = Array.isArray(skills)
+    ? skills.filter((s) => typeof s === "string" && s.trim())
+    : typeof skills === "string"
+      ? skills.split(/[,;\n•·|]+/).map((s) => s.trim()).filter(Boolean)
+      : [];
+
   const SectionTitle = ({ children }) => (
     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
       <div style={{ width: 4, height: 18, borderRadius: 2, background: accent }} />
@@ -140,11 +146,11 @@ const CreativeTemplate = ({ data, customization }) => {
         )}
 
         {/* Skills as colored tags */}
-        {skills.length > 0 && (
+        {normalizedSkills.length > 0 && (
           <div style={{ marginBottom: 26 }}>
             <SectionTitle>Skills & Technologies</SectionTitle>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {skills.map((skill, i) => (
+              {normalizedSkills.map((skill, i) => (
                 <span
                   key={i}
                   style={{
