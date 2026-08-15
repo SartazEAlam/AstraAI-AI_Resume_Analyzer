@@ -47,8 +47,31 @@ const extractTextFromFile = async (filePath, originalName) => {
     const dataBuffer = fs.readFileSync(filePath);
 
     if (ext === '.pdf') {
-        const pdfData = await pdfParse(dataBuffer);
-        return pdfData.text ? pdfData.text.trim() : '';
+        // 1. Try Python pypdf microservice first (handles all modern vector, Chrome print, and compressed PDFs)
+        try {
+            const mlServiceUrl = process.env.ML_SERVICE_URL || 'http://localhost:8000';
+            const base64Data = dataBuffer.toString('base64');
+            const pyRes = await axios.post(`${mlServiceUrl}/extract-pdf-base64`, {
+                pdf_base64: base64Data
+            });
+            if (pyRes.data && pyRes.data.text && pyRes.data.text.trim().length > 10) {
+                return pyRes.data.text.trim();
+            }
+        } catch (pyErr) {
+            console.warn('pypdf extraction error, falling back to pdf-parse:', pyErr.message);
+        }
+
+        // 2. Fallback to node pdf-parse
+        try {
+            const pdfData = await pdfParse(dataBuffer);
+            if (pdfData.text && pdfData.text.trim().length > 10) {
+                return pdfData.text.trim();
+            }
+        } catch (pdfErr) {
+            console.warn('pdfParse fallback error:', pdfErr.message);
+        }
+
+        return '';
     } else if (ext === '.docx') {
         const result = await mammoth.extractRawText({ buffer: dataBuffer });
         return result.value ? result.value.trim() : '';
