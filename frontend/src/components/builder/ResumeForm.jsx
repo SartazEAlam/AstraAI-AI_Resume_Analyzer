@@ -58,13 +58,14 @@ const Input = ({ label, value, onChange, placeholder, type = "text", ...props })
 
 /* ── Textarea with optional AI Enhance ── */
 const TextArea = ({ label, value, onChange, placeholder, rows = 3, onEnhance, enhancing }) => (
-  <div className="space-y-1">
+  <div className="space-y-1 relative group">
     {label && (
       <div className="flex items-center justify-between">
         <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{label}</label>
         {onEnhance && (
           <button
-            onClick={onEnhance}
+            type="button"
+            onClick={(e) => { e.preventDefault(); onEnhance(); }}
             disabled={enhancing || !value?.trim()}
             className="flex items-center gap-1 text-[10px] font-bold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 disabled:opacity-40 transition-colors"
           >
@@ -162,22 +163,56 @@ const ResumeForm = ({ data, onChange }) => {
     }
   };
 
+  /* ── AI Enhance Professional Summary ── */
+  const enhanceSummary = async () => {
+    const summaryText = data.summary?.trim() || "";
+    // If summary is empty, generate from roles/skills
+    const contextText = summaryText || (data.skills?.length > 0 ? `Experienced professional skilled in ${data.skills.slice(0, 5).join(", ")}.` : "");
+    if (!contextText) return;
+
+    setEnhancingStates((prev) => ({ ...prev, summary: true }));
+    try {
+      const response = await axios.post("http://localhost:5000/api/enhance-bullet", { text: contextText });
+      if (response.data?.enhanced) {
+        update("summary", response.data.enhanced);
+      }
+    } catch (err) {
+      console.error("Enhance summary failed:", err);
+    } finally {
+      setEnhancingStates((prev) => ({ ...prev, summary: false }));
+    }
+  };
+
   /* ── Skills tag input ── */
   const [skillInput, setSkillInput] = useState("");
 
   const addSkill = () => {
-    const trimmed = skillInput.trim();
-    if (trimmed && !(data.skills || []).includes(trimmed)) {
-      update("skills", [...(data.skills || []), trimmed]);
+    const raw = skillInput.trim();
+    if (!raw) return;
+    const currentSkills = Array.isArray(data.skills) 
+      ? data.skills 
+      : (typeof data.skills === 'string' ? data.skills.split(/[,;\n•|]+/).map(s => s.trim()).filter(Boolean) : []);
+
+    const newItems = raw
+      .split(/[,;\n•|]+/)
+      .map((s) => s.trim())
+      .filter((s) => s && !currentSkills.includes(s));
+
+    if (newItems.length > 0) {
+      update("skills", [...currentSkills, ...newItems]);
       setSkillInput("");
     }
   };
 
-  const removeSkill = (index) =>
-    update("skills", (data.skills || []).filter((_, i) => i !== index));
+  const removeSkill = (index) => {
+    const currentSkills = Array.isArray(data.skills) 
+      ? data.skills 
+      : (typeof data.skills === 'string' ? data.skills.split(/[,;\n•|]+/).map(s => s.trim()).filter(Boolean) : []);
+    update("skills", currentSkills.filter((_, i) => i !== index));
+  };
 
   return (
-    <div className="space-y-3 overflow-y-auto pb-8 pr-1 builder-form-scrollbar">
+    <div className="space-y-3 pb-6">
       {/* ── Personal Info ── */}
       <Section
         icon={User}
@@ -238,10 +273,13 @@ const ResumeForm = ({ data, onChange }) => {
         onToggle={() => toggle("summary")}
       >
         <TextArea
+          label="Summary"
           value={data.summary}
           onChange={(v) => update("summary", v)}
           placeholder="Write a compelling 2-3 sentence summary highlighting your key strengths and career goals..."
           rows={4}
+          onEnhance={enhanceSummary}
+          enhancing={enhancingStates.summary}
         />
       </Section>
 
@@ -289,7 +327,8 @@ const ResumeForm = ({ data, onChange }) => {
                     />
                     <div className="flex flex-col gap-1 mt-1">
                       <button
-                        onClick={() => enhanceBullet(i, j)}
+                        type="button"
+                        onClick={(e) => { e.preventDefault(); enhanceBullet(i, j); }}
                         disabled={enhancingStates[`exp-${i}-${j}`] || !bullet?.trim()}
                         title="AI Enhance"
                         className="p-1.5 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 text-purple-500 disabled:opacity-30 transition-colors"
