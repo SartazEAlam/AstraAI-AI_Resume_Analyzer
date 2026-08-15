@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&family=Roboto+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -262,4 +264,43 @@ html[data-theme="dark"] .shimmer {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
   }
+}
+
+/* ── Resume Builder Styles ── */
+.builder-form-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+  overflow-y: auto;
+}
+
+.builder-form-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.builder-form-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.builder-form-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 9999px;
+}
+
+.builder-form-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--border-strong);
+}
+
+/* Line clamping utility for template descriptions */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Resume template base — ensures consistent rendering */
+.resume-template {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
