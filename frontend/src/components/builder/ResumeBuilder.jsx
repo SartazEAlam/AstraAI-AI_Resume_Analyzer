@@ -235,18 +235,13 @@ const ResumeBuilder = ({ theme, onAnalyzeResume }) => {
           )}
 
           {/* Form */}
-          <div
-            className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5"
-            style={{ maxHeight: "calc(100vh - 280px)", overflow: "hidden", display: "flex", flexDirection: "column" }}
-          >
-            <div style={{ flex: 1, overflow: "hidden" }}>
-              <ResumeForm data={resumeData} onChange={handleDataChange} />
-            </div>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 max-h-[calc(100vh-180px)] overflow-y-auto builder-form-scrollbar">
+            <ResumeForm data={resumeData} onChange={handleDataChange} />
           </div>
         </div>
 
         {/* Right: Live Preview */}
-        <div className="lg:col-span-5 sticky top-24" style={{ height: "calc(100vh - 200px)" }}>
+        <div className="lg:col-span-5 sticky top-24 h-[calc(100vh-180px)]">
           <ResumePreview
             data={resumeData}
             customization={customization}
