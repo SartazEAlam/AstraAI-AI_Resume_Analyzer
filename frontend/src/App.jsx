@@ -147,10 +147,7 @@ function App() {
     try {
       const response = await axios.post(
         "http://localhost:5000/api/upload",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        },
+        formData
       );
       setTimeout(() => {
         setResults(response.data);
@@ -158,9 +155,8 @@ function App() {
       }, 1500);
     } catch (err) {
       console.error("Upload error:", err);
-      setError(
-        "Service connection failed. Ensure backend and ML services are running.",
-      );
+      const errorMessage = err.response?.data?.error || "Service connection failed. Ensure backend and ML services are running.";
+      setError(errorMessage);
       setLoading(false);
     }
   };
