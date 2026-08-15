@@ -34,6 +34,7 @@ import BulletPointEnhancer from "./components/shared/BulletPointEnhancer";
 import LiveEditor from "./components/editor/LiveEditor";
 import ExecutiveReport from "./components/report/ExecutiveReport";
 import OrganizationDashboard from "./components/dashboard/OrganizationDashboard";
+import ResumeBuilder from "./components/builder/ResumeBuilder";
 
 /* ── File Validation ── */
 const ALLOWED_EXTENSIONS = [".pdf", ".docx", ".doc", ".txt", ".rtf", ".md"];
@@ -914,6 +915,30 @@ function App() {
               )}
             </div>
           </>
+        ) : mode === "builder" ? (
+          <div className="max-w-[1600px] mx-auto w-full">
+            <ResumeBuilder
+              theme={theme}
+              onAnalyzeResume={(text) => {
+                setMode("individual");
+                setResults(null);
+                setLoading(true);
+                axios.post("http://localhost:5000/api/analyze-text", {
+                  text,
+                  jobId: null,
+                  customJD: null,
+                }).then((res) => {
+                  setResults(res.data);
+                  setLoading(false);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }).catch((err) => {
+                  console.error("Builder analyze error:", err);
+                  setError("Failed to analyze resume from builder.");
+                  setLoading(false);
+                });
+              }}
+            />
+          </div>
         ) : (
           <div className="max-w-[1400px] mx-auto w-full">
             <div className="text-center mb-12">
@@ -973,6 +998,15 @@ function App() {
                   }}
                 >
                   Candidate Audit (Single)
+                </li>
+                <li
+                  className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer"
+                  onClick={() => {
+                    setMode("builder");
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                >
+                  AI Resume Builder
                 </li>
                 <li
                   className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer"
