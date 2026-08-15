@@ -2,6 +2,8 @@ import ClassicTemplate from "./ClassicTemplate";
 import ModernTemplate from "./ModernTemplate";
 import MinimalTemplate from "./MinimalTemplate";
 import CreativeTemplate from "./CreativeTemplate";
+import ExecutiveTemplate from "./ExecutiveTemplate";
+import TechTemplate from "./TechTemplate";
 
 const TEMPLATES = [
   {
@@ -10,6 +12,20 @@ const TEMPLATES = [
     description: "Clean, ATS-friendly single-column layout trusted across MNCs and campus placements.",
     component: ClassicTemplate,
     tags: ["ATS-Safe", "Professional"],
+  },
+  {
+    id: "tech",
+    name: "Tech",
+    description: "A sleek, modern template tailored for developers with monospace skills tags and highly scannable sections.",
+    component: TechTemplate,
+    tags: ["Developer", "Modern"],
+  },
+  {
+    id: "executive",
+    name: "Executive",
+    description: "A distinguished, highly structured layout for senior professionals featuring elegant serif typography.",
+    component: ExecutiveTemplate,
+    tags: ["Senior", "Elegant"],
   },
   {
     id: "modern",
