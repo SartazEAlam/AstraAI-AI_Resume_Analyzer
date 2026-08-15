@@ -3,6 +3,7 @@ import {
   Layers,
   Sun,
   Moon,
+  FileText,
 } from "lucide-react";
 
 const Navbar = ({ mode, setMode, theme, toggleTheme }) => (
@@ -33,6 +34,17 @@ const Navbar = ({ mode, setMode, theme, toggleTheme }) => (
             }`}
           >
             Candidate Audit
+          </button>
+          <button
+            onClick={() => setMode("builder")}
+            className={`px-3 sm:px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              mode === "builder"
+                ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+            }`}
+          >
+            <FileText className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Resume</span> Builder
           </button>
           <button
             onClick={() => setMode("organization")}
