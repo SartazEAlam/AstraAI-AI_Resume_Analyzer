@@ -235,7 +235,7 @@ const ResumeBuilder = ({ theme, onAnalyzeResume }) => {
           )}
 
           {/* Form */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 max-h-[calc(100vh-180px)] overflow-y-auto builder-form-scrollbar">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-4 h-[calc(100vh-180px)]">
             <ResumeForm data={resumeData} onChange={handleDataChange} />
           </div>
         </div>
