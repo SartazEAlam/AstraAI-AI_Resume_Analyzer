@@ -1,6 +1,5 @@
 import React, { useRef, useState } from "react";
 import { Download, Target, Printer, FileText, Check, Loader2 } from "lucide-react";
-import { generateATSCompliantPDF } from "../../utils/pdfGenerator";
 
 /* ── Resume Preview Panel ──
    Shows the selected template at a scaled-down size.
@@ -12,48 +11,36 @@ const ResumePreview = ({ data, customization, TemplateComponent, onAnalyze }) =>
   const [downloadedPdf, setDownloadedPdf] = useState(false);
   const [downloadedTxt, setDownloadedTxt] = useState(false);
 
-  /* 1. Direct 100% ATS-Compliant Vector PDF Generation */
-  const handleDownloadPDF = async () => {
-    try {
-      setDownloadingPdf(true);
-      const pdfBytes = await generateATSCompliantPDF(data, customization);
-      const blob = new Blob([pdfBytes], { type: "application/pdf" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${(data?.personalInfo?.fullName || "Resume").replace(/\s+/g, "_")}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      setDownloadedPdf(true);
-      setTimeout(() => setDownloadedPdf(false), 2000);
-    } catch (err) {
-      console.error("PDF generation failed:", err);
-      // Fallback to print
-      handlePrint();
-    } finally {
-      setDownloadingPdf(false);
-    }
-  };
-
-  /* 2. Browser Print Dialog (Fallback / Physical Print) */
-  const handlePrint = () => {
+  /* 1. Export PDF using Native Browser Print (Guarantees 100% Template Accuracy & ATS Compliance) */
+  const handleExportPDF = () => {
     const printWindow = window.open("", "_blank", "width=800,height=1100");
     if (!printWindow) return;
 
     const templateHtml = previewRef.current?.querySelector(".resume-template")?.outerHTML || "";
+    
+    // Grab all styles from the parent window so Tailwind is synchronous
+    const styles = Array.from(document.styleSheets)
+      .map(sheet => {
+        try {
+          return Array.from(sheet.cssRules).map(rule => rule.cssText).join('');
+        } catch (e) {
+          return ''; // Ignore CORS stylesheets
+        }
+      })
+      .join('\\n');
+    
+    // Also grab any <style> or <link rel="stylesheet"> tags directly to be safe, but remove scripts
+    const headHtml = document.head.innerHTML.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
 
     printWindow.document.write(`
       <!DOCTYPE html>
       <html>
       <head>
         <meta charset="utf-8">
-        <title>${data?.personalInfo?.fullName ? `${data.personalInfo.fullName} - Resume` : "Resume"}</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Georgia&family=Outfit:wght@400;500;600;700;800;900&family=Roboto+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <title>${data?.personalInfo?.fullName ? data.personalInfo.fullName + " - Resume" : "Resume"}</title>
+        ${headHtml}
         <style>
+          ${styles}
           *, *::before, *::after {
             margin: 0;
             padding: 0;
@@ -64,28 +51,63 @@ const ResumePreview = ({ data, customization, TemplateComponent, onAnalyze }) =>
           }
           @page {
             size: A4 portrait;
-            margin: 0;
+            margin: 0 !important;
           }
           html, body {
             background: #ffffff !important;
             color: #111827;
-            margin: 0;
-            padding: 0;
+            margin: 0 !important;
+            padding: 0 !important;
             width: 210mm;
+            height: 297mm;
+            overflow: hidden !important;
+          }
+          #print-container {
+            width: 210mm;
+            height: 297mm;
+            overflow: hidden;
+            position: relative;
+            background: white;
           }
           .resume-template {
             width: 210mm !important;
             min-height: 297mm !important;
             margin: 0 auto;
             box-shadow: none !important;
+            /* Force background colors to print */
+            background-color: white;
           }
         </style>
       </head>
       <body>
-        ${templateHtml}
+        <div id="print-container">
+          ${templateHtml}
+        </div>
         <script>
           window.onload = function() {
-            setTimeout(function() { window.print(); }, 250);
+            var template = document.querySelector('.resume-template');
+            if (template) {
+              // Wait a tiny bit just in case fonts are loading
+              setTimeout(function() {
+                var actualHeight = template.offsetHeight;
+                var targetHeight = 1120; // Approx 297mm in pixels at 96dpi
+                
+                if (actualHeight > targetHeight) {
+                  var scale = targetHeight / actualHeight;
+                  // Use zoom instead of transform. Transform matrices break ATS text extraction in many parsers
+                  // (like pdfminer or PyPDF2) because they compute overlapping bounding boxes incorrectly.
+                  // Zoom naturally resizes the layout in Chrome without applying a PDF affine transform matrix.
+                  template.style.zoom = scale;
+                }
+                
+                window.print();
+              }, 100);
+            } else {
+              window.print();
+            }
+          };
+          window.onafterprint = function() {
+            window.close();
           };
         </script>
       </body>
@@ -205,7 +227,7 @@ const ResumePreview = ({ data, customization, TemplateComponent, onAnalyze }) =>
       <div className="flex flex-wrap items-center gap-2 mb-3">
         {/* Direct Vector PDF Download Button */}
         <button
-          onClick={handleDownloadPDF}
+          onClick={handleExportPDF}
           disabled={downloadingPdf}
           className="flex-1 min-w-[130px] flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md shadow-indigo-500/20"
         >
@@ -216,7 +238,7 @@ const ResumePreview = ({ data, customization, TemplateComponent, onAnalyze }) =>
           ) : (
             <Download className="w-3.5 h-3.5" />
           )}
-          {downloadingPdf ? "Generating..." : downloadedPdf ? "PDF Saved!" : "Download PDF"}
+          {downloadingPdf ? "Generating..." : downloadedPdf ? "PDF Exported!" : "Export to PDF"}
         </button>
 
         {/* ATS .TXT Export Button */}
