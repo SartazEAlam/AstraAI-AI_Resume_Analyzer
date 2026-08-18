@@ -129,14 +129,18 @@ export async function generateResumePDF(data, customization = {}) {
   let baseBld = StandardFonts.HelveticaBold;
   let baseItl = StandardFonts.HelveticaOblique;
 
-  if (customFont.includes("monospace") || customFont.includes("roboto mono")) {
+  if (customFont.includes("roboto mono") || customFont.includes("monospace") || customFont.includes("consolas")) {
     baseReg = StandardFonts.Courier;
     baseBld = StandardFonts.CourierBold;
     baseItl = StandardFonts.CourierOblique;
-  } else if (customFont.includes("serif") || customFont.includes("georgia")) {
+  } else if (customFont.includes("georgia") || customFont.includes("times") || (customFont.includes("serif") && !customFont.includes("sans-serif"))) {
     baseReg = StandardFonts.TimesRoman;
     baseBld = StandardFonts.TimesRomanBold;
     baseItl = StandardFonts.TimesRomanItalic;
+  } else {
+    baseReg = StandardFonts.Helvetica;
+    baseBld = StandardFonts.HelveticaBold;
+    baseItl = StandardFonts.HelveticaOblique;
   }
   
   fontRegular = await pdfDoc.embedFont(baseReg);
