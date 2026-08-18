@@ -190,8 +190,8 @@ export default function CoverLetterPreview({ formData, customization, setCustomi
                 <h1 className="text-2xl font-bold leading-tight mb-2">{formData.name || 'Your Name'}</h1>
                 <div className="w-8 h-1 bg-white/40 mb-6"></div>
                 <div className="space-y-4 text-sm text-white/90">
-                  <p>{formData.email || 'Email Address'}</p>
-                  <p>{formData.phone || 'Phone Number'}</p>
+                  {formData.email && <p>{formData.email}</p>}
+                  {formData.phone && <p>{formData.phone}</p>}
                 </div>
               </div>
             )}
@@ -213,17 +213,23 @@ export default function CoverLetterPreview({ formData, customization, setCustomi
 
               {/* Letter Body */}
               <div className="mt-8 space-y-6 text-sm leading-relaxed whitespace-pre-wrap text-slate-700">
-                <p className="font-semibold text-slate-900">
-                  {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                </p>
+                {formData.date && (
+                  <p className="font-semibold text-slate-900">
+                    {new Date(formData.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}
+                  </p>
+                )}
                 
                 <div className="font-medium text-slate-800">
-                  <p>{formData.hiringManager || 'Hiring Manager'}</p>
-                  <p>{formData.targetRole || 'Target Role'}</p>
-                  <p>{formData.targetCompany || 'Target Company'}</p>
+                  {formData.hiringManager && <p>{formData.hiringManager}</p>}
+                  {formData.targetRole && <p>{formData.targetRole}</p>}
+                  {formData.targetCompany && <p>{formData.targetCompany}</p>}
+                  {formData.companyAddress && <p className="text-slate-600">{formData.companyAddress}</p>}
                 </div>
 
-                <div className="pt-2">
+                <div className={`pt-2 ${
+                  formData.letterAlignment === 'justify' ? 'text-justify' :
+                  formData.letterAlignment === 'center' ? 'text-center' : 'text-left'
+                }`}>
                   {formData.letterContent || 'Your tailored cover letter will appear here when generated...'}
                 </div>
               </div>

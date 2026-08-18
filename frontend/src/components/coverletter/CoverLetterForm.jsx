@@ -27,10 +27,52 @@ export default function CoverLetterForm({ formData, setFormData, onGenerate, isG
       </div>
 
       <div className="flex-1 overflow-y-auto p-5 space-y-6">
+        {/* Personal Details */}
+        <div className="space-y-4">
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+            <User className="w-4 h-4 text-slate-400" /> Your Details
+          </h3>
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Your Name</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name || ''}
+                onChange={handleChange}
+                placeholder="e.g. Jane Doe"
+                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Your Email</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email || ''}
+                onChange={handleChange}
+                placeholder="e.g. jane@example.com"
+                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Your Phone</label>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone || ''}
+                onChange={handleChange}
+                placeholder="e.g. +1 234 567 890"
+                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+              />
+            </div>
+          </div>
+        </div>
+
         {/* Recipient Details */}
         <div className="space-y-4">
           <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
-            <Building2 className="w-4 h-4 text-slate-400" /> Target Role
+            <Building2 className="w-4 h-4 text-slate-400" /> Target Role & Company
           </h3>
           
           <div className="space-y-3">
@@ -57,11 +99,32 @@ export default function CoverLetterForm({ formData, setFormData, onGenerate, isG
               />
             </div>
             <div>
+              <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Company Address (Optional)</label>
+              <input
+                type="text"
+                name="companyAddress"
+                value={formData.companyAddress || ''}
+                onChange={handleChange}
+                placeholder="e.g. 1600 Amphitheatre Pkwy"
+                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Date</label>
+              <input
+                type="date"
+                name="date"
+                value={formData.date || ''}
+                onChange={handleChange}
+                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+              />
+            </div>
+            <div>
               <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Hiring Manager (Optional)</label>
               <input
                 type="text"
                 name="hiringManager"
-                value={formData.hiringManager}
+                value={formData.hiringManager || ''}
                 onChange={handleChange}
                 placeholder="e.g. John Doe or Hiring Team"
                 className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
@@ -79,6 +142,22 @@ export default function CoverLetterForm({ formData, setFormData, onGenerate, isG
                   {TONES.map(tone => (
                     <option key={tone.id} value={tone.id}>{tone.label}</option>
                   ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Text Alignment</label>
+              <div className="relative">
+                <select
+                  name="letterAlignment"
+                  value={formData.letterAlignment || 'left'}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none appearance-none transition-all"
+                >
+                  <option value="left">Left Align</option>
+                  <option value="center">Center</option>
+                  <option value="justify">Justify</option>
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
               </div>

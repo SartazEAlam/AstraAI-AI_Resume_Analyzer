@@ -8,10 +8,13 @@ export default function CoverLetterBuilder() {
     name: '',
     email: '',
     phone: '',
+    date: new Date().toISOString().split('T')[0],
     targetRole: '',
     targetCompany: '',
+    companyAddress: '',
     hiringManager: '',
     tone: 'Professional',
+    letterAlignment: 'left',
     letterContent: '',
     skills: [],
     experienceHighlights: []

@@ -641,9 +641,9 @@ export async function generateCoverLetterPDF(data, custom) {
   const textClr = rgb(0.15, 0.17, 0.21); // Slate 800
 
   // Fonts
-  const { fetchFont } = await import("./fontFetcher.js");
-  const baseReg = await fetchFont("Helvetica");
-  const baseBld = await fetchFont("Helvetica-Bold");
+  const { StandardFonts } = await import("pdf-lib");
+  const baseReg = StandardFonts.Helvetica;
+  const baseBld = StandardFonts.HelveticaBold;
 
   let fontRegular, fontBold;
   const fontId = custom?.fontFamily || "";
@@ -652,18 +652,18 @@ export async function generateCoverLetterPDF(data, custom) {
   if (fontId.includes("Inter")) {
     try {
       const [regBytes, bldBytes] = await Promise.all([
-        fetchFont("https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfMZhrib2Bg-4.ttf"),
-        fetchFont("https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuI1IMZhrib2Bg-4.ttf")
+        fetch("https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfMZhrj72A.ttf").then(r => r.arrayBuffer()),
+        fetch("https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuFuYMZhrj72A.ttf").then(r => r.arrayBuffer())
       ]);
       customReg = regBytes; customBld = bldBytes;
     } catch (e) { console.warn(e); }
   } else if (fontId.includes("Outfit")) {
     try {
       const [regBytes, bldBytes] = await Promise.all([
-        fetchFont("https://fonts.gstatic.com/s/outfit/v11/QGYyz_MVcBeNP4NJtEtqU1xl.ttf"),
-        fetchFont("https://fonts.gstatic.com/s/outfit/v11/QGYyz_MVcBeNP4NJtEtqU1xl.ttf") 
+        fetch("https://fonts.gstatic.com/s/outfit/v15/QGYyz_MVcBeNP4NjuGObqx1XmO1I4TC1C4G-FCAp.ttf").then(r => r.arrayBuffer()),
+        fetch("https://fonts.gstatic.com/s/outfit/v15/QGYyz_MVcBeNP4NjuGObqx1XmO1I4deyC4G-FCAp.ttf").then(r => r.arrayBuffer()) 
       ]);
-      customReg = regBytes; customBld = regBytes; // Temporary fallback for outfit bold
+      customReg = regBytes; customBld = bldBytes;
     } catch (e) { console.warn(e); }
   }
 
@@ -684,11 +684,12 @@ export async function generateCoverLetterPDF(data, custom) {
     page.drawText(safe, { x, y: yPos, size, font, color });
   };
 
-  const drawWrapped = (text, x, yPos, w, font, size, color) => {
+  const drawWrapped = (text, startX, yPos, w, font, size, color, align = 'left') => {
     const lines = [];
     let currentLine = '';
-    const safeText = (text || '').replace(/[\x00-\x1F\x7F-\x9F]/g, "");
-    const words = safeText.split(' ');
+    // Replace newlines with space, then strip control chars
+    const safeText = (text || '').replace(/\n/g, " ").replace(/[\x00-\x1F\x7F-\x9F]/g, "");
+    const words = safeText.split(/\s+/).filter(Boolean);
     
     for (const word of words) {
       const testLine = currentLine ? `${currentLine} ${word}` : word;
@@ -702,15 +703,37 @@ export async function generateCoverLetterPDF(data, custom) {
     if (currentLine) lines.push(currentLine);
 
     let cy = yPos;
-    for (const line of lines) {
-      drawT(line, x, cy, size, font, color);
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      
+      if (align === 'center') {
+        const lw = font.widthOfTextAtSize(line, size);
+        drawT(line, startX + (w - lw) / 2, cy, size, font, color);
+      } else if (align === 'justify' && i < lines.length - 1) {
+        const wordsInLine = line.split(' ');
+        if (wordsInLine.length > 1) {
+          const totalWordsWidth = wordsInLine.reduce((sum, wd) => sum + font.widthOfTextAtSize(wd, size), 0);
+          const spaceWidth = (w - totalWordsWidth) / (wordsInLine.length - 1);
+          let cx = startX;
+          for (const wd of wordsInLine) {
+            drawT(wd, cx, cy, size, font, color);
+            cx += font.widthOfTextAtSize(wd, size) + spaceWidth;
+          }
+        } else {
+          drawT(line, startX, cy, size, font, color);
+        }
+      } else {
+        // Left align (or last line of justify)
+        drawT(line, startX, cy, size, font, color);
+      }
+      
       cy -= size * 1.5;
     }
     return cy;
   };
 
   const templateId = custom?.templateId || "classic";
-  const { name, email, phone, targetRole, targetCompany, hiringManager, letterContent } = data;
+  const { name, email, phone, targetRole, targetCompany, companyAddress, hiringManager, letterContent, letterAlignment } = data;
 
   const baseSize = custom?.fontSize === 'small' ? 10 : custom?.fontSize === 'large' ? 12 : 11;
 
@@ -739,13 +762,32 @@ export async function generateCoverLetterPDF(data, custom) {
     const mx = sideW + 40;
     const mw = PAGE_WIDTH - mx - 40;
     
-    drawT(new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }), mx, cy, baseSize, fontBold, textClr);
-    cy -= 30;
-    drawT(hiringManager || "Hiring Manager", mx, cy, baseSize, fontBold, textClr); cy -= (baseSize * 1.5);
-    drawT(targetRole || "Target Role", mx, cy, baseSize, fontBold, textClr); cy -= (baseSize * 1.5);
-    drawT(targetCompany || "Target Company", mx, cy, baseSize, fontBold, textClr); cy -= 30;
+    if (data.date) {
+      drawT(new Date(data.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }), mx, cy, baseSize, fontBold, textClr);
+      cy -= 30;
+    }
     
-    drawWrapped(letterContent || "", mx, cy, mw, fontRegular, baseSize, textClr);
+    if (hiringManager) {
+      drawT(hiringManager, mx, cy, baseSize, fontBold, textClr); cy -= (baseSize * 1.5);
+    }
+    if (targetRole) {
+      drawT(targetRole, mx, cy, baseSize, fontBold, textClr); cy -= (baseSize * 1.5);
+    }
+    if (targetCompany) {
+      drawT(targetCompany, mx, cy, baseSize, fontBold, textClr); cy -= (baseSize * 1.5);
+    }
+    if (companyAddress) {
+      drawT(companyAddress, mx, cy, baseSize, fontRegular, textClr); cy -= (baseSize * 1.5);
+    }
+    cy -= 15;
+    
+    const paras = (letterContent || "").split('\n\n');
+    for (const para of paras) {
+      if (para.trim()) {
+        cy = drawWrapped(para.trim(), mx, cy, mw, fontRegular, baseSize, textClr, letterAlignment || 'left');
+        cy -= (baseSize * 1.5);
+      }
+    }
 
   } else {
     // Classic & Minimal
@@ -766,17 +808,29 @@ export async function generateCoverLetterPDF(data, custom) {
       y -= 40;
     }
 
-    drawT(new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }), MARGIN_X, y, baseSize, fontBold, textClr);
-    y -= 30;
+    if (data.date) {
+      drawT(new Date(data.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }), MARGIN_X, y, baseSize, fontBold, textClr);
+      y -= 30;
+    }
     
-    drawT(hiringManager || "Hiring Manager", MARGIN_X, y, baseSize, fontBold, textClr); y -= (baseSize * 1.5);
-    drawT(targetRole || "Target Role", MARGIN_X, y, baseSize, fontBold, textClr); y -= (baseSize * 1.5);
-    drawT(targetCompany || "Target Company", MARGIN_X, y, baseSize, fontBold, textClr); y -= 30;
+    if (hiringManager) {
+      drawT(hiringManager, MARGIN_X, y, baseSize, fontBold, textClr); y -= (baseSize * 1.5);
+    }
+    if (targetRole) {
+      drawT(targetRole, MARGIN_X, y, baseSize, fontBold, textClr); y -= (baseSize * 1.5);
+    }
+    if (targetCompany) {
+      drawT(targetCompany, MARGIN_X, y, baseSize, fontBold, textClr); y -= (baseSize * 1.5);
+    }
+    if (companyAddress) {
+      drawT(companyAddress, MARGIN_X, y, baseSize, fontRegular, textClr); y -= (baseSize * 1.5);
+    }
+    y -= 15;
 
     const paras = (letterContent || "").split('\n\n');
     for (const para of paras) {
       if (para.trim()) {
-        y = drawWrapped(para.trim(), MARGIN_X, y, CONTENT_W, fontRegular, baseSize, textClr);
+        y = drawWrapped(para.trim(), MARGIN_X, y, CONTENT_W, fontRegular, baseSize, textClr, letterAlignment || 'left');
         y -= (baseSize * 1.5);
       }
     }
