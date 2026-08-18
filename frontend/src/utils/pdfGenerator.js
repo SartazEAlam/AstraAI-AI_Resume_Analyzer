@@ -616,3 +616,171 @@ export async function generateResumePDF(data, customization = {}) {
 
   return await pdfDoc.save();
 }
+
+/**
+ * Generates an A4 PDF for Cover Letter based on the selected template and fonts.
+ */
+export async function generateCoverLetterPDF(data, custom) {
+  const { PDFDocument, rgb } = await import("pdf-lib");
+  const fontkit = (await import("@pdf-lib/fontkit")).default;
+  const pdfDoc = await PDFDocument.create();
+  pdfDoc.registerFontkit(fontkit);
+
+  const PAGE_WIDTH = 595.28;
+  const PAGE_HEIGHT = 841.89;
+  const MARGIN_X = 50;
+  const MARGIN_TOP = 50;
+  const CONTENT_W = PAGE_WIDTH - MARGIN_X * 2;
+
+  const hexToRgb = (hex) => {
+    let clr = (hex || "#4f46e5").replace("#", "");
+    if (clr.length === 3) clr = clr.split("").map(c => c + c).join("");
+    return rgb(parseInt(clr.substring(0, 2), 16) / 255, parseInt(clr.substring(2, 4), 16) / 255, parseInt(clr.substring(4, 6), 16) / 255);
+  };
+  const accentClr = hexToRgb(custom?.accentColor);
+  const textClr = rgb(0.15, 0.17, 0.21); // Slate 800
+
+  // Fonts
+  const { fetchFont } = await import("./fontFetcher.js");
+  const baseReg = await fetchFont("Helvetica");
+  const baseBld = await fetchFont("Helvetica-Bold");
+
+  let fontRegular, fontBold;
+  const fontId = custom?.fontFamily || "";
+  let customReg, customBld;
+
+  if (fontId.includes("Inter")) {
+    try {
+      const [regBytes, bldBytes] = await Promise.all([
+        fetchFont("https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfMZhrib2Bg-4.ttf"),
+        fetchFont("https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuI1IMZhrib2Bg-4.ttf")
+      ]);
+      customReg = regBytes; customBld = bldBytes;
+    } catch (e) { console.warn(e); }
+  } else if (fontId.includes("Outfit")) {
+    try {
+      const [regBytes, bldBytes] = await Promise.all([
+        fetchFont("https://fonts.gstatic.com/s/outfit/v11/QGYyz_MVcBeNP4NJtEtqU1xl.ttf"),
+        fetchFont("https://fonts.gstatic.com/s/outfit/v11/QGYyz_MVcBeNP4NJtEtqU1xl.ttf") 
+      ]);
+      customReg = regBytes; customBld = regBytes; // Temporary fallback for outfit bold
+    } catch (e) { console.warn(e); }
+  }
+
+  if (customReg && customBld) {
+    fontRegular = await pdfDoc.embedFont(customReg);
+    fontBold = await pdfDoc.embedFont(customBld);
+  } else {
+    fontRegular = await pdfDoc.embedFont(baseReg);
+    fontBold = await pdfDoc.embedFont(baseBld);
+  }
+
+  const page = pdfDoc.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
+  let y = PAGE_HEIGHT - MARGIN_TOP;
+
+  const drawT = (text, x, yPos, size, font, color) => {
+    if (!text) return;
+    const safe = text.replace(/[\x00-\x1F\x7F-\x9F]/g, "");
+    page.drawText(safe, { x, y: yPos, size, font, color });
+  };
+
+  const drawWrapped = (text, x, yPos, w, font, size, color) => {
+    const lines = [];
+    let currentLine = '';
+    const safeText = (text || '').replace(/[\x00-\x1F\x7F-\x9F]/g, "");
+    const words = safeText.split(' ');
+    
+    for (const word of words) {
+      const testLine = currentLine ? `${currentLine} ${word}` : word;
+      if (font.widthOfTextAtSize(testLine, size) <= w) {
+        currentLine = testLine;
+      } else {
+        if (currentLine) lines.push(currentLine);
+        currentLine = word;
+      }
+    }
+    if (currentLine) lines.push(currentLine);
+
+    let cy = yPos;
+    for (const line of lines) {
+      drawT(line, x, cy, size, font, color);
+      cy -= size * 1.5;
+    }
+    return cy;
+  };
+
+  const templateId = custom?.templateId || "classic";
+  const { name, email, phone, targetRole, targetCompany, hiringManager, letterContent } = data;
+
+  const baseSize = custom?.fontSize === 'small' ? 10 : custom?.fontSize === 'large' ? 12 : 11;
+
+  if (templateId === "modern") {
+    // Sidebar
+    const sideW = 200;
+    page.drawRectangle({ x: 0, y: 0, width: sideW, height: PAGE_HEIGHT, color: accentClr });
+    
+    let sy = PAGE_HEIGHT - 60;
+    // Initial avatar
+    page.drawCircle({ x: sideW / 2, y: sy - 30, size: 40, color: rgb(1,1,1), opacity: 0.2 });
+    const init = name ? name.split(' ').map(n => n[0]).join('') : 'C';
+    page.drawText(init, { x: sideW/2 - 15, y: sy - 40, size: 28, font: fontBold, color: rgb(1,1,1) });
+    sy -= 100;
+    
+    drawT(name || "Your Name", 30, sy, 22, fontBold, rgb(1,1,1));
+    sy -= 10;
+    page.drawLine({ start: { x: 30, y: sy }, end: { x: 60, y: sy }, thickness: 2, color: rgb(1,1,1), opacity: 0.4 });
+    sy -= 30;
+    
+    drawT(email || "Email", 30, sy, 11, fontRegular, rgb(1,1,1)); sy -= 20;
+    drawT(phone || "Phone", 30, sy, 11, fontRegular, rgb(1,1,1));
+    
+    // Main Content
+    let cy = PAGE_HEIGHT - 60;
+    const mx = sideW + 40;
+    const mw = PAGE_WIDTH - mx - 40;
+    
+    drawT(new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }), mx, cy, baseSize, fontBold, textClr);
+    cy -= 30;
+    drawT(hiringManager || "Hiring Manager", mx, cy, baseSize, fontBold, textClr); cy -= (baseSize * 1.5);
+    drawT(targetRole || "Target Role", mx, cy, baseSize, fontBold, textClr); cy -= (baseSize * 1.5);
+    drawT(targetCompany || "Target Company", mx, cy, baseSize, fontBold, textClr); cy -= 30;
+    
+    drawWrapped(letterContent || "", mx, cy, mw, fontRegular, baseSize, textClr);
+
+  } else {
+    // Classic & Minimal
+    if (templateId === "classic") {
+      const nameW = fontBold.widthOfTextAtSize(name || "Your Name", 28);
+      drawT(name || "Your Name", (PAGE_WIDTH - nameW)/2, y, 28, fontBold, textClr);
+      y -= 20;
+      const contactStr = `${email || 'Email'}  •  ${phone || 'Phone'}`;
+      const cw = fontRegular.widthOfTextAtSize(contactStr, 11);
+      drawT(contactStr, (PAGE_WIDTH - cw)/2, y, 11, fontRegular, textClr);
+      y -= 15;
+      page.drawLine({ start: { x: MARGIN_X, y }, end: { x: PAGE_WIDTH - MARGIN_X, y }, thickness: 1, color: accentClr });
+      y -= 30;
+    } else {
+      drawT(name || "Your Name", MARGIN_X, y, 28, fontBold, accentClr);
+      y -= 20;
+      drawT(`${email || 'Email'}  •  ${phone || 'Phone'}`, MARGIN_X, y, 11, fontRegular, textClr);
+      y -= 40;
+    }
+
+    drawT(new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }), MARGIN_X, y, baseSize, fontBold, textClr);
+    y -= 30;
+    
+    drawT(hiringManager || "Hiring Manager", MARGIN_X, y, baseSize, fontBold, textClr); y -= (baseSize * 1.5);
+    drawT(targetRole || "Target Role", MARGIN_X, y, baseSize, fontBold, textClr); y -= (baseSize * 1.5);
+    drawT(targetCompany || "Target Company", MARGIN_X, y, baseSize, fontBold, textClr); y -= 30;
+
+    const paras = (letterContent || "").split('\n\n');
+    for (const para of paras) {
+      if (para.trim()) {
+        y = drawWrapped(para.trim(), MARGIN_X, y, CONTENT_W, fontRegular, baseSize, textClr);
+        y -= (baseSize * 1.5);
+      }
+    }
+  }
+
+  return await pdfDoc.save();
+}

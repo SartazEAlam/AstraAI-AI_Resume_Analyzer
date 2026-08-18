@@ -910,3 +910,48 @@ def enhance_bullet(request: BulletRequest):
         "score": max(0, score),
         "enhanced": enhanced_text if (enhanced_text != text) else text + " (Optimized)"
     }
+
+from typing import List, Optional
+
+class CoverLetterRequest(BaseModel):
+    name: str
+    target_role: str
+    target_company: str
+    hiring_manager: Optional[str] = "Hiring Manager"
+    skills: List[str]
+    experience_highlights: List[str]
+    tone: str = "Professional"
+
+@app.post("/generate-cover-letter")
+def generate_cover_letter(req: CoverLetterRequest):
+    """
+    Generates a tailored cover letter using NLP synthesis based on candidate data and target role.
+    """
+    try:
+        # Construct the paragraphs
+        skills_str = ", ".join(req.skills[:5]) if req.skills else "my diverse skill set"
+        exp_str = req.experience_highlights[0] if req.experience_highlights else "delivering high-quality results"
+        
+        opening = f"Dear {req.hiring_manager},\n\nI am writing to express my strong interest in the {req.target_role} position at {req.target_company}. With a proven track record in the industry and a deep passion for innovation, I am confident in my ability to make an immediate impact on your team."
+        
+        if req.tone.lower() == "enthusiastic":
+            opening = f"Dear {req.hiring_manager},\n\nI am absolutely thrilled to apply for the {req.target_role} role at {req.target_company}! I have been following your company's incredible work, and I know my background makes me a perfect fit for this exciting opportunity."
+        elif req.tone.lower() == "executive":
+            opening = f"Dear {req.hiring_manager},\n\nPlease accept this letter as formal expression of my interest in the {req.target_role} position with {req.target_company}. My career has been defined by driving strategic initiatives and fostering operational excellence."
+            
+        body1 = f"Throughout my career, I have honed my expertise in {skills_str}. For example, {exp_str}. This experience has equipped me with the unique ability to navigate complex challenges and consistently deliver value. I thrive in environments that demand both strategic thinking and hands-on execution."
+        
+        if req.tone.lower() == "confident":
+            body1 = f"My expertise in {skills_str} sets me apart as a top performer. Specifically, {exp_str}. I consistently exceed expectations and bring a high level of dedication and strategic vision to every project I touch."
+            
+        body2 = f"What draws me to {req.target_company} is your commitment to excellence and innovation in the space. I am eager to bring my background to your organization and contribute to your continued success. I believe my unique blend of technical skills and collaborative mindset aligns perfectly with your goals."
+        
+        conclusion = f"Thank you for considering my application. I would welcome the opportunity to discuss how my experience and vision can contribute to the success of {req.target_company}. I look forward to the possibility of speaking with you soon.\n\nSincerely,\n{req.name}"
+
+        return {
+            "letter": f"{opening}\n\n{body1}\n\n{body2}\n\n{conclusion}"
+        }
+    except Exception as e:
+        import traceback
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e))

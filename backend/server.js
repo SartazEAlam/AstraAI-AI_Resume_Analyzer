@@ -294,6 +294,22 @@ app.post('/api/analyze-text', async (req, res) => {
         res.status(500).json({ error: 'Internal server error during text analysis.' });
     }
 });
+
+// ── Generate Cover Letter Endpoint ──
+app.post('/api/generate-cover-letter', async (req, res) => {
+    try {
+        const mlServiceUrl = process.env.ML_SERVICE_URL || 'http://localhost:8000';
+        const pythonResponse = await axios.post(
+            `${mlServiceUrl}/generate-cover-letter`,
+            req.body
+        );
+        res.json(pythonResponse.data);
+    } catch (error) {
+        console.error('Error generating cover letter:', error.message);
+        if (error.response) console.error('ML service response:', error.response.data);
+        res.status(500).json({ error: 'Internal server error during cover letter generation.' });
+    }
+});
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`\n🚀 Node.js Backend running at http://localhost:${PORT}`);

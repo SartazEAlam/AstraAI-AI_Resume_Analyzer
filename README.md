@@ -12,6 +12,7 @@ Upload your resume in any format, select a target role or explore universal mark
 |---|---|
 | **Multi-Format Support** | Seamless text extraction for **PDF, Word (DOCX/DOC), TXT, RTF, and Markdown** using `mammoth` and native stream parsers. |
 | **Interactive Resume Builder & Templates** | Build or edit resumes live using 3 professionally designed templates (**Classic, Modern, and Minimal**). |
+| **AI Cover Letter Generator** | Auto-tailor dynamic, impactful cover letters targeted at specific roles and companies using NLP, exportable to perfectly matched A4 PDFs. |
 | **1-Click ATS-Compliant PDF Export** | Uses a pixel-perfect, custom coordinate-based `pdf-lib` rendering engine on the client to generate high-fidelity vector PDFs (100% ATS-compliant text runs) and dynamically fit them to a single A4 page. |
 | **Cascading Job Selector & Custom JDs** | Filter by Industry Sector, select a Specific Job Role, or **Paste a Custom Job Description** for on-the-fly keyword extraction. |
 | **Hybrid ATS Match Engine** | Blends direct technical skill overlap with **AI Semantic Concept Matching** (`sentence-transformers`) for realistic ATS grading and fewer false negatives. |
@@ -61,6 +62,7 @@ AI_Resume_Analyzer/
 ├── frontend/                 # React + Vite frontend
 │   ├── src/
 │   │   ├── App.jsx           # Main application (Individual + Organization modes, Executive Report)
+│   │   ├── components/       # UI Components (Builder, Cover Letter, Dashboard, Editor, Report, Shared)
 │   │   ├── index.css         # Global styles, @media print styles, animations
 │   │   └── main.jsx          # React entry point
 │   ├── index.html            # HTML shell

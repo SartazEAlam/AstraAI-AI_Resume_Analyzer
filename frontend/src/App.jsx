@@ -35,7 +35,7 @@ import LiveEditor from "./components/editor/LiveEditor";
 import ExecutiveReport from "./components/report/ExecutiveReport";
 import OrganizationDashboard from "./components/dashboard/OrganizationDashboard";
 import ResumeBuilder from "./components/builder/ResumeBuilder";
-
+import CoverLetterBuilder from "./components/coverletter/CoverLetterBuilder";
 /* ── File Validation ── */
 const ALLOWED_EXTENSIONS = [".pdf", ".docx", ".doc", ".txt", ".rtf", ".md"];
 const isAllowedFile = (name) => {
@@ -934,6 +934,10 @@ function App() {
                 });
               }}
             />
+          </div>
+        ) : mode === "cover_letter" ? (
+          <div className="max-w-[1600px] mx-auto w-full">
+            <CoverLetterBuilder />
           </div>
         ) : (
           <div className="max-w-[1400px] mx-auto w-full">

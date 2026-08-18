@@ -47,6 +47,16 @@ const Navbar = ({ mode, setMode, theme, toggleTheme }) => (
             <span className="hidden sm:inline">Resume</span> Builder
           </button>
           <button
+            onClick={() => setMode("cover_letter")}
+            className={`px-3 sm:px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              mode === "cover_letter"
+                ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+            }`}
+          >
+            <span className="hidden sm:inline">Cover</span> Letter
+          </button>
+          <button
             onClick={() => setMode("organization")}
             className={`px-3 sm:px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
               mode === "organization"
