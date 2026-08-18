@@ -1,4 +1,5 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import fontkit from "@pdf-lib/fontkit";
 
 /**
  * Multi-Template ATS PDF Generator with Typographic Auto-Fitter
@@ -94,6 +95,7 @@ function normalizeSkills(skills) {
 export async function generateResumePDF(data, customization = {}) {
   console.log("=== PDF Generator Running - Version 2.1.0 ===", { template: customization?.templateId, accentColor: customization?.accentColor });
   const pdfDoc = await PDFDocument.create();
+  pdfDoc.registerFontkit(fontkit);
 
   let fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
   let fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
@@ -143,9 +145,46 @@ export async function generateResumePDF(data, customization = {}) {
     baseItl = StandardFonts.HelveticaOblique;
   }
   
-  fontRegular = await pdfDoc.embedFont(baseReg);
-  fontBold = await pdfDoc.embedFont(baseBld);
-  fontItalic = await pdfDoc.embedFont(baseItl);
+  const FONT_MAP = {
+    inter: {
+      regular: "https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfMZhrj72A.ttf",
+      bold: "https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuFuYMZhrj72A.ttf",
+      italic: "https://fonts.gstatic.com/s/inter/v20/UcCM3FwrK3iLTcvneQg7Ca725JhhKnNqk4j1ebLhAm8SrXTc2dthjZ-Ck-8.ttf"
+    },
+    outfit: {
+      regular: "https://fonts.gstatic.com/s/outfit/v15/QGYyz_MVcBeNP4NjuGObqx1XmO1I4TC1C4G-FCAp.ttf",
+      bold: "https://fonts.gstatic.com/s/outfit/v15/QGYyz_MVcBeNP4NjuGObqx1XmO1I4deyC4G-FCAp.ttf",
+      italic: "https://fonts.gstatic.com/s/outfit/v15/QGYyz_MVcBeNP4NjuGObqx1XmO1I4TC1C4G-FCAp.ttf"
+    }
+  };
+
+  const fontId = customFont.includes("outfit") ? "outfit" : customFont.includes("inter") ? "inter" : null;
+  let customReg = null, customBld = null, customItl = null;
+
+  if (fontId && FONT_MAP[fontId]) {
+    try {
+      const [regBytes, bldBytes, itlBytes] = await Promise.all([
+        fetch(FONT_MAP[fontId].regular).then(r => { if(!r.ok) throw new Error(); return r.arrayBuffer(); }),
+        fetch(FONT_MAP[fontId].bold).then(r => { if(!r.ok) throw new Error(); return r.arrayBuffer(); }),
+        fetch(FONT_MAP[fontId].italic).then(r => { if(!r.ok) throw new Error(); return r.arrayBuffer(); })
+      ]);
+      customReg = regBytes;
+      customBld = bldBytes;
+      customItl = itlBytes;
+    } catch (err) {
+      console.warn(`[PDF Generator] Failed to load custom Google Font "${fontId}", falling back to standard Helvetica:`, err);
+    }
+  }
+
+  if (customReg && customBld && customItl) {
+    fontRegular = await pdfDoc.embedFont(customReg);
+    fontBold = await pdfDoc.embedFont(customBld);
+    fontItalic = await pdfDoc.embedFont(customItl);
+  } else {
+    fontRegular = await pdfDoc.embedFont(baseReg);
+    fontBold = await pdfDoc.embedFont(baseBld);
+    fontItalic = await pdfDoc.embedFont(baseItl);
+  }
 
   // Layout Engine
   const buildLayout = (page, fMult) => {
