@@ -43,17 +43,6 @@ const TextArea = ({ label, value, onChange, placeholder, rows = 3, onEnhance, en
         <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 transition-colors group-focus-within:text-indigo-500">
           {label}
         </label>
-        {onEnhance && (
-          <button
-            type="button"
-            onClick={(e) => { e.preventDefault(); onEnhance(); }}
-            disabled={enhancing || !value?.trim()}
-            className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 disabled:opacity-40 transition-colors"
-          >
-            {enhancing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
-            AI Enhance
-          </button>
-        )}
       </div>
     )}
     <textarea
@@ -81,7 +70,6 @@ const TABS = [
 /* ── Main Resume Form Component ── */
 const ResumeForm = ({ data, onChange }) => {
   const [activeTab, setActiveTab] = useState("personal");
-  const [enhancingStates, setEnhancingStates] = useState({});
 
   const update = (field, value) => onChange({ ...data, [field]: value });
 
@@ -125,43 +113,7 @@ const ResumeForm = ({ data, onChange }) => {
     update("experience", exp);
   };
 
-  /* ── AI Enhance a single bullet ── */
-  const enhanceBullet = async (expIndex, bulletIndex) => {
-    const key = `exp-${expIndex}-${bulletIndex}`;
-    const bulletText = data.experience?.[expIndex]?.bullets?.[bulletIndex];
-    if (!bulletText?.trim()) return;
 
-    setEnhancingStates((prev) => ({ ...prev, [key]: true }));
-    try {
-      const response = await axios.post("http://localhost:5000/api/enhance-bullet", { text: bulletText });
-      if (response.data?.enhanced) {
-        updateBullet(expIndex, bulletIndex, response.data.enhanced);
-      }
-    } catch (err) {
-      console.error("Enhance failed:", err);
-    } finally {
-      setEnhancingStates((prev) => ({ ...prev, [key]: false }));
-    }
-  };
-
-  /* ── AI Enhance Professional Summary ── */
-  const enhanceSummary = async () => {
-    const summaryText = data.summary?.trim() || "";
-    const contextText = summaryText || (data.skills?.length > 0 ? `Experienced professional skilled in ${data.skills.slice(0, 5).join(", ")}.` : "");
-    if (!contextText) return;
-
-    setEnhancingStates((prev) => ({ ...prev, summary: true }));
-    try {
-      const response = await axios.post("http://localhost:5000/api/enhance-bullet", { text: contextText });
-      if (response.data?.enhanced) {
-        update("summary", response.data.enhanced);
-      }
-    } catch (err) {
-      console.error("Enhance summary failed:", err);
-    } finally {
-      setEnhancingStates((prev) => ({ ...prev, summary: false }));
-    }
-  };
 
   /* ── Skills tag input ── */
   const [skillInput, setSkillInput] = useState("");
@@ -248,13 +200,11 @@ const ResumeForm = ({ data, onChange }) => {
                 <h2 className="text-lg font-black text-slate-900 dark:text-white">Professional Summary</h2>
               </div>
               <TextArea
-                label="Summary Statement"
+                label="Professional Summary"
                 value={data.summary}
                 onChange={(v) => update("summary", v)}
-                placeholder="Highly motivated software engineer with 5+ years of experience..."
-                rows={6}
-                onEnhance={enhanceSummary}
-                enhancing={enhancingStates.summary}
+                placeholder="Brief overview of your professional background and goals..."
+                rows={4}
               />
             </div>
           )}
@@ -303,15 +253,7 @@ const ResumeForm = ({ data, onChange }) => {
                           />
                         </div>
                         <div className="flex flex-col gap-1 mt-1 opacity-0 group-hover/bullet:opacity-100 transition-opacity">
-                          <button
-                            type="button"
-                            onClick={(e) => { e.preventDefault(); enhanceBullet(i, j); }}
-                            disabled={enhancingStates[`exp-${i}-${j}`] || !bullet?.trim()}
-                            title="AI Enhance"
-                            className="p-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 disabled:opacity-30 transition-colors"
-                          >
-                            {enhancingStates[`exp-${i}-${j}`] ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
-                          </button>
+
                           <button onClick={() => removeBullet(i, j)} title="Remove Bullet" className="p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/20 text-rose-400 hover:text-rose-600 transition-colors">
                             <Trash2 className="w-4 h-4" />
                           </button>
