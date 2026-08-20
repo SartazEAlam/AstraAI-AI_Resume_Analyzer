@@ -30,7 +30,6 @@ import Navbar from "./components/shared/Navbar";
 import { ScoreRing, DualScoreRing } from "./components/shared/ScoreRing";
 import FeatureCard from "./components/shared/FeatureCard";
 import LoadingOverlay from "./components/shared/LoadingOverlay";
-import BulletPointEnhancer from "./components/shared/BulletPointEnhancer";
 import LiveEditor from "./components/editor/LiveEditor";
 import ExecutiveReport from "./components/report/ExecutiveReport";
 import OrganizationDashboard from "./components/dashboard/OrganizationDashboard";
@@ -899,8 +898,6 @@ function App() {
                   </motion.div>
                 )}
               </AnimatePresence>
-              
-              <BulletPointEnhancer />
 
               {results?.parsed_text && (
                 <LiveEditor
