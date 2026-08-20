@@ -894,11 +894,23 @@ def enhance_bullet(request: BulletRequest):
             # Strip trailing punctuation before appending
             if enhanced_text.endswith(".") or enhanced_text.endswith(";"):
                 enhanced_text = enhanced_text[:-1]
-            enhanced_text += ", resulting in a 20% improvement in overall efficiency."
+                
+            text_l = enhanced_text.lower()
+            if any(k in text_l for k in ["sales", "revenue", "deal", "growth", "profit"]):
+                enhanced_text += ", driving a [X]% increase in revenue."
+            elif any(k in text_l for k in ["code", "software", "app", "system", "performance", "develop"]):
+                enhanced_text += ", resulting in a [X]% improvement in system performance."
+            elif any(k in text_l for k in ["team", "manage", "lead", "staff", "train"]):
+                enhanced_text += ", leading to a [X]% increase in team productivity."
+            elif any(k in text_l for k in ["customer", "client", "user", "support", "satisfaction"]):
+                enhanced_text += ", achieving a [X]% increase in customer satisfaction."
+            else:
+                enhanced_text += ", resulting in a [X]% improvement in [Key Metric]."
+                
         elif not has_impact and "by" not in enhanced_text.lower():
             if enhanced_text.endswith(".") or enhanced_text.endswith(";"):
                 enhanced_text = enhanced_text[:-1]
-            enhanced_text += " by implementing optimized protocols and best practices."
+            enhanced_text += " by implementing [Specific Tool/Strategy]."
             
     if score == 100:
         feedback.append("✨ Strong bullet point! It starts with a good verb and includes quantifiable metrics.")
