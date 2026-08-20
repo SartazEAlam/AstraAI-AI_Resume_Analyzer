@@ -235,23 +235,7 @@ app.post('/api/upload', upload.single('resume'), async (req, res) => {
     }
 });
 
-// ── Enhance Bullet Point Endpoint ──
-app.post('/api/enhance-bullet', async (req, res) => {
-    try {
-        const { text } = req.body;
-        if (!text) {
-            return res.status(400).json({ error: 'Text is required' });
-        }
-        
-        const mlServiceUrl = process.env.ML_SERVICE_URL || 'http://localhost:8000';
-        const pythonResponse = await axios.post(`${mlServiceUrl}/enhance-bullet`, { text });
-        
-        res.json(pythonResponse.data);
-    } catch (error) {
-        console.error('Error enhancing bullet:', error.message);
-        res.status(500).json({ error: 'Failed to communicate with ML service' });
-    }
-});
+
 
 // ── Analyze Text Endpoint (For Live Editor) ──
 app.post('/api/analyze-text', async (req, res) => {
