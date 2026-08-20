@@ -25,6 +25,7 @@ except Exception as e:
     print(f"Warning: Could not load sentence-transformers model. Semantic search will be disabled. Error: {e}")
     sbert_model = None
 
+
 app = FastAPI()
 
 class Base64PDFRequest(BaseModel):
@@ -828,100 +829,6 @@ def analyze_resume(request: AnalysisRequest):
         print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
 
-class BulletRequest(BaseModel):
-    text: str
-
-from action_verbs import get_suggestion_for_weak_verb, ACTION_VERBS, WEAK_VERBS
-
-@app.post("/enhance-bullet")
-def enhance_bullet(request: BulletRequest):
-    """Provides actionable feedback on a resume bullet point."""
-    text = request.text.strip()
-    if not text:
-        return {"feedback": [], "enhanced": False, "score": 0}
-        
-    feedback = []
-    score = 100
-    
-    # 1. Weak verb check
-    verb_suggestion = get_suggestion_for_weak_verb(text)
-    if verb_suggestion:
-        feedback.append(verb_suggestion)
-        score -= 20
-        
-    # 2. Metrics / Number check
-    has_metrics = bool(re.search(r'\d+', text)) or '%' in text or '$' in text
-    if not has_metrics:
-        feedback.append("Missing metrics: Add numbers, percentages, or dollar amounts to quantify your impact.")
-        score -= 30
-        
-    # 3. Length check
-    words = text.split()
-    if len(words) < 8:
-        feedback.append("Too short: Expand on the context or the result of your action.")
-        score -= 10
-    elif len(words) > 30:
-        feedback.append("Too long: Keep bullet points concise (aim for 1-2 lines).")
-        score -= 10
-        
-    # 4. STAR method formatting
-    # Basic check: looks for "by", "resulting in", "leading to", "achieving"
-    impact_keywords = ['by', 'resulting in', 'leading to', 'achieving', 'to', 'which']
-    has_impact = any(keyword in text.lower() for keyword in impact_keywords)
-    if not has_impact and score > 50:
-        feedback.append("Format suggestion: Try using the 'Action + Context + Result' format. What was the impact of your work?")
-        score -= 15
-        
-    # Basic rule-based string enhancement
-    enhanced_text = text.strip()
-    
-    # Capitalize first letter
-    if enhanced_text and enhanced_text[0].islower():
-        enhanced_text = enhanced_text[0].upper() + enhanced_text[1:]
-        
-    # Replace weak starting verbs
-    text_lower = enhanced_text.lower()
-    for weak_verb in WEAK_VERBS:
-        if text_lower.startswith(weak_verb):
-            # Pick a decent default strong verb
-            strong_verb = "Spearheaded" if "manage" in weak_verb or "handle" in weak_verb else "Engineered"
-            enhanced_text = strong_verb + enhanced_text[len(weak_verb):]
-            break
-            
-    # Always try to enhance if it's not a perfect score
-    if score < 100:
-        if not has_metrics and "resulting in" not in enhanced_text.lower():
-            # Strip trailing punctuation before appending
-            if enhanced_text.endswith(".") or enhanced_text.endswith(";"):
-                enhanced_text = enhanced_text[:-1]
-                
-            text_l = enhanced_text.lower()
-            if any(k in text_l for k in ["sales", "revenue", "deal", "growth", "profit"]):
-                enhanced_text += ", driving a [X]% increase in revenue."
-            elif any(k in text_l for k in ["code", "software", "app", "system", "performance", "develop"]):
-                enhanced_text += ", resulting in a [X]% improvement in system performance."
-            elif any(k in text_l for k in ["team", "manage", "lead", "staff", "train"]):
-                enhanced_text += ", leading to a [X]% increase in team productivity."
-            elif any(k in text_l for k in ["customer", "client", "user", "support", "satisfaction"]):
-                enhanced_text += ", achieving a [X]% increase in customer satisfaction."
-            else:
-                enhanced_text += ", resulting in a [X]% improvement in [Key Metric]."
-                
-        elif not has_impact and "by" not in enhanced_text.lower():
-            if enhanced_text.endswith(".") or enhanced_text.endswith(";"):
-                enhanced_text = enhanced_text[:-1]
-            enhanced_text += " by implementing [Specific Tool/Strategy]."
-            
-    if score == 100:
-        feedback.append("✨ Strong bullet point! It starts with a good verb and includes quantifiable metrics.")
-        
-    # Return the enhanced string if it changed, otherwise return the original (but formatted) so the UI updates
-    return {
-        "original": text,
-        "feedback": feedback,
-        "score": max(0, score),
-        "enhanced": enhanced_text if (enhanced_text != text) else text + " (Optimized)"
-    }
 
 from typing import List, Optional
 
