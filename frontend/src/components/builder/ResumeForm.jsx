@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
 import {
   User,
   Briefcase,
@@ -11,8 +10,6 @@ import {
   FileText,
   Plus,
   Trash2,
-  Wand2,
-  Loader2,
   ChevronRight
 } from "lucide-react";
 
@@ -35,15 +32,13 @@ const Input = ({ label, value, onChange, placeholder, type = "text", ...props })
   </div>
 );
 
-/* ── Textarea with optional AI Enhance ── */
-const TextArea = ({ label, value, onChange, placeholder, rows = 3, onEnhance, enhancing }) => (
+/* ── Textarea ── */
+const TextArea = ({ label, value, onChange, placeholder, rows = 3 }) => (
   <div className="space-y-1 relative group">
     {label && (
-      <div className="flex items-center justify-between mb-1">
-        <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 transition-colors group-focus-within:text-indigo-500">
-          {label}
-        </label>
-      </div>
+      <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 transition-colors group-focus-within:text-indigo-500">
+        {label}
+      </label>
     )}
     <textarea
       value={value || ""}
