@@ -1,16 +1,17 @@
 import React, { useRef, useState } from "react";
-import { Download, Target, Printer, FileText, Check, Loader2 } from "lucide-react";
+import { Download, Target, FileText, Check, Loader2, ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
 import { generateResumePDF } from "../../utils/pdfGenerator";
 
 /* ── Resume Preview Panel ──
-   Shows the selected template at a scaled-down size.
-   Provides Direct Vector PDF Export (100% ATS-Compliant), Print, ATS .TXT, and ATS Analyze. */
+   Shows the selected template at a scaled-down size with interactive zoom controls.
+   Provides Direct Vector PDF Export (100% ATS-Compliant), ATS .TXT, and ATS Analyze. */
 
 const ResumePreview = ({ data, customization, TemplateComponent, onAnalyze }) => {
   const previewRef = useRef(null);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
   const [downloadedPdf, setDownloadedPdf] = useState(false);
   const [downloadedTxt, setDownloadedTxt] = useState(false);
+  const [zoomScale, setZoomScale] = useState(0.48);
 
   /* 1. Export ATS-Compliant PDF using pdf-lib (real text runs, 100% extractable) */
   const handleExportPDF = async () => {
@@ -144,7 +145,7 @@ const ResumePreview = ({ data, customization, TemplateComponent, onAnalyze }) =>
   return (
     <div className="flex flex-col h-full">
       {/* Action Buttons */}
-      <div className="flex flex-wrap items-center gap-2 mb-3">
+      <div className="flex flex-wrap items-center gap-2 mb-2">
         {/* Direct Vector PDF Download Button */}
         <button
           onClick={handleExportPDF}
@@ -181,28 +182,84 @@ const ResumePreview = ({ data, customization, TemplateComponent, onAnalyze }) =>
         </button>
       </div>
 
-      {/* Scaled Preview */}
+      {/* Zoom Controls Toolbar */}
+      <div className="flex items-center justify-between px-3 py-1.5 mb-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 shadow-sm">
+        <span className="font-semibold text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
+          <Maximize2 className="w-3 h-3 text-indigo-500" /> Live Preview
+        </span>
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => setZoomScale((z) => Math.max(0.35, parseFloat((z - 0.05).toFixed(2))))}
+            title="Zoom Out"
+            className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors"
+          >
+            <ZoomOut className="w-3.5 h-3.5" />
+          </button>
+          <span className="font-mono text-[11px] font-bold min-w-[38px] text-center text-slate-800 dark:text-slate-200">
+            {Math.round(zoomScale * 100)}%
+          </span>
+          <button
+            onClick={() => setZoomScale((z) => Math.min(1.0, parseFloat((z + 0.05).toFixed(2))))}
+            title="Zoom In"
+            className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors"
+          >
+            <ZoomIn className="w-3.5 h-3.5" />
+          </button>
+          <div className="h-3 w-[1px] bg-slate-200 dark:bg-slate-700 mx-0.5" />
+          <button
+            onClick={() => setZoomScale(0.48)}
+            title="Reset Zoom (Fit)"
+            className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all border ${
+              zoomScale === 0.48
+                ? "bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 border-indigo-200 dark:border-indigo-700"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:text-indigo-600"
+            }`}
+          >
+            Fit
+          </button>
+          <button
+            onClick={() => setZoomScale(0.75)}
+            title="75% View"
+            className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all border ${
+              zoomScale === 0.75
+                ? "bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 border-indigo-200 dark:border-indigo-700"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:text-indigo-600"
+            }`}
+          >
+            75%
+          </button>
+          <button
+            onClick={() => setZoomScale(1.0)}
+            title="100% Actual Size"
+            className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all border ${
+              zoomScale === 1.0
+                ? "bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 border-indigo-200 dark:border-indigo-700"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:text-indigo-600"
+            }`}
+          >
+            100%
+          </button>
+        </div>
+      </div>
+
+      {/* Scaled Preview Canvas */}
       <div
-        className="flex-1 overflow-auto rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/50 builder-form-scrollbar"
+        className="flex-1 overflow-auto rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/50 builder-form-scrollbar p-4 flex justify-center"
         style={{ position: "relative" }}
       >
         <div
           ref={previewRef}
-          className="origin-top-left"
+          className="shadow-xl rounded-sm transition-transform duration-150"
           style={{
-            transform: "scale(0.42)",
-            transformOrigin: "top left",
+            transform: `scale(${zoomScale})`,
+            transformOrigin: "top center",
             width: "210mm",
-            position: "absolute",
-            top: 12,
-            left: "50%",
-            marginLeft: `calc(-210mm * 0.42 / 2)`,
+            minHeight: "297mm",
+            marginBottom: `calc((297mm * ${zoomScale}) - 297mm + 24px)`,
           }}
         >
           {TemplateComponent && <TemplateComponent data={data} customization={customization} />}
         </div>
-        {/* Spacer div so the container scrolls to the right height */}
-        <div style={{ height: `calc(297mm * 0.42 + 24px)`, pointerEvents: "none" }} />
       </div>
     </div>
   );

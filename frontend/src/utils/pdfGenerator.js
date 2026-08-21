@@ -104,18 +104,20 @@ export async function generateResumePDF(data, customization = {}) {
   const templateId = customization?.templateId || customization?.template || "classic";
   const accentHex = customization?.accentColor || "#4f46e5";
   
-  // Base font multiplier from user settings
+  // Base font multiplier from user settings (matches templates: 0.88x / 1.05x / 1.25x)
   const fontSizeSetting = customization?.fontSize || "default";
-  const userBaseFMult = fontSizeSetting === "small" ? 0.9 : fontSizeSetting === "large" ? 1.1 : 1.0;
+  const userBaseFMult = fontSizeSetting === "small" ? 0.88 : fontSizeSetting === "large" ? 1.25 : 1.05;
 
   // Premium Color Palette
   const accentColor = hexToRgb(accentHex);
   const darkCharcoal = rgb(0.12, 0.16, 0.22);
+  const darkSlate = rgb(0.12, 0.16, 0.23); // #1e293b
   const mediumColor = rgb(0.3, 0.35, 0.4);
   const grayColor = rgb(0.45, 0.5, 0.55);
   const lightGray = rgb(0.85, 0.88, 0.9);
   const whiteColor = rgb(1, 1, 1);
   const translucentWhite = rgb(0.9, 0.9, 0.9);
+  const veryLightGray = rgb(0.92, 0.94, 0.95);
 
 
 
@@ -271,7 +273,6 @@ export async function generateResumePDF(data, customization = {}) {
         
         const cx = sideW / 2;
         const cy = y - rad; // Center of circle is one radius below y
-        console.log("AVATAR GEOMETRY:", { rad, cx, cy, y, fMult });
         page.drawCircle({ x: cx, y: cy, size: rad, color: translucentWhite });
         drawT(initials, { x: cx, yPos: cy - rad * 0.28, size: s(28), font: fontBold, color: accentColor, align: "center" });
       }
@@ -310,45 +311,45 @@ export async function generateResumePDF(data, customization = {}) {
     } 
     else if (isClassic) {
       if (pi.fullName) {
-        drawT(pi.fullName, { x: PAGE_WIDTH / 2, yPos: y, size: s(24), font: fontBold, color: darkCharcoal, align: "center" });
-        y -= s(24) + s(12);
+        drawT(pi.fullName, { x: PAGE_WIDTH / 2, yPos: y, size: s(26), font: fontBold, color: darkCharcoal, align: "center" });
+        y -= s(26) + s(12);
       }
       
-      const contactLine = [pi.email, pi.phone, pi.location].filter(Boolean).join("   •   ");
+      const contactLine = [pi.email, pi.phone, pi.location].filter(Boolean).join("    |    ");
       if (contactLine) {
         drawT(contactLine, { x: PAGE_WIDTH / 2, yPos: y, size: s(10), font: fontRegular, color: mediumColor, align: "center" });
         y -= s(10) + s(8);
       }
 
-      const linkLine = [pi.linkedin, pi.portfolio].filter(Boolean).join("   •   ");
+      const linkLine = [pi.linkedin, pi.portfolio].filter(Boolean).join("    |    ");
       if (linkLine) {
-        drawT(linkLine, { x: PAGE_WIDTH / 2, yPos: y, size: s(9.5), font: fontRegular, color: accentColor, align: "center" });
-        y -= s(9.5) + s(8);
+        drawT(linkLine, { x: PAGE_WIDTH / 2, yPos: y, size: s(10), font: fontRegular, color: accentColor, align: "center" });
+        y -= s(10) + s(12);
       }
 
-      drawLine(MARGIN_X, y, PAGE_WIDTH - MARGIN_X, 1.5, accentColor);
+      drawLine(PAGE_WIDTH / 2 - 200, y, PAGE_WIDTH / 2 + 200, 2.5, accentColor);
       y -= s(24);
     } 
     else if (isMinimal) {
       if (pi.fullName) {
-        drawT(pi.fullName, { x: MARGIN_X, yPos: y, size: s(24), font: fontBold, color: darkCharcoal });
-        y -= s(24) + s(12);
+        drawT(pi.fullName, { x: MARGIN_X, yPos: y, size: s(28), font: fontBold, color: darkCharcoal });
+        y -= s(28) + s(12);
       }
       
-      const contactLine = [pi.email, pi.phone, pi.location].filter(Boolean).join("   •   ");
+      const contactLine = [pi.email, pi.phone, pi.location].filter(Boolean).join("   ·   ");
       if (contactLine) {
         drawT(contactLine, { x: MARGIN_X, yPos: y, size: s(10), font: fontRegular, color: grayColor });
         y -= s(10) + s(8);
       }
 
-      const linkLine = [pi.linkedin, pi.portfolio].filter(Boolean).join("   •   ");
+      const linkLine = [pi.linkedin, pi.portfolio].filter(Boolean).join("   ·   ");
       if (linkLine) {
         drawT(linkLine, { x: MARGIN_X, yPos: y, size: s(9.5), font: fontRegular, color: accentColor });
         y -= s(9.5) + s(8);
       }
 
-      drawLine(MARGIN_X, y, PAGE_WIDTH - MARGIN_X, 1.5, lightGray);
-      y -= s(24);
+      // No header line for minimal, just spacing
+      y -= s(20);
     }
 
     // ── Helper to draw elegant section headers ──
@@ -357,25 +358,27 @@ export async function generateResumePDF(data, customization = {}) {
       
       if (isModern) {
         if (inSidebar) {
-          drawT(title.toUpperCase(), { x: xPos, yPos: currentY, size: s(11), font: fontBold, color: whiteColor });
+          drawT(title.toUpperCase(), { x: xPos, yPos: currentY, size: s(9.5), font: fontBold, color: translucentWhite, skipSanitize: true });
           currentY -= s(10);
-          drawLine(xPos, currentY, xPos + width - 20, 1.5, translucentWhite);
         } else {
-          const spaced = title.toUpperCase().split(' ').map(w => w.split('').join(' ')).join('     '); // 5 spaces between words
-          drawT(spaced, { x: xPos, yPos: currentY, size: s(10), font: fontBold, color: accentColor, skipSanitize: true });
+          drawT(title.toUpperCase(), { x: xPos, yPos: currentY, size: s(11.5), font: fontBold, color: accentColor });
           currentY -= s(10);
-          drawLine(xPos, currentY, xPos + width, 1.5, accentColor);
+          drawLine(xPos, currentY, xPos + width, 1.5, translucentWhite); // Soft bottom border
         }
       } 
       else if (isClassic) {
-        drawT(title.toUpperCase(), { x: xPos, yPos: currentY, size: s(13), font: fontBold, color: accentColor });
+        // Vertical accent bar on left
+        const titleH = s(12);
+        if (page) page.drawRectangle({ x: xPos, y: currentY - s(2), width: 3, height: titleH + s(2), color: accentColor });
+        drawT(title.toUpperCase(), { x: xPos + 10, yPos: currentY, size: s(12), font: fontBold, color: accentColor });
         currentY -= s(10);
-        drawLine(xPos, currentY, xPos + width, 2, accentColor);
+        drawLine(xPos, currentY, xPos + width, 1, veryLightGray);
       } 
       else if (isMinimal) {
-        drawT(title.toUpperCase(), { x: xPos, yPos: currentY, size: s(13), font: fontBold, color: darkCharcoal });
+        // Thin horizontal line above section
+        drawLine(xPos, currentY + s(14), xPos + width, 0.5, lightGray);
+        drawT(title.toUpperCase(), { x: xPos, yPos: currentY, size: s(10.5), font: fontBold, color: grayColor });
         currentY -= s(10);
-        drawLine(xPos, currentY, xPos + width, 0.5, lightGray);
       }
       
       return currentY - s(14);
@@ -506,7 +509,7 @@ export async function generateResumePDF(data, customization = {}) {
         sY = drawSectionTitle("Skills", sY, sX, sW, true);
         
         // Render pill tags in modern sidebar
-        const tagFontSize = s(9.5);
+        const tagFontSize = s(8.5);
         const tagPadX = 8;
         const tagPadY = s(4);
         const tagGapX = 6;
@@ -524,16 +527,40 @@ export async function generateResumePDF(data, customization = {}) {
             tagRowY -= tagH + tagGapY;
           }
 
-          drawRect(tagX, tagRowY - tagH, totalW, tagH, rgb(1,1,1)); // White background
-          drawT(skill, { x: tagX + tagPadX, yPos: tagRowY - tagFontSize - tagPadY + s(3), size: tagFontSize, font: fontBold, color: accentColor });
+          if (page) page.drawRectangle({ x: tagX, y: tagRowY - tagH, width: totalW, height: tagH, color: whiteColor, opacity: 0.1, borderColor: whiteColor, borderWidth: 0.5, borderOpacity: 0.3 });
+          drawT(skill, { x: tagX + tagPadX, yPos: tagRowY - tagFontSize - tagPadY + s(3), size: tagFontSize, font: fontBold, color: whiteColor });
           
           tagX += totalW + tagGapX;
         }
         sY = tagRowY - tagH - s(16);
 
+      } else if (isClassic) {
+        y = drawSectionTitle("Technical Skills", y, sX, sW);
+        // Inline tags with accent tint
+        const tagFontSize = s(9.5);
+        const tagPadX = 10;
+        const tagPadY = s(4);
+        const tagGapX = 8;
+        const tagGapY = s(8);
+        const tagH = tagFontSize + tagPadY * 2;
+        let tagX = sX;
+        let tagRowY = y;
+
+        for (const skill of skills) {
+          const textW = fontBold.widthOfTextAtSize(sanitize(skill), tagFontSize);
+          const totalW = textW + tagPadX * 2;
+          if (tagX + totalW > sX + sW) {
+            tagX = sX;
+            tagRowY -= tagH + tagGapY;
+          }
+          if (page) page.drawRectangle({ x: tagX, y: tagRowY - tagH, width: totalW, height: tagH, color: accentColor, opacity: 0.05, borderColor: accentColor, borderWidth: 0.5, borderOpacity: 0.2 });
+          drawT(skill, { x: tagX + tagPadX, yPos: tagRowY - tagFontSize - tagPadY + s(3), size: tagFontSize, font: fontBold, color: darkCharcoal });
+          tagX += totalW + tagGapX;
+        }
+        y = tagRowY - tagH - s(16);
       } else {
         y = drawSectionTitle("Technical Skills", y, sX, sW);
-        const skillText = skills.join("   •   ");
+        const skillText = skills.join("    ·    ");
         const consumed = drawWrapped(skillText, { x: sX, yPos: y, w: sW, font: fontRegular, size: s(10.5), color: darkCharcoal, lineHeight: 1.6 });
         y -= consumed + s(16);
       }
@@ -559,11 +586,13 @@ export async function generateResumePDF(data, customization = {}) {
       } else {
         y = drawSectionTitle("Certifications", y, sX, sW);
         for (const cert of certs) {
-          const txt = `•   ${cert.name}${cert.issuer ? ` — ${cert.issuer}` : ""}${cert.year ? ` (${cert.year})` : ""}`;
-          const consumed = drawWrapped(txt, { x: sX + 4, yPos: y, w: sW - 8, font: fontRegular, size: s(10.5), color: darkCharcoal, lineHeight: 1.5 });
-          y -= consumed + s(6);
+          const certLeft = `${cert.name}${cert.issuer ? ` — ${cert.issuer}` : ""}`;
+          const certRight = cert.year ? `${cert.year}` : "";
+          drawT(certLeft, { x: sX, yPos: y, size: s(10.5), font: fontBold, color: darkCharcoal });
+          if (certRight) drawT(certRight, { x: sX + sW, yPos: y, size: s(9.5), font: fontItalic, color: grayColor, align: "right" });
+          y -= s(16);
         }
-        y -= s(10);
+        y -= s(4);
       }
     }
 
@@ -581,7 +610,7 @@ export async function generateResumePDF(data, customization = {}) {
         }
       } else {
         y = drawSectionTitle("Languages", y, sX, sW);
-        const langText = langs.map(l => `${l.language}${l.proficiency ? ` (${l.proficiency})` : ""}`).join("   •   ");
+        const langText = langs.map(l => `${l.language}${l.proficiency ? ` (${l.proficiency})` : ""}`).join("    ·    ");
         const consumed = drawWrapped(langText, { x: sX, yPos: y, w: sW, font: fontRegular, size: s(10.5), color: darkCharcoal });
         y -= consumed + s(16);
       }
@@ -594,17 +623,25 @@ export async function generateResumePDF(data, customization = {}) {
   // Pass 1: Baseline measurement
   let height = buildLayout(null, currentMultiplier);
 
+  // Determine Auto-Fitter bounds based on user's manual font size choice
+  let maxAllowedMultiplier = 1.45;
+  if (fontSizeSetting === "small") maxAllowedMultiplier = 0.95; // Prevent stretching if user explicitly wants small text
+  else if (fontSizeSetting === "large") maxAllowedMultiplier = 1.65; // Allow extra stretching if user wants large text
 
   // Shrink Loop: If content overflows page, shrink fonts incrementally
-  while (height > PAGE_HEIGHT && currentMultiplier > 0.7) {
+  while (height > PAGE_HEIGHT && currentMultiplier > 0.45) { // Lowered from 0.7 to 0.45 to prevent cut-off for long resumes
     currentMultiplier -= 0.025;
     height = buildLayout(null, currentMultiplier);
   }
 
+  // Determine target height for Grow Loop based on font size setting
+  let targetGrowHeight = PAGE_HEIGHT * 0.92; 
+  if (fontSizeSetting === "small") targetGrowHeight = 0; // Disable grow loop for small (stays compact)
+  else if (fontSizeSetting === "large") targetGrowHeight = PAGE_HEIGHT * 0.98; // Aggressively fill page for large
+
   // Grow Loop: If content is too short (leaves too much whitespace), grow fonts incrementally
-  // (We target 92% of the page to leave a healthy bottom margin)
-  if (height < PAGE_HEIGHT * 0.85) {
-    while (height < PAGE_HEIGHT * 0.92 && currentMultiplier < 1.25) {
+  if (height < targetGrowHeight) {
+    while (height < targetGrowHeight && currentMultiplier < maxAllowedMultiplier) {
       currentMultiplier += 0.025;
       height = buildLayout(null, currentMultiplier);
     }
